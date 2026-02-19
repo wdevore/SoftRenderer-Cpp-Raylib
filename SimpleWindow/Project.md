@@ -50,4 +50,3 @@ To use it, replace the `program` field in your `launch.json`:
 "program": "${command:cmake.launchTargetPath}"
 ```
 
-## Add a check to ensure the saved window position is within the current monitor bounds?
