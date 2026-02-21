@@ -91,8 +91,6 @@ int main(int argc, char *argv[])
 
             BeginDrawing();
 
-            // ClearBackground(RAYWHITE);
-
             //------------------------------------------------------------------
             // Draw the Texture2D (which resides in GPU memory and was updated
             // with your pixel buffer on line 83) onto the application window
