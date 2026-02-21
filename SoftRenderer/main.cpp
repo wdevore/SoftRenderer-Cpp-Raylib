@@ -4,6 +4,7 @@
 #include <string>
 #include <fstream>
 #include <iostream>
+#include <exception>
 
 int main(int argc, char *argv[])
 {
@@ -72,20 +73,25 @@ int main(int argc, char *argv[])
 
     SetTargetFPS(60);
 
+    try
     {
         // Initialize Canvas
         Canvas canvas(screenWidth, screenHeight);
 
+        canvas.SetClearColor(DARKGRAY);
+
         while (!WindowShouldClose())
         {
-            // Update Canvas
             canvas.Clear();
-            canvas.PutPixel(screenWidth / 2, screenHeight / 2, RED); // Draw a test pixel
+
+            // Rasterize your sceen
+            canvas.PutPixel((screenWidth) / 2, (screenHeight) / 2, RED); // Draw a test pixel
+
             canvas.Update();
 
             BeginDrawing();
 
-            ClearBackground(RAYWHITE);
+            // ClearBackground(RAYWHITE);
 
             //------------------------------------------------------------------
             // Draw the Texture2D (which resides in GPU memory and was updated
@@ -96,15 +102,25 @@ int main(int argc, char *argv[])
             //------------------------------------------------------------------
             canvas.Blit(0, 0);
 
-            DrawText("SoftRenderer is running.", 10, 10, 20, DARKGRAY);
+            DrawText("SoftRenderer is running.", 10, 10, 20, WHITE);
 
-            const char *fpsText = TextFormat("FPS: %i", GetFPS());
-            int fontSize = 10;
-            int textWidth = MeasureText(fpsText, fontSize);
-            DrawText(fpsText, GetScreenWidth() - textWidth - 10, GetScreenHeight() - fontSize - 10, fontSize, ORANGE);
+            // const char *fpsText = TextFormat("FPS: %i", GetFPS());
+            // int fontSize = 10;
+            // int textWidth = MeasureText(fpsText, fontSize);
+            // DrawText(fpsText, GetScreenWidth() - textWidth - 10, GetScreenHeight() - fontSize - 10, fontSize, ORANGE);
+
+            DrawFPS(GetScreenWidth() - 80, GetScreenHeight() - 20);
 
             EndDrawing();
         }
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "Exception: " << e.what() << std::endl;
+    }
+    catch (...)
+    {
+        std::cerr << "Unknown exception occurred" << std::endl;
     }
 
     std::ofstream saveFile(configPath);

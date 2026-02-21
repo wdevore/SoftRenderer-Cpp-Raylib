@@ -17,8 +17,9 @@ public:
 private:
     int width;
     int height;
-    std::vector<Color> pixels;
-    Texture2D texture;
+
+    Image canvas;
+    Texture2D targetTexture;
 
     Color clearColor = WHITE;
 };
