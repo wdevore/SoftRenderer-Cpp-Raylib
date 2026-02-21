@@ -1,7 +1,9 @@
 cmake_minimum_required(VERSION 3.14)
-project(SoftRenderer)
+project(SoftRenderer VERSION 0.1.0 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 17)
+
+add_executable(SoftRenderer main.cpp)
 
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Debug)
@@ -20,5 +22,9 @@ if(NOT TARGET raylib)
   FetchContent_MakeAvailable(raylib)
 endif()
 
-add_executable(SoftRenderer main.cpp)
-target_link_libraries(SoftRenderer raylib)
+add_subdirectory(Drawing)
+
+target_link_libraries(SoftRenderer
+  DrawingLib
+  raylib
+  )

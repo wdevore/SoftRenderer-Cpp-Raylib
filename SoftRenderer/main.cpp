@@ -1,4 +1,5 @@
 #include "raylib.h"
+#include "Drawing/Canvas.h"
 #include <cstdlib>
 #include <string>
 #include <fstream>
@@ -37,7 +38,7 @@ int main(int argc, char *argv[])
     }
 
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-    InitWindow(screenWidth, screenHeight, "SoftRenderer - Raylib");
+    InitWindow(screenWidth, screenHeight, "Software Renderer - Raylib");
 
     if (argc >= 3)
     {
@@ -71,15 +72,39 @@ int main(int argc, char *argv[])
 
     SetTargetFPS(60);
 
-    while (!WindowShouldClose())
     {
-        BeginDrawing();
+        // Initialize Canvas
+        Canvas canvas(screenWidth, screenHeight);
 
-        ClearBackground(RAYWHITE);
+        while (!WindowShouldClose())
+        {
+            // Update Canvas
+            canvas.Clear();
+            canvas.PutPixel(screenWidth / 2, screenHeight / 2, RED); // Draw a test pixel
+            canvas.Update();
 
-        DrawText("SoftRenderer is running.", 190, 200, 20, LIGHTGRAY);
+            BeginDrawing();
 
-        EndDrawing();
+            ClearBackground(RAYWHITE);
+
+            //------------------------------------------------------------------
+            // Draw the Texture2D (which resides in GPU memory and was updated
+            // with your pixel buffer on line 83) onto the application window
+            // at coordinates (0, 0) Your PutPixel calls only change data in a
+            // std::vector (RAM). canvas.Update() uploads that RAM to the GPU.
+            // This line finally makes that GPU texture visible on the screen.
+            //------------------------------------------------------------------
+            canvas.Blit(0, 0);
+
+            DrawText("SoftRenderer is running.", 10, 10, 20, DARKGRAY);
+
+            const char *fpsText = TextFormat("FPS: %i", GetFPS());
+            int fontSize = 10;
+            int textWidth = MeasureText(fpsText, fontSize);
+            DrawText(fpsText, GetScreenWidth() - textWidth - 10, GetScreenHeight() - fontSize - 10, fontSize, ORANGE);
+
+            EndDrawing();
+        }
     }
 
     std::ofstream saveFile(configPath);
