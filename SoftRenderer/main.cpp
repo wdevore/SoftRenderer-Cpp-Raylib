@@ -104,12 +104,13 @@ int main(int argc, char *argv[])
 
             DrawText("SoftRenderer is running.", 10, 10, 20, WHITE);
 
+            // --- Manual way of drawing FPS
             // const char *fpsText = TextFormat("FPS: %i", GetFPS());
             // int fontSize = 10;
             // int textWidth = MeasureText(fpsText, fontSize);
-            // DrawText(fpsText, GetScreenWidth() - textWidth - 10, GetScreenHeight() - fontSize - 10, fontSize, ORANGE);
+            // DrawText(fpsText, screenWidth - textWidth - 10, screenHeight - fontSize - 10, fontSize, ORANGE);
 
-            DrawFPS(GetScreenWidth() - 80, GetScreenHeight() - 20);
+            DrawFPS(screenWidth - 80, screenHeight - 20);
 
             EndDrawing();
         }
