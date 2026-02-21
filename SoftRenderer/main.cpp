@@ -11,8 +11,6 @@ int main(int argc, char *argv[])
     int savedX = -1;
     int savedY = -1;
 
-    std::cout << "DEBUG: SoftRenderer main.cpp is running." << std::endl;
-
     std::string configPath = "window.state";
     if (FileExists(configPath.c_str()))
     {

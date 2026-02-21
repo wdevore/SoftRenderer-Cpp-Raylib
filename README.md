@@ -1,23 +1,22 @@
 # SoftRenderer-Cpp-Raylib
 A port of my Java software renderer to Cpp and Raylib
 
-# Solution to changing projects
+# Building and Running
 
-1) You need to update the *settings.json* file and the trailing file path to match which project folder you want to switch to. For example, to switch from "SimpleWindow" to "SoftRenderer" you would need to change:
+This repository uses a root `CMakeLists.txt` to manage sub-projects. You do not need to edit `settings.json` to switch projects.
 
-```json
-{
-    "cmake.sourceDirectory": "/home/iposthuman/Development/cpp/SoftRenderer-Cpp-Raylib/SimpleWindow"
-}
-```
-to
-```json
-{
-    "cmake.sourceDirectory": "/home/iposthuman/Development/cpp/SoftRenderer-Cpp-Raylib/SoftRenderer"
-}
-```
-2) Go back to the CMake extension.
-3) Hover over the the *Project Status* bar and click **Delete cache and Reconfigure** on the right of the bar where the icons appear.
-4) Now hover over the *Edit* icon under the *Launch* section. When you click it you will see the **Debug** and **Launch** entries will switch to the new project. 
-5) Finally hover over the *Edit* icon under the *Build* section. A dropdown will allow you to select new project.
-6) Now you can compile and run
+1.  **Clean Setup:**
+    *   Remove `cmake.sourceDirectory` from `.vscode/settings.json`.
+    *   **Delete the `build` folder** entirely to prevent cache conflicts.
+    *   Open the Command Palette (`Ctrl+Shift+P`) and run **CMake: Select a Kit** (choose your compiler, e.g., GCC or Clang).
+    *   Run **CMake: Delete Cache and Reconfigure** to ensure the project is indexed.
+
+2.  **Select Targets (Command Palette):**
+    *   Press `Ctrl+Shift+P`.
+    *   Run **CMake: Set Build Target** -> Choose `SoftRenderer`.
+    *   Run **CMake: Set Launch/Debug Target** -> Choose `SoftRenderer` (executable).
+    *   *Note: You must set **both**. Build Target controls compilation; Launch/Debug Target controls execution.*
+
+3.  **Build and Run:**
+    *   Click "Build" or press `F7`.
+    *   Click "Play" (Run) or press `Shift+F5`.
