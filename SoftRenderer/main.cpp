@@ -1,10 +1,14 @@
 #include "raylib.h"
-#include "Drawing/Canvas.h"
+
 #include <cstdlib>
 #include <string>
 #include <fstream>
 #include <iostream>
 #include <exception>
+
+#include "Canvas.h"
+#include "test_bresenham_lines.h"
+#include "test_wu_blended_lines.h"
 
 int main(int argc, char *argv[])
 {
@@ -72,6 +76,9 @@ int main(int argc, char *argv[])
     }
 
     SetTargetFPS(60);
+    // TestBresenhamLines lines;
+    TestWublendedLines lines;
+    lines.initialize(screenWidth, screenHeight);
 
     try
     {
@@ -85,7 +92,8 @@ int main(int argc, char *argv[])
             canvas.Clear();
 
             // Rasterize your sceen
-            canvas.PutPixel((screenWidth) / 2, (screenHeight) / 2, RED); // Draw a test pixel
+            // canvas.PutPixel((screenWidth) / 2, (screenHeight) / 2, RED); // Draw a test pixel
+            lines.draw(canvas);
 
             canvas.Update();
 

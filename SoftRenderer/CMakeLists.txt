@@ -3,7 +3,11 @@ project(SoftRenderer VERSION 0.1.0 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(SoftRenderer main.cpp)
+add_executable(SoftRenderer
+  main.cpp
+  test_bresenham_lines.cpp
+  test_wu_blended_lines.cpp
+  )
 
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Debug)
@@ -22,9 +26,22 @@ if(NOT TARGET raylib)
   FetchContent_MakeAvailable(raylib)
 endif()
 
+add_subdirectory(Math)
 add_subdirectory(Drawing)
+add_subdirectory(Geometry)
+add_subdirectory(Graphics)
+
+target_include_directories(SoftRenderer
+    INTERFACE Math
+    INTERFACE Drawing
+    INTERFACE Geometry
+    INTERFACE Graphics
+)
 
 target_link_libraries(SoftRenderer
+  MathLib
   DrawingLib
+  GeometryLib
+  GraphicsLib
   raylib
   )
