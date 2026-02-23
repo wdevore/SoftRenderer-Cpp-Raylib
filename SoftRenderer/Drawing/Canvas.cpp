@@ -46,15 +46,15 @@ Color Canvas::GetPixel(int x, int y)
     return ((Color *)canvas.data)[y * width + x];
 }
 
+/// @brief Update the existing GPU texture with new CPU pixel data
 void Canvas::Update()
 {
-    // Update the existing GPU texture with new CPU pixel data
     UpdateTexture(targetTexture, canvas.data);
 }
 
+/// @brief Draw software buffer to the screen
 void Canvas::Blit(int x, int y)
 {
-    // Draw your software buffer to the screen
     DrawTexture(targetTexture, x, y, WHITE);
 }
 
@@ -121,7 +121,7 @@ void Canvas::DrawBresenhamLine(int xP, int yP, int xQ, int yQ, Color c)
     }
 }
 
-// NOT WORKING
+/// @brief NOT WORKING
 void Canvas::DrawWuIndexedLine(int X0, int Y0, int X1, int Y1, WuColor color)
 {
     if (X0 < 0 || X0 > width - 1 || X1 < 0 || X1 > width - 1)

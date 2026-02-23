@@ -92,7 +92,6 @@ int main(int argc, char *argv[])
             canvas.Clear();
 
             // Rasterize your sceen
-            // canvas.PutPixel((screenWidth) / 2, (screenHeight) / 2, RED); // Draw a test pixel
             lines.draw(canvas);
 
             canvas.Update();
