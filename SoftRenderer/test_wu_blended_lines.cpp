@@ -13,10 +13,10 @@ void TestWublendedLines::initialize(int width, int height)
 {
     this->width = width;
     this->height = height;
-    pxs = GetRandomValue(0, width);
-    pys = GetRandomValue(0, height);
-    pxe = GetRandomValue(0, width);
-    pye = GetRandomValue(0, height);
+    pxs = GetRandomValue(0, width - 1);
+    pys = GetRandomValue(0, height - 1);
+    pxe = GetRandomValue(0, width - 1);
+    pye = GetRandomValue(0, height - 1);
     delay = 60;
     delayCnt = 0;
 }
