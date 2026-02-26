@@ -5,10 +5,10 @@
 class ZBuffer
 {
 public:
-    ZBuffer(int width, int height);
+    ZBuffer();
     ~ZBuffer();
 
-    void initialize();
+    void initialize(int width, int height);
     void reset();
     int getIndex(int col, int row);
     int setZ(int col, int row, float zv, bool debug);

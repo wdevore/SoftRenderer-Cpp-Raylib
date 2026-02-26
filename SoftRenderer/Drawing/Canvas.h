@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "WuColor.h"
+#include "ZBuffer.h"
 
 class Canvas
 {
@@ -11,6 +12,7 @@ public:
     Canvas(int width, int height);
     ~Canvas();
 
+    void initialize();
     void Clear();
     void SetClearColor(Color c);
     void PutPixel(int x, int y, Color c);
@@ -20,6 +22,7 @@ public:
 
     // Primitives
     void DrawBresenhamLine(int xP, int yP, int xQ, int yQ, Color c);
+    void DrawZBresenhamLine(int xP, int yP, int xQ, int yQ, float zP, float zQ, Color c);
     void DrawWuIndexedLine(int X0, int Y0, int X1, int Y1, WuColor color);
     void DrawWuBlendedLine(int X0, int Y0, int X1, int Y1, WuColor color);
 
@@ -51,6 +54,9 @@ private:
     int Weighting{};
     int WeightingComplementMask{};
     Color colorWeighting{};
+
+    // Z buffer vars
+    ZBuffer zb{};
 
     Image canvas;
     Texture2D targetTexture;

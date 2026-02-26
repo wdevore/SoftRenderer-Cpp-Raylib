@@ -18,6 +18,11 @@ Canvas::~Canvas()
     UnloadImage(canvas);
 }
 
+void Canvas::initialize()
+{
+    zb.initialize(width, height);
+}
+
 void Canvas::Clear()
 {
     ImageClearBackground(&canvas, clearColor);
@@ -50,6 +55,9 @@ Color Canvas::GetPixel(int x, int y)
 void Canvas::Update()
 {
     UpdateTexture(targetTexture, canvas.data);
+
+    // Reset z buffer for next frame
+    zb.reset();
 }
 
 /// @brief Draw software buffer to the screen
@@ -111,6 +119,97 @@ void Canvas::DrawBresenhamLine(int xP, int yP, int xQ, int yQ, Color c)
             if (y == yQ)
                 break;
             y += yInc;
+            D += M;
+            if (D > HY)
+            {
+                x += xInc;
+                D -= C;
+            }
+        }
+    }
+}
+
+void Canvas::DrawZBresenhamLine(int xP, int yP, int xQ, int yQ, float zP, float zQ, Color c)
+{
+    if (xP < 0 || xP > width - 1 || xQ < 0 || xQ > width - 1)
+        return;
+    if (yP < 0 || yP > height - 1 || yQ < 0 || yQ > height - 1)
+        return;
+
+    float zrP = 1.0f / zP;
+    float zrQ = 1.0f / zQ;
+    float dzr = zrQ - zrP;
+    float dx = (xQ - xP);
+    float dy = (yQ - yP);
+    float z = zrP;
+    float dzdx = dzr / dx;
+    float dzdy = dzr / dy;
+
+    int zl, zstatus;
+
+    x = xP;
+    y = yP;
+    D = 0;
+    HX = xQ - xP;
+    HY = yQ - yP;
+    xInc = 1;
+    yInc = 1;
+    if (HX < 0)
+    {
+        xInc = -1;
+        dzdx = -dzdx;
+        HX = -HX;
+    }
+    if (HY < 0)
+    {
+        yInc = -1;
+        dzdy = -dzdy;
+        HY = -HY;
+    }
+    if (HY <= HX)
+    {
+        C = 2 * HX;
+        M = 2 * HY;
+        for (;;)
+        {
+            zl = zb.getIndex(x, y);
+            if (zl < 0)
+                break; // pixel off screen
+            zstatus = zb.setZ(zl, z, false);
+            if (zstatus == 1)
+            {
+                PutPixel(x, y, c); // pixel closer
+            }
+            if (x == xQ)
+                break;
+            x += xInc;
+            z += dzdx;
+            D += M;
+            if (D > HX)
+            {
+                y += yInc;
+                D -= C;
+            }
+        }
+    }
+    else
+    {
+        C = 2 * HY;
+        M = 2 * HX;
+        for (;;)
+        {
+            zl = zb.getIndex(x, y);
+            if (zl < 0)
+                break; // pixel off screen
+            zstatus = zb.setZ(zl, z, false);
+            if (zstatus == 1)
+            {
+                PutPixel(x, y, c); // pixel closer
+            }
+            if (y == yQ)
+                break;
+            y += yInc;
+            z += dzdy;
             D += M;
             if (D > HY)
             {

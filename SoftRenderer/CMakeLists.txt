@@ -1,4 +1,5 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.31.0)
+
 project(SoftRenderer VERSION 0.1.0 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -32,10 +33,10 @@ add_subdirectory(Geometry)
 add_subdirectory(Graphics)
 
 target_include_directories(SoftRenderer
-    INTERFACE Math
-    INTERFACE Drawing
-    INTERFACE Geometry
-    INTERFACE Graphics
+    PRIVATE Math
+    PRIVATE Drawing
+    PRIVATE Geometry
+    PRIVATE Graphics
 )
 
 target_link_libraries(SoftRenderer

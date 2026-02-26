@@ -4,29 +4,31 @@
 
 #include "ZBuffer.h"
 
-ZBuffer::ZBuffer(int width, int height)
+ZBuffer::ZBuffer()
 {
-    this->width = width;
-    this->height = height;
 }
 
 ZBuffer::~ZBuffer()
 {
 }
 
-void ZBuffer::initialize()
+void ZBuffer::initialize(int width, int height)
 {
+    this->width = width;
+    this->height = height;
+
     zsize = width * height;
     z.resize(zsize);
+
     reset();
 }
 
 void ZBuffer::reset()
 {
-    // We initialize it to "infinity" (or a very large number) so that any
+    // We initialize it to "-infinity" (or a very small number) so that any
     // incoming geometry is closer than the background.
     for (int i = 0; i < zsize; i++)
-        z[i] = std::numeric_limits<float>::max();
+        z[i] = std::numeric_limits<float>::min();
 }
 
 int ZBuffer::getIndex(int col, int row)

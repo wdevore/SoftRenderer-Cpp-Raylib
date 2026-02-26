@@ -84,6 +84,7 @@ int main(int argc, char *argv[])
     {
         // Initialize Canvas
         Canvas canvas(screenWidth, screenHeight);
+        canvas.initialize();
 
         canvas.SetClearColor(DARKGRAY);
 

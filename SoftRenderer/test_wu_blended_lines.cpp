@@ -38,8 +38,11 @@ void TestWublendedLines::draw(Canvas &canvas)
 
     wuColor.initialize(bg, fg, 16);
 
-    canvas.DrawWuBlendedLine(pxs, pys, pxe, pye, wuColor);
-    // canvas.DrawWuBlendedLine(764, 405, 265, 316, wuColor);
+    // canvas.DrawZBresenhamLine(pxs, pys, pxe, pye, 10.0f, 10.0f, wuColor);
+
+    canvas.DrawZBresenhamLine(pxs, pys, pxe, pye, 10.0f, 10.0f, ORANGE);
+    // If zQ is smaller GREEN line appears over ORANGE.
+    canvas.DrawZBresenhamLine(pxs, pys - 5, pxe, pye + 5, 10.0f, 9.0f, GREEN);
 
     // canvas.DrawWuBlendedLine(10, 200, 210, 200, wuColor);
     // canvas.DrawWuBlendedLine(200, 10, 200, 210, wuColor);
