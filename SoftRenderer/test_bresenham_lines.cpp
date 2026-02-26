@@ -22,7 +22,28 @@ void TestBresenhamLines::initialize(int width, int height)
 
 void TestBresenhamLines::draw(Canvas &canvas)
 {
-    canvas.DrawBresenhamLine(pxs, pys, pxe, pye, ORANGE);
+    WuColor wuColor{};
+    CColor bg{};
+    bg.r = 80;
+    bg.g = 80;
+    bg.b = 80;
+    bg.a = 255;
+
+    CColor fg{};
+    fg.r = 255;
+    fg.g = 161;
+    fg.b = 0;
+    fg.a = 255;
+
+    wuColor.initialize(bg, fg, 16);
+
+    // canvas.DrawZBresenhamLine(pxs, pys, pxe, pye, 10.0f, 10.0f, wuColor);
+
+    canvas.DrawZBresenhamLine(pxs, pys, pxe, pye, 10.0f, 10.0f, ORANGE);
+    // If zQ is smaller GREEN line appears over ORANGE.
+    canvas.DrawZBresenhamLine(pxs, pys - 5, pxe, pye + 5, 10.0f, 9.0f, GREEN);
+
+    // canvas.DrawBresenhamLine(pxs, pys, pxe, pye, ORANGE);
 
     delayCnt++;
     if (delayCnt >= delay)
