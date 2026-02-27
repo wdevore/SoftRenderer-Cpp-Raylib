@@ -136,16 +136,14 @@ void Canvas::DrawZBresenhamLine(int xP, int yP, int xQ, int yQ, float zP, float 
     if (yP < 0 || yP > height - 1 || yQ < 0 || yQ > height - 1)
         return;
 
-    float zrP = 1.0f / zP;
-    float zrQ = 1.0f / zQ;
-    float dzr = zrQ - zrP;
-    float dx = (xQ - xP);
-    float dy = (yQ - yP);
-    float z = zrP;
-    float dzdx = dzr / dx;
-    float dzdy = dzr / dy;
-
-    int zl, zstatus;
+    zrP = 1.0f / zP;
+    zrQ = 1.0f / zQ;
+    dzr = zrQ - zrP;
+    dx = (xQ - xP);
+    dy = (yQ - yP);
+    z = zrP;
+    dzdx = dzr / dx;
+    dzdy = dzr / dy;
 
     x = xP;
     y = yP;
@@ -297,6 +295,7 @@ void Canvas::DrawWuIndexedLine(int X0, int Y0, int X1, int Y1, WuColor color)
     ErrorAcc = 0; // initialize the line error accumulator to 0
     // # of bits by which to shift ErrorAcc to get intensity level
     IntensityShift = 16 - color.intensityBits;
+
     // Mask used to flip all bits in an intensity weighting, producing the
     // result (1 - intensity weighting)
     WeightingComplementMask = color.numIntensityLevels - 1;
@@ -338,6 +337,7 @@ void Canvas::DrawWuIndexedLine(int X0, int Y0, int X1, int Y1, WuColor color)
             PutPixel(X0, Y0, colorWeighting);
 
             Weighting = Weighting ^ WeightingComplementMask;
+
             PutPixel(X0 + XDir, Y0, colorWeighting);
         }
     }
@@ -426,9 +426,9 @@ void Canvas::DrawWuBlendedLine(int X0, int Y0, int X1, int Y1, WuColor color)
         DeltaX = -DeltaX; /* make DeltaX positive */
     }
 
-    //  Special-case horizontal, vertical, and diagonal lines, which
-    //  require no weighting because they go right through the center of
-    //  every pixel
+    // Special-case horizontal, vertical, and diagonal lines, which
+    // require no weighting because they go right through the center of
+    // every pixel
     DeltaY = Y1 - Y0;
     if (DeltaY == 0)
     {
@@ -471,9 +471,6 @@ void Canvas::DrawWuBlendedLine(int X0, int Y0, int X1, int Y1, WuColor color)
     /* Mask used to flip all bits in an intensity weighting, producing the
         result (1 - intensity weighting) */
     WeightingComplementMask = color.numIntensityLevels - 1;
-
-    Color cc{};
-    Color cp{};
 
     /* Is this an X-major or Y-major line? */
     if (DeltaY > DeltaX)
@@ -580,4 +577,304 @@ void Canvas::DrawWuBlendedLine(int X0, int Y0, int X1, int Y1, WuColor color)
     // Draw the final pixel, which is always exactly intersected by the line
     // and thus needs no weighting
     PutPixel(X1, Y1, c);
+}
+
+void Canvas::DrawZWuBlendedLine(int X0, int Y0, int X1, int Y1, float zP, float zQ, WuColor color)
+{
+    if (X0 < 0 || X0 > width - 1 || X1 < 0 || X1 > width - 1)
+        return;
+    if (Y0 < 0 || Y0 > height - 1 || Y1 < 0 || Y1 > height - 1)
+        return;
+
+    I = 0.0f;
+
+    /* Make sure the line runs top to bottom */
+    if (Y0 > Y1)
+    {
+        Temp = Y0;
+        Y0 = Y1;
+        Y1 = Temp;
+        Temp = X0;
+        X0 = X1;
+        X1 = Temp;
+        Tempf = zP;
+        zP = zQ;
+        zQ = Tempf;
+    }
+
+    zrP = 1.0f / zP;
+    zrQ = 1.0f / zQ;
+    dzr = zrQ - zrP;
+    dx = (X1 - X0);
+    dy = (Y1 - Y0);
+    z = zrP;
+    dzdx = dzr / dx;
+    dzdy = dzr / dy;
+
+    // Draw the initial pixel, which is always exactly intersected by the
+    // line and needs no weighting
+    Color c = CLITERAL(Color){(unsigned char)color.color.r, (unsigned char)color.color.g, (unsigned char)color.color.b, (unsigned char)color.color.a};
+    zl = zb.getIndex(X0, Y0);
+    if (zl >= 0)
+    {
+        zstatus = zb.setZ(zl, z, false);
+        if (zstatus == 1)
+        {
+            PutPixel(X0, Y0, c);
+        }
+    }
+
+    DeltaX = X1 - X0;
+
+    if (DeltaX >= 0)
+    {
+        XDir = 1;
+    }
+    else
+    {
+        XDir = -1;
+        DeltaX = -DeltaX; /* make DeltaX positive */
+        dzdx = -dzdx;
+    }
+
+    // Special-case horizontal, vertical, and diagonal lines, which
+    // require no weighting because they go right through the center of
+    // every pixel
+    DeltaY = Y1 - Y0;
+    if (DeltaY == 0)
+    {
+        /* Horizontal line */
+        while (DeltaX-- != 0)
+        {
+            X0 += XDir;
+            zl = zb.getIndex(X0, Y0);
+            if (zl < 0)
+                break; // pixel off screen
+            zstatus = zb.setZ(zl, z, false);
+            if (zstatus == 1)
+            {
+                PutPixel(X0, Y0, c); // pixel closer
+            }
+            z += dzdx;
+        }
+        return;
+    }
+
+    if (DeltaX == 0)
+    {
+        /* Vertical line */
+        do
+        {
+            Y0++;
+            zl = zb.getIndex(X0, Y0);
+            if (zl < 0)
+                break; // pixel off screen
+            zstatus = zb.setZ(zl, z, false);
+            if (zstatus == 1)
+            {
+                PutPixel(X0, Y0, c); // pixel closer
+            }
+            z += dzdy;
+        } while (--DeltaY != 0);
+        return;
+    }
+
+    if (DeltaX == DeltaY)
+    {
+        /* Diagonal line */
+        do
+        {
+            X0 += XDir;
+            Y0++;
+            zl = zb.getIndex(X0, Y0);
+            if (zl < 0)
+                break; // pixel off screen
+            zstatus = zb.setZ(zl, z, false);
+            if (zstatus == 1)
+            {
+                PutPixel(X0, Y0, c); // pixel closer
+            }
+            z += dzdx;
+        } while (--DeltaY != 0);
+        return;
+    }
+
+    /* Line is not horizontal, diagonal, or vertical */
+    ErrorAcc = 0; /* initialize the line error accumulator to 0 */
+    /* # of bits by which to shift ErrorAcc to get intensity level */
+    IntensityShift = 16 - color.intensityBits;
+    /*
+     * Mask used to flip all bits in an intensity weighting, producing the
+     * result (1 - intensity weighting)
+     */
+    WeightingComplementMask = color.numIntensityLevels - 1;
+
+    // ===================================================
+    /* Is this an X-major or Y-major line? */
+    if (DeltaY > DeltaX)
+    {
+
+        /*
+         * Y-major line; calculate 16-bit fixed-point fractional part of a
+         * pixel that X advances each time Y advances 1 pixel, truncating the
+         * result so that we won't overrun the endpoint along the X axis
+         */
+        ErrorAdj = (int)(((long)DeltaX << 16) / (long)DeltaY);
+        /* Draw all pixels other than the first and last */
+        while (--DeltaY != 0)
+        {
+            ErrorAccTemp = ErrorAcc; /* remember currrent accumulated error */
+            ErrorAcc += ErrorAdj;    /* calculate error for next pixel */
+            if (ErrorAcc > 65535)
+            {
+                /* The error accumulator turned over, so advance the X coord */
+                ErrorAcc = ErrorAcc & 0x0000ffff;
+                X0 += XDir;
+            }
+            Y0++; /* Y-major, so always advance Y */
+            /*
+             * The IntensityBits most significant bits of ErrorAcc give us the
+             * intensity weighting for this pixel, and the complement of the
+             * weighting for the paired pixel
+             */
+            Weighting = ErrorAcc >> IntensityShift;
+
+            // get background color
+            cp = GetPixel(X0 + XDir, Y0);
+
+            I = (float)Weighting / (float)color.numIntensityLevels; // I = intensity
+
+            cc.r = (int)(cp.r - ((cp.r - c.r) * I));
+            cc.g = (int)(cp.g - ((cp.g - c.g) * I));
+            cc.b = (int)(cp.b - ((cp.b - c.b) * I));
+            cc.a = 255;
+
+            zl = zb.getIndex(X0 + XDir, Y0);
+            if (zl >= 0)
+            {
+                zstatus = zb.setZ(zl, z, false);
+                if (zstatus == 1)
+                {
+                    PutPixel(X0 + XDir, Y0, cc); // pixel closer
+                }
+            }
+
+            // get background color
+            cp = GetPixel(X0, Y0);
+
+            I = 1.0f - I;
+
+            cc.r = (int)(cp.r - ((cp.r - c.r) * I));
+            cc.g = (int)(cp.g - ((cp.g - c.g) * I));
+            cc.b = (int)(cp.b - ((cp.b - c.b) * I));
+            cc.a = 255;
+
+            zl = zb.getIndex(X0, Y0);
+            if (zl >= 0)
+            {
+                zstatus = zb.setZ(zl, z, false);
+                if (zstatus == 1)
+                {
+                    PutPixel(X0, Y0, cc); // pixel closer
+                }
+            }
+            z += dzdy;
+        }
+
+        /*
+         * Draw the final pixel, which is always exactly intersected by the line
+         * and so needs no weighting
+         */
+        zl = zb.getIndex(X1, Y1);
+        if (zl < 0)
+            return; // pixel off screen
+        zstatus = zb.setZ(zl, z, false);
+        if (zstatus == 1)
+        {
+            PutPixel(X1, Y1, c); // pixel closer
+        }
+        return;
+    }
+
+    /*
+     * It's an X-major line; calculate 16-bit fixed-point fractional part of a
+     * pixel that Y advances each time X advances 1 pixel, truncating the
+     * result to avoid overrunning the endpoint along the X axis
+     */
+    ErrorAdj = (int)(((long)DeltaY << 16) / (long)DeltaX);
+    /* Draw all pixels other than the first and last */
+    while (--DeltaX != 0)
+    {
+        ErrorAccTemp = ErrorAcc; /* remember currrent accumulated error */
+        ErrorAcc += ErrorAdj;    /* calculate error for next pixel */
+        if (ErrorAcc > 65535)
+        {
+            /* The error accumulator turned over, so advance the Y coord */
+            ErrorAcc = ErrorAcc & 0x0000ffff;
+            Y0++;
+            // System.out.println("turn over");
+        }
+        X0 += XDir; /* X-major, so always advance X */
+        /*
+         * The IntensityBits most significant bits of ErrorAcc give us the
+         * intensity weighting for this pixel, and the complement of the
+         * weighting for the paired pixel
+         */
+        Weighting = ErrorAcc >> IntensityShift;
+
+        // get background color
+        cp = GetPixel(X0, Y0 + 1);
+
+        I = (float)Weighting / (float)color.numIntensityLevels; // I = intensity
+
+        cc.r = (int)(cp.r - ((cp.r - c.r) * I));
+        cc.g = (int)(cp.g - ((cp.g - c.g) * I));
+        cc.b = (int)(cp.b - ((cp.b - c.b) * I));
+        cc.a = 255;
+
+        zl = zb.getIndex(X0, Y0 + 1);
+        if (zl >= 0)
+        {
+            zstatus = zb.setZ(zl, z, false);
+            if (zstatus == 1)
+            {
+                PutPixel(X0, Y0 + 1, cc); // pixel closer
+            }
+        }
+
+        // get background color
+        cp = GetPixel(X0, Y0);
+
+        I = 1.0f - I;
+
+        cc.r = (int)(cp.r - ((cp.r - c.r) * I));
+        cc.g = (int)(cp.g - ((cp.g - c.g) * I));
+        cc.b = (int)(cp.b - ((cp.b - c.b) * I));
+        cc.a = 255;
+
+        zl = zb.getIndex(X0, Y0);
+        if (zl >= 0)
+        {
+            zstatus = zb.setZ(zl, z, false);
+            if (zstatus == 1)
+            {
+                PutPixel(X0, Y0, cc); // pixel closer
+            }
+        }
+        z += dzdx;
+    }
+    // ===================================================
+
+    /*
+     * Draw the final pixel, which is always exactly intersected by the line
+     * and so needs no weighting
+     */
+    zl = zb.getIndex(X1, Y1);
+    if (zl < 0)
+        return; // pixel off screen
+    zstatus = zb.setZ(zl, z, false);
+    if (zstatus == 1)
+    {
+        PutPixel(X1, Y1, c); // pixel closer
+    }
 }

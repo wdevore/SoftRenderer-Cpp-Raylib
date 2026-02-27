@@ -76,8 +76,8 @@ int main(int argc, char *argv[])
     }
 
     SetTargetFPS(60);
-    TestBresenhamLines lines;
-    // TestWublendedLines lines;
+    // TestBresenhamLines lines;
+    TestWublendedLines lines;
     lines.initialize(screenWidth, screenHeight);
 
     try

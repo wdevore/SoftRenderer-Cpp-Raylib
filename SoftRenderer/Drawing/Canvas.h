@@ -23,8 +23,10 @@ public:
     // Primitives
     void DrawBresenhamLine(int xP, int yP, int xQ, int yQ, Color c);
     void DrawZBresenhamLine(int xP, int yP, int xQ, int yQ, float zP, float zQ, Color c);
+
     void DrawWuIndexedLine(int X0, int Y0, int X1, int Y1, WuColor color);
     void DrawWuBlendedLine(int X0, int Y0, int X1, int Y1, WuColor color);
+    void DrawZWuBlendedLine(int X0, int Y0, int X1, int Y1, float zP, float zQ, WuColor color);
 
 private:
     int width;
@@ -54,6 +56,21 @@ private:
     int Weighting{};
     int WeightingComplementMask{};
     Color colorWeighting{};
+    Color cc{};
+    Color cp{};
+
+    // Z variables
+    float zrP{};
+    float zrQ{};
+    float dzr{};
+    float dx{};
+    float dy{};
+    float z{};
+    float dzdx{};
+    float dzdy{};
+    int zl{};
+    int zstatus{};
+    float Tempf{};
 
     // Z buffer vars
     ZBuffer zb{};
