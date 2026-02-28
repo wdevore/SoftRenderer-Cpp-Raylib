@@ -1,6 +1,8 @@
-#include "Canvas.h"
 #include <algorithm>
 #include <iostream>
+#include <cmath>
+
+#include "Canvas.h"
 
 Canvas::Canvas(int width, int height) : width(width), height(height)
 {
@@ -9,6 +11,8 @@ Canvas::Canvas(int width, int height) : width(width), height(height)
 
     // 2. Load an empty texture to the GPU that we will update every frame
     targetTexture = LoadTextureFromImage(canvas);
+
+    clipRectangle = Maths::Rectangle(0, 0, width - 1, height - 1);
 }
 
 Canvas::~Canvas()
@@ -877,4 +881,115 @@ void Canvas::DrawZWuBlendedLine(int X0, int Y0, int X1, int Y1, float zP, float 
     {
         PutPixel(X1, Y1, c); // pixel closer
     }
+}
+
+long Canvas::DrawFlatTriangle(GradientInterpolation &g,
+                              EdgeInterpolation &TM, EdgeInterpolation &TB, EdgeInterpolation &MB,
+                              bool blnMiddleIsLeft, Color &color)
+{
+    ////////////////////////////////////////////////
+    // Top half of triangle
+    ////////////////////////////////////////////////
+    if (blnMiddleIsLeft)
+    {
+        Left = TM;
+        Right = TB;
+    }
+    else
+    {
+        Left = TB;
+        Right = TM; // works
+    }
+
+    // Middle indicates height
+    int Height = TM.Height;
+    while (Height-- > 0)
+    {
+        DrawZFlatScanLine(g, Left, Right, color);
+        Left.Step();
+        Right.Step();
+    }
+
+    ////////////////////////////////////////////////
+    // Bottom half of triangle
+    ////////////////////////////////////////////////
+    if (blnMiddleIsLeft)
+    {
+        Left = MB;
+        Right = TB;
+    }
+    else
+    {
+        Left = TB;
+        Right = MB; // works
+    }
+
+    Height = MB.Height;
+    while (Height-- > 0)
+    {
+        DrawZFlatScanLine(g, Left, Right, color);
+        Left.Step();
+        Right.Step();
+    }
+
+    return 0; // PixelsProcessed;
+}
+
+void Canvas::DrawZFlatScanLine(GradientInterpolation &g,
+                               EdgeInterpolation &l, EdgeInterpolation &r,
+                               Color &color)
+{
+    int XStart = (int)std::ceil(l.X);
+    float XPrestep = XStart - l.X;
+    int Width = (int)std::ceil(r.X) - XStart;
+
+    // -----------------------------------------------
+    // Setup Z-Depth gradients and counters
+    // -----------------------------------------------
+    int zstatus;
+    // 1/z zstart + (adjust * dz/dx)
+    float OneOverZ = l.OneOverZ + (XPrestep * g.dOneOverZdX);
+    // Get the starting zbuffer index for the current scanline(l.Y) and X position
+    int zl = zb.getIndex(XStart, l.Y);
+    if (zl < 0)
+        return; // Forget it. scanline or pixel is off the screen.
+
+    int x = XStart; // A hack to show edges in black
+    while (Width-- > 0)
+    {
+        // -----------------------------------------------
+        // -- Draw pixel if closer
+        // -----------------------------------------------
+        zstatus = zb.setZ(zl, OneOverZ, false);
+        if (zstatus == 1)
+        {
+            // pixel closer
+            if (x == XStart)
+                PutPixel(XStart, l.Y, BLACK);
+            else
+                PutPixel(XStart, l.Y, color);
+        }
+        else
+        {
+            // Just hacking. It creates a neat effect.
+            // setPixel(XStart, l.Y, RED);
+        }
+
+        // -----------------------------------------------
+        // -- increment gradients and counters
+        // -----------------------------------------------
+        XStart++;                  // move to next pixel
+        zl++;                      // move to next zbuffer cell
+        OneOverZ += g.dOneOverZdX; // increment z gradient
+    }
+}
+
+/// @brief Generates a 4 bit code. Each bit indicates if x and/or y outside
+///        the clip rectangle.
+/// @param x
+/// @param y
+/// @return
+int Canvas::CalcClipCode(float x, float y)
+{
+    return (x < clipRectangle.x ? 8 : 0) | (x > clipRectangle.width ? 4 : 0) | (y < clipRectangle.y ? 2 : 0) | (y > clipRectangle.height ? 1 : 0);
 }

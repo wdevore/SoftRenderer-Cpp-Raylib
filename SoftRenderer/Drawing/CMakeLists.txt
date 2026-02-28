@@ -16,6 +16,7 @@ target_include_directories(DrawingLib
 # you must explicitly link libraries to targets so they inherit the necessary 
 # include paths (where raylib.h lives).
 target_link_libraries(DrawingLib 
+    MathLib
     GraphicsLib
     raylib
 )

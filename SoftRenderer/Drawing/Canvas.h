@@ -5,6 +5,10 @@
 
 #include "WuColor.h"
 #include "ZBuffer.h"
+#include "EdgeInterpolation.h"
+#include "Vertex3f.h"
+#include "GradientInterpolation.h"
+#include "Rectangle.h"
 
 class Canvas
 {
@@ -24,9 +28,22 @@ public:
     void DrawBresenhamLine(int xP, int yP, int xQ, int yQ, Color c);
     void DrawZBresenhamLine(int xP, int yP, int xQ, int yQ, float zP, float zQ, Color c);
 
+    // Wu algorithm
     void DrawWuIndexedLine(int X0, int Y0, int X1, int Y1, WuColor color);
     void DrawWuBlendedLine(int X0, int Y0, int X1, int Y1, WuColor color);
     void DrawZWuBlendedLine(int X0, int Y0, int X1, int Y1, float zP, float zQ, WuColor color);
+
+    // Scanline algorithms: Triangle rasterization
+    long DrawFlatTriangle(GradientInterpolation &g,
+                          EdgeInterpolation &TM, EdgeInterpolation &TB, EdgeInterpolation &MB,
+                          bool blnMiddleIsLeft,
+                          Color &color);
+    void DrawZFlatScanLine(GradientInterpolation &g,
+                           EdgeInterpolation &l, EdgeInterpolation &r,
+                           Color &color);
+
+    // Clip methods
+    int CalcClipCode(float x, float y);
 
 private:
     int width;
@@ -72,6 +89,10 @@ private:
     int zstatus{};
     float Tempf{};
 
+    // Scanline algorithm variables
+    EdgeInterpolation Left{};
+    EdgeInterpolation Right{};
+
     // Z buffer vars
     ZBuffer zb{};
 
@@ -79,4 +100,5 @@ private:
     Texture2D targetTexture;
 
     Color clearColor = WHITE;
+    Maths::Rectangle clipRectangle{};
 };
