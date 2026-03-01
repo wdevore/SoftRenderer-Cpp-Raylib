@@ -6,7 +6,6 @@
 #include "WuColor.h"
 #include "ZBuffer.h"
 #include "EdgeInterpolation.h"
-#include "Vertex3f.h"
 #include "GradientInterpolation.h"
 #include "Rectangle.h"
 
@@ -44,6 +43,7 @@ public:
 
     // Clip methods
     int CalcClipCode(float x, float y);
+    int ClipLine(float Px, float Py, float Qx, float Qy, Point3f &clP, Point3f &clQ);
 
 private:
     int width;
@@ -92,6 +92,14 @@ private:
     // Scanline algorithm variables
     EdgeInterpolation Left{};
     EdgeInterpolation Right{};
+
+    // Clipping variables
+    int cliP{};
+    int cliQ{};
+    float pPx{};
+    float pPy{};
+    float pQx{};
+    float pQy{};
 
     // Z buffer vars
     ZBuffer zb{};

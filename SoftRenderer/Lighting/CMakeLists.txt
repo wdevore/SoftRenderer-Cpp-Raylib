@@ -2,16 +2,14 @@ cmake_minimum_required(VERSION 3.31.0)
 
 file(GLOB DIR_SOURCES CONFIGURE_DEPENDS *.cpp)
 
-add_library(GeometryLib STATIC
+add_library(LightingLib STATIC
     ${DIR_SOURCES}
 )
 
-target_include_directories(GeometryLib 
+target_include_directories(LightingLib 
     PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-target_link_libraries(GeometryLib 
+target_link_libraries(LightingLib 
     PUBLIC MathLib
-    PUBLIC DrawingLib
-    PUBLIC LightingLib
 )

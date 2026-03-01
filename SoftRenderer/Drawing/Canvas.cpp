@@ -984,6 +984,7 @@ void Canvas::DrawZFlatScanLine(GradientInterpolation &g,
     }
 }
 
+// ======================== Clipping ========================================
 /// @brief Generates a 4 bit code. Each bit indicates if x and/or y outside
 ///        the clip rectangle.
 /// @param x
@@ -992,4 +993,86 @@ void Canvas::DrawZFlatScanLine(GradientInterpolation &g,
 int Canvas::CalcClipCode(float x, float y)
 {
     return (x < clipRectangle.x ? 8 : 0) | (x > clipRectangle.width ? 4 : 0) | (y < clipRectangle.y ? 2 : 0) | (y > clipRectangle.height ? 1 : 0);
+}
+
+/// @brief
+///        0 = both points outside of region.
+///        1 = one point clipped.
+//         2 = none were clipped.
+/// @param Px
+/// @param Py
+/// @param Qx
+/// @param Qy
+/// @param clP
+/// @param clQ
+/// @return
+int Canvas::ClipLine(float Px, float Py, float Qx, float Qy, Point3f &clP, Point3f &clQ)
+{
+    cliP = CalcClipCode(Px, Py);
+    cliQ = CalcClipCode(Qx, Qy);
+    pPx = Px, pPy = Py, pQx = Qx, pQy = Qy;
+
+    while ((cliP | cliQ) != 0)
+    {
+        if ((cliP & cliQ) != 0)
+            return 0; // both points outside of region
+        dx = Qx - Px;
+        dy = Qy - Py;
+        if (cliP != 0)
+        {
+            if ((cliP & 8) == 8)
+            {
+                Py += (clipRectangle.x - Px) * dy / dx;
+                Px = clipRectangle.x;
+            }
+            else if ((cliP & 4) == 4)
+            {
+                Py += (clipRectangle.width - Px) * dy / dx;
+                Px = clipRectangle.width;
+            }
+            else if ((cliP & 2) == 2)
+            {
+                Px += (clipRectangle.y - Py) * dx / dy;
+                Py = clipRectangle.y;
+            }
+            else if ((cliP & 1) == 1)
+            {
+                Px += (clipRectangle.height - Py) * dx / dy;
+                Py = clipRectangle.height;
+            }
+            cliP = CalcClipCode(Px, Py);
+        }
+        else if (cliQ != 0)
+        {
+            if ((cliQ & 8) == 8)
+            {
+                Qy += (clipRectangle.x - Qx) * dy / dx;
+                Qx = clipRectangle.x;
+            }
+            else if ((cliQ & 4) == 4)
+            {
+                Qy += (clipRectangle.width - Qx) * dy / dx;
+                Qx = clipRectangle.width;
+            }
+            else if ((cliQ & 2) == 2)
+            {
+                Qx += (clipRectangle.y - Qy) * dx / dy;
+                Qy = clipRectangle.y;
+            }
+            else if ((cliQ & 1) == 1)
+            {
+                Qx += (clipRectangle.height - Qy) * dx / dy;
+                Qy = clipRectangle.height;
+            }
+            cliQ = CalcClipCode(Qx, Qy);
+        }
+    }
+
+    clP.set(Px, Py, 0);
+    clQ.set(Qx, Qy, 0);
+
+    if (pPx == Px && pPy == Py && pQx == Qx && pQy == Qy)
+        return 2;
+    else
+        return 1;
 }

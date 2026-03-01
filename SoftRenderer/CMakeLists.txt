@@ -4,11 +4,11 @@ project(SoftRenderer VERSION 0.1.0 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 
+file(GLOB DIR_SOURCES CONFIGURE_DEPENDS *.cpp)
+
 add_executable(SoftRenderer
-  main.cpp
-  test_bresenham_lines.cpp
-  test_wu_blended_lines.cpp
-  )
+  ${DIR_SOURCES}
+)
 
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Debug)
@@ -31,12 +31,16 @@ add_subdirectory(Math)
 add_subdirectory(Drawing)
 add_subdirectory(Geometry)
 add_subdirectory(Graphics)
+add_subdirectory(Pipeline)
+add_subdirectory(Lighting)
 
 target_include_directories(SoftRenderer
     PRIVATE Math
     PRIVATE Drawing
     PRIVATE Geometry
     PRIVATE Graphics
+    PRIVATE Pipeline
+    PRIVATE Lighting
 )
 
 target_link_libraries(SoftRenderer
@@ -44,5 +48,7 @@ target_link_libraries(SoftRenderer
   DrawingLib
   GeometryLib
   GraphicsLib
+  PipelineLib
+  LightingLib
   raylib
   )

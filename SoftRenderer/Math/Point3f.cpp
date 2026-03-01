@@ -15,41 +15,48 @@ void Point3f::set(float x, float y, float z)
     this->z = z;
 }
 
-void Point3f::set(const Point3f &p1)
+void Point3f::set(const Point3f &p)
 {
-    this->x = p1.x;
-    this->y = p1.y;
-    this->z = p1.z;
+    this->x = p.x;
+    this->y = p.y;
+    this->z = p.z;
 }
 
-float Point3f::distance(const Point3f &p1) const
+void Point3f::set(const Vector3f &v)
 {
-    float dx = x - p1.x;
-    float dy = y - p1.y;
-    float dz = z - p1.z;
+    this->x = v.x;
+    this->y = v.y;
+    this->z = v.z;
+}
+
+float Point3f::distance(const Point3f &p) const
+{
+    float dx = x - p.x;
+    float dy = y - p.y;
+    float dz = z - p.z;
     return std::sqrt(dx * dx + dy * dy + dz * dz);
 }
 
-float Point3f::distanceSquared(const Point3f &p1) const
+float Point3f::distanceSquared(const Point3f &p) const
 {
-    float dx = x - p1.x;
-    float dy = y - p1.y;
-    float dz = z - p1.z;
+    float dx = x - p.x;
+    float dy = y - p.y;
+    float dz = z - p.z;
     return dx * dx + dy * dy + dz * dz;
 }
 
-void Point3f::add(const Vector3f &v1)
+void Point3f::add(const Vector3f &v)
 {
-    x += v1.x;
-    y += v1.y;
-    z += v1.z;
+    x += v.x;
+    y += v.y;
+    z += v.z;
 }
 
-void Point3f::sub(const Vector3f &v1)
+void Point3f::sub(const Vector3f &v)
 {
-    x -= v1.x;
-    y -= v1.y;
-    z -= v1.z;
+    x -= v.x;
+    y -= v.y;
+    z -= v.z;
 }
 
 void Point3f::sub(const Point3f &p1, const Point3f &p2)
@@ -57,6 +64,13 @@ void Point3f::sub(const Point3f &p1, const Point3f &p2)
     x = p1.x - p2.x;
     y = p1.y - p2.y;
     z = p1.z - p2.z;
+}
+
+void Point3f::scale(float s)
+{
+    x *= s;
+    y *= s;
+    z *= s;
 }
 
 std::string Point3f::toString() const

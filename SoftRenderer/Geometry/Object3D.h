@@ -10,9 +10,10 @@ class Object3D
 {
 public:
     Object3D();
-    ~Object3D();
+    virtual ~Object3D() = 0; // Makes class abstract
 
     std::string name{};
+    bool animate{};
 
     std::vector<Vertex3f> vertices{};
     std::vector<Vertex3f> vertex_normals{};
@@ -30,6 +31,9 @@ public:
     void setOrientation(float x, float y, float z, float angle);
 
     Matrix4f &getModelToWorldMatrix();
+    int GetVertexCount() { return vertices.size(); }
+
+    virtual void SetAnimate(bool animate) = 0;
 
 protected:
     Vector3f p1{};

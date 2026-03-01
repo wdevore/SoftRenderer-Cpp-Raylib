@@ -1,6 +1,8 @@
-#include "Vector3f.h"
 #include <cmath>
 #include <sstream>
+
+#include "Vector3f.h"
+#include "Point3f.h"
 
 Vector3f::Vector3f() : x(0.0f), y(0.0f), z(0.0f) {}
 
@@ -15,11 +17,18 @@ void Vector3f::set(float x, float y, float z)
     this->z = z;
 }
 
-void Vector3f::set(const Vector3f &v1)
+void Vector3f::set(const Vector3f &v)
 {
-    this->x = v1.x;
-    this->y = v1.y;
-    this->z = v1.z;
+    this->x = v.x;
+    this->y = v.y;
+    this->z = v.z;
+}
+
+void Vector3f::set(const Point3f &p)
+{
+    this->x = p.x;
+    this->y = p.y;
+    this->z = p.z;
 }
 
 float Vector3f::length() const
@@ -84,6 +93,20 @@ void Vector3f::sub(const Vector3f &v1, const Vector3f &v2)
     x = v1.x - v2.x;
     y = v1.y - v2.y;
     z = v1.z - v2.z;
+}
+
+void Vector3f::sub(const Point3f &p, const Vector3f &v)
+{
+    x = p.x - v.x;
+    y = p.y - v.y;
+    z = p.z - v.z;
+}
+
+void Vector3f::sub(const Point3f &p1, const Point3f &p2)
+{
+    x = p1.x - p2.x;
+    y = p1.y - p2.y;
+    z = p1.z - p2.z;
 }
 
 void Vector3f::scale(float s)
