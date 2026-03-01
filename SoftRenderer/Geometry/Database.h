@@ -34,6 +34,7 @@ public:
     int GetTriCount() { return triCount; }
     int GetLightCount() { return lights.size(); }
     int GetObjectCount() { return objects.size(); }
+    Object3D *GetObject(std::string name);
 
     LightBase *GetLight(int index);
     void AddObject(std::unique_ptr<Object3D> o);

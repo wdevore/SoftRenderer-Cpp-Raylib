@@ -9,6 +9,18 @@ Database::~Database()
 {
 }
 
+Object3D *Database::GetObject(std::string name)
+{
+    for (auto &o : objects)
+    {
+        if (o->name == name)
+        {
+            return o.get();
+        }
+    }
+    return nullptr;
+}
+
 LightBase *Database::GetLight(int index)
 {
     if (index >= 0 && index < lights.size())
