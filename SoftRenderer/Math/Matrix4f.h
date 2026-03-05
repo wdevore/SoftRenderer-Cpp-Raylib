@@ -54,6 +54,7 @@ public:
     float determinant() const;
 
     void transform(Point3f &point) const;
+    void transform(const Point3f &point, Point3f &pointOut) const;
     void transform(Vector3f &normal) const;
 
     void setRotation(AxisAngle4f a1);

@@ -9,16 +9,20 @@ class WuColor
 private:
     /* data */
 public:
-    std::vector<CColor> wuIntensities{};
+    std::vector<PaintColoring::CColor> wuIntensities{};
 
-    CColor color{};
+    PaintColoring::CColor color{};
     int intensityBits{};
     int numIntensityLevels{};
 
     WuColor(/* args */);
     ~WuColor();
 
-    void initialize(CColor bg, CColor fg, int intensityBits);
+    /// @brief
+    /// @param bg Sets the background blending color.
+    /// @param fg Sets object's color property
+    /// @param intensityBits
+    void initialize(PaintColoring::CColor bg, PaintColoring::CColor fg, int intensityBits);
     void setIntensityBits(int numberOfBits);
-    CColor &GetColor(int weighting);
+    PaintColoring::CColor &GetColor(int weighting);
 };

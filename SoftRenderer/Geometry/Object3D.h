@@ -30,7 +30,7 @@ public:
     void setPosition(float x, float y, float z);
     void setOrientation(float x, float y, float z, float angle);
 
-    Matrix4f &getModelToWorldMatrix();
+    Matrix4f &GetModelToWorldMatrix();
     int GetVertexCount() { return vertices.size(); }
 
     virtual void SetAnimate(bool animate) = 0;

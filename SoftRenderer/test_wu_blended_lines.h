@@ -3,6 +3,7 @@
 #include "raylib.h"
 
 #include "Canvas.h"
+#include "WuColor.h"
 
 class TestWublendedLines
 {

@@ -14,10 +14,15 @@ void Frustum::SetWidth(float left, float right)
 {
     this->left = left;
     this->right = right;
-    width = std::abs(right - left);
 }
 
 void Frustum::SetHeight(float top, float bottom)
+{
+    this->top = top;
+    this->bottom = bottom;
+}
+
+void Frustum::SetDepth(float near, float far)
 {
     this->near = near;
     this->far = far;
@@ -32,25 +37,25 @@ void Frustum::SetNearPlane(float nx, float ny, float nz, float px, float py, flo
 
 void Frustum::BuildProjectionMatrix()
 {
-    volume.m00 = (2.0f * near) / (right - left);
-    volume.m01 = 0.0f;
-    volume.m02 = (right + left) / (right - left);
-    volume.m03 = 0.0f;
+    projection.m00 = (2.0f * near) / (right - left);
+    projection.m01 = 0.0f;
+    projection.m02 = (right + left) / (right - left);
+    projection.m03 = 0.0f;
 
-    volume.m10 = 0.0f;
-    volume.m11 = (2.0f * near) / (top - bottom);
-    volume.m12 = (top + bottom) / (top - bottom);
-    volume.m13 = 0.0f;
+    projection.m10 = 0.0f;
+    projection.m11 = (2.0f * near) / (top - bottom);
+    projection.m12 = (top + bottom) / (top - bottom);
+    projection.m13 = 0.0f;
 
-    volume.m20 = 0.0f;
-    volume.m21 = 0.0f;
-    volume.m22 = (far + near) / (near - far);
-    volume.m23 = 2.0f * (far * near) / (near - far);
+    projection.m20 = 0.0f;
+    projection.m21 = 0.0f;
+    projection.m22 = (far + near) / (near - far);
+    projection.m23 = 2.0f * (far * near) / (near - far);
 
-    volume.m30 = 0.0f;
-    volume.m31 = 0.0f;
-    volume.m32 = -1.0f;
-    volume.m33 = 0.0f;
+    projection.m30 = 0.0f;
+    projection.m31 = 0.0f;
+    projection.m32 = -1.0f;
+    projection.m33 = 0.0f;
 }
 
 /**

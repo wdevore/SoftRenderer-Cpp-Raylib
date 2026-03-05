@@ -3,19 +3,13 @@
 
 #include <vector>
 
-#include "WuColor.h"
-#include "ZBuffer.h"
-#include "EdgeInterpolation.h"
-#include "GradientInterpolation.h"
-#include "Rectangle.h"
-
 class Canvas
 {
 public:
-    Canvas(int width, int height);
+    Canvas();
     ~Canvas();
 
-    void initialize();
+    void initialize(int width, int height);
     void Clear();
     void SetClearColor(Color c);
     void PutPixel(int x, int y, Color c);
@@ -23,90 +17,12 @@ public:
     void Update();
     void Blit(int x, int y);
 
-    // Primitives
-    void DrawBresenhamLine(int xP, int yP, int xQ, int yQ, Color c);
-    void DrawZBresenhamLine(int xP, int yP, int xQ, int yQ, float zP, float zQ, Color c);
-
-    // Wu algorithm
-    void DrawWuIndexedLine(int X0, int Y0, int X1, int Y1, WuColor color);
-    void DrawWuBlendedLine(int X0, int Y0, int X1, int Y1, WuColor color);
-    void DrawZWuBlendedLine(int X0, int Y0, int X1, int Y1, float zP, float zQ, WuColor color);
-
-    // Scanline algorithms: Triangle rasterization
-    long DrawFlatTriangle(GradientInterpolation &g,
-                          EdgeInterpolation &TM, EdgeInterpolation &TB, EdgeInterpolation &MB,
-                          bool blnMiddleIsLeft,
-                          Color &color);
-    void DrawZFlatScanLine(GradientInterpolation &g,
-                           EdgeInterpolation &l, EdgeInterpolation &r,
-                           Color &color);
-
-    // Clip methods
-    int CalcClipCode(float x, float y);
-    int ClipLine(float Px, float Py, float Qx, float Qy, Point3f &clP, Point3f &clQ);
-
 private:
     int width;
     int height;
-
-    // Bresenham Line algorithm variables
-    int x{};
-    int y{};
-    int C{};
-    int D{};
-    int M{};
-    int HX{};
-    int HY{};
-    int xInc{};
-    int yInc{};
-    float I{};
-
-    // Wu algorithm variables
-    int DeltaX{};
-    int DeltaY{};
-    int Temp{};
-    int XDir{};
-    int IntensityShift{};
-    int ErrorAccTemp{};
-    int ErrorAdj{};
-    int ErrorAcc{};
-    int Weighting{};
-    int WeightingComplementMask{};
-    Color colorWeighting{};
-    Color cc{};
-    Color cp{};
-
-    // Z variables
-    float zrP{};
-    float zrQ{};
-    float dzr{};
-    float dx{};
-    float dy{};
-    float z{};
-    float dzdx{};
-    float dzdy{};
-    int zl{};
-    int zstatus{};
-    float Tempf{};
-
-    // Scanline algorithm variables
-    EdgeInterpolation Left{};
-    EdgeInterpolation Right{};
-
-    // Clipping variables
-    int cliP{};
-    int cliQ{};
-    float pPx{};
-    float pPy{};
-    float pQx{};
-    float pQy{};
-
-    // Z buffer vars
-    ZBuffer zb{};
 
     Image canvas;
     Texture2D targetTexture;
 
     Color clearColor = WHITE;
-    Maths::Rectangle clipRectangle{};
 };

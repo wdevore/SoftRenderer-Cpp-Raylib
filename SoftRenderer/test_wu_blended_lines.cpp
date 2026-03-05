@@ -24,13 +24,13 @@ void TestWublendedLines::initialize(int width, int height)
 void TestWublendedLines::draw(Canvas &canvas)
 {
     WuColor wuColor{};
-    CColor bg{};
+    PaintColoring::CColor bg{};
     bg.r = 80;
     bg.g = 80;
     bg.b = 80;
     bg.a = 255;
 
-    CColor fg{};
+    PaintColoring::CColor fg{};
     fg.r = 255;
     fg.g = 161;
     fg.b = 0;
@@ -41,15 +41,15 @@ void TestWublendedLines::draw(Canvas &canvas)
 
     wuColor.initialize(bg, fg, 16);
     // canvas.DrawWuBlendedLine(pxs, pys, pxe, pye, wuColor);
-    canvas.DrawZWuBlendedLine(pxs, pys + 5, pxe, pye - 5, 10.0f, 11.0f, wuColor);
+    // canvas.DrawZWuBlendedLine(pxs, pys + 5, pxe, pye - 5, 10.0f, 11.0f, wuColor);
 
-    CColor green{};
+    PaintColoring::CColor green{};
     green.r = 64;
     green.g = 255;
     green.b = 64;
     green.a = 255;
     wuColor.initialize(bg, green, 16);
-    canvas.DrawZWuBlendedLine(pxs, pys - 15, pxe, pye + 15, 8.0f, 9.0f, wuColor);
+    // canvas.DrawZWuBlendedLine(pxs, pys - 15, pxe, pye + 15, 8.0f, 9.0f, wuColor);
     // canvas.DrawZWuBlendedLine(10, 200, 210, 200, 10.0f, 11.0f, wuColor);
     // canvas.DrawZWuBlendedLine(200, 10, 200, 210, 10.0f, 11.0f, wuColor);
     // canvas.DrawZWuBlendedLine(10, 10, 200, 200, 10.0f, 11.0f, wuColor);

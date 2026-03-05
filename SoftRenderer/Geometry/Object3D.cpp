@@ -14,9 +14,8 @@ Object3D::~Object3D()
 
 void Object3D::reset()
 {
-    for (size_t i = 0; i < vertices.size(); i++)
+    for (auto &v : vertices)
     {
-        Vertex3f v = vertices[i];
         v.transformed = false;
     }
 }
@@ -47,7 +46,7 @@ void Object3D::setOrientation(float x, float y, float z, float angle)
 /// @brief returns a matrix that transforms the object from local to
 ///        world-space; NOT camera or view-space.
 /// @return
-Matrix4f &Object3D::getModelToWorldMatrix()
+Matrix4f &Object3D::GetModelToWorldMatrix()
 {
     rotation.setIdentity();
     rotation.setRotation(aa);

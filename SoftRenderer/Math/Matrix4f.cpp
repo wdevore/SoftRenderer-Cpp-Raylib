@@ -265,6 +265,27 @@ void Matrix4f::transform(Point3f &point) const
     }
 }
 
+void Matrix4f::transform(const Point3f &point, Point3f &pointOut) const
+{
+    float x = m00 * point.x + m01 * point.y + m02 * point.z + m03;
+    float y = m10 * point.x + m11 * point.y + m12 * point.z + m13;
+    float z = m20 * point.x + m21 * point.y + m22 * point.z + m23;
+    float w = m30 * point.x + m31 * point.y + m32 * point.z + m33;
+
+    if (w != 1.0f && w != 0.0f)
+    {
+        pointOut.x = x / w;
+        pointOut.y = y / w;
+        pointOut.z = z / w;
+    }
+    else
+    {
+        pointOut.x = x;
+        pointOut.y = y;
+        pointOut.z = z;
+    }
+}
+
 void Matrix4f::transform(Vector3f &normal) const
 {
     float x = m00 * normal.x + m01 * normal.y + m02 * normal.z;

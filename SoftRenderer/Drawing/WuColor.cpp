@@ -11,7 +11,7 @@ WuColor::~WuColor()
 {
 }
 
-void WuColor::initialize(CColor bg, CColor fg, int intensityBits)
+void WuColor::initialize(PaintColoring::CColor bg, PaintColoring::CColor fg, int intensityBits)
 {
     color = fg;
     setIntensityBits(intensityBits);
@@ -25,7 +25,7 @@ void WuColor::initialize(CColor bg, CColor fg, int intensityBits)
 
     for (float i = 1.0f; i < (float)numIntensityLevels + 1; i += 1.0f)
     {
-        CColor &cu = wuIntensities[(int)i - 1];
+        PaintColoring::CColor &cu = wuIntensities[(int)i - 1];
         cu.r = (int)((float)fg.r + (crR * i));
         cu.g = (int)((float)fg.g + (crG * i));
         cu.b = (int)((float)fg.b + (crB * i));
@@ -40,7 +40,7 @@ void WuColor::setIntensityBits(int numberOfBits)
     numIntensityLevels = 1 << intensityBits; // std::pow(2, intensityBits);
 }
 
-CColor &WuColor::GetColor(int weighting)
+PaintColoring::CColor &WuColor::GetColor(int weighting)
 {
     return wuIntensities[weighting];
 }

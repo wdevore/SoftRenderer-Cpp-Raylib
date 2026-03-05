@@ -24,7 +24,7 @@ public:
     WireMeshObject(std::string name);
     ~WireMeshObject();
 
-    void Initialize(CColor bg, CColor fg, int intensityBits);
+    void Initialize(PaintColoring::CColor bg, PaintColoring::CColor fg, int intensityBits);
     void SetAnimate(bool animate) override;
 
     int GetTriangleCount() { return triangles.size(); }

@@ -56,7 +56,7 @@ public:
     float width{};
     float height{};
 
-    Matrix4f volume{};
+    Matrix4f projection{};
     Plane nearPlane{};
 
     Frustum(/* args */);
@@ -64,6 +64,7 @@ public:
 
     void SetWidth(float left, float right);
     void SetHeight(float top, float bottom);
+    void SetDepth(float near, float far);
     void SetNearPlane(float nx, float ny, float nz, float px, float py, float pz);
 
     void BuildProjectionMatrix();

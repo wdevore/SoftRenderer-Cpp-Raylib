@@ -12,4 +12,6 @@ target_include_directories(PipelineLib
 
 target_link_libraries(PipelineLib 
     PUBLIC MathLib
+    PUBLIC GeometryLib
+    PUBLIC DrawingLib
 )

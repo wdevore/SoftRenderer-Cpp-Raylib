@@ -7,6 +7,8 @@
 #include <exception>
 
 #include "Canvas.h"
+#include "Pipeline.h"
+
 #include "test_bresenham_lines.h"
 #include "test_wu_blended_lines.h"
 
@@ -76,39 +78,78 @@ int main(int argc, char *argv[])
     }
 
     SetTargetFPS(60);
+
+    std::unique_ptr<Database> db = std::make_unique<Database>();
+    db->AddTripod(5.0f);
+
     // TestBresenhamLines lines;
-    TestWublendedLines lines;
-    lines.initialize(screenWidth, screenHeight);
+    // TestWublendedLines lines;
+    // lines.initialize(screenWidth, screenHeight);
 
     try
     {
-        // Initialize Canvas
-        Canvas canvas(screenWidth, screenHeight);
-        canvas.initialize();
+        Pipeline pipeline{screenWidth, screenHeight};
+        pipeline.Initialize(std::move(db));
+        pipeline.InitComplete();
 
-        canvas.SetClearColor(DARKGRAY);
+        // Initialize Canvas
+        pipeline.Setup();
 
         while (!WindowShouldClose())
         {
-            canvas.Clear();
+            // ===============================================================
+            // --- Input Handling ---
+            // ===============================================================
+            if (IsKeyDown(KEY_W)) // Move Camera Forward
+            {
+                std::cout << "Moving camera forward..." << std::endl;
+            }
+            if (IsKeyDown(KEY_S))
+            { /* Move Camera Backward */
+            }
+            if (IsKeyDown(KEY_A))
+            { /* Move Camera Left */
+            }
+            if (IsKeyDown(KEY_D))
+            { /* Move Camera Right */
+            }
 
+            if (IsKeyDown(KEY_UP))
+            { /* Rotate Up */
+            }
+            if (IsKeyDown(KEY_DOWN))
+            { /* Rotate Down */
+            }
+            if (IsKeyDown(KEY_LEFT))
+            { /* Rotate Left */
+            }
+            if (IsKeyDown(KEY_RIGHT))
+            { /* Rotate Right */
+            }
+
+            if (IsKeyPressed(KEY_SPACE))
+            { /* Toggle Animation/Action */
+            }
+
+            pipeline.Begin();
+
+            // ===============================================================
             // Rasterize your sceen
-            lines.draw(canvas);
+            pipeline.Render();
+            // ===============================================================
 
-            canvas.Update();
+            // lines.draw(canvas);
+
+            pipeline.Update();
 
             BeginDrawing();
 
-            //------------------------------------------------------------------
-            // Draw the Texture2D (which resides in GPU memory and was updated
-            // with your pixel buffer on line 83) onto the application window
-            // at coordinates (0, 0) Your PutPixel calls only change data in a
-            // std::vector (RAM). canvas.Update() uploads that RAM to the GPU.
-            // This line finally makes that GPU texture visible on the screen.
-            //------------------------------------------------------------------
-            canvas.Blit(0, 0);
+            pipeline.End();
 
-            DrawText("SoftRenderer is running.", 10, 10, 20, WHITE);
+            // ===============================================================
+            // Raylib
+            // ===============================================================
+            DrawText("SoftRenderer is running.", 10, 10, 20, DARKGRAY);
 
             // --- Manual way of drawing FPS
             // const char *fpsText = TextFormat("FPS: %i", GetFPS());

@@ -14,7 +14,7 @@ WireMeshObject::~WireMeshObject()
     name = "MeshObject";
 }
 
-void WireMeshObject::Initialize(CColor bg, CColor fg, int intensityBits)
+void WireMeshObject::Initialize(PaintColoring::CColor bg, PaintColoring::CColor fg, int intensityBits)
 {
     wuC.initialize(bg, fg, intensityBits);
 }
@@ -35,7 +35,7 @@ void WireMeshObject::AddVertex(Vertex3f v)
 /// @param i3 is 1-based
 void WireMeshObject::AddTriangle(int i1, int i2, int i3)
 {
-    std::unique_ptr<Triangle> t(new Triangle(i1 - 1, i2 - 1, i3 - 1));
+    std::unique_ptr<Triangle> t(std::make_unique<Triangle>(i1 - 1, i2 - 1, i3 - 1));
     t->Initialize();
 
     t->SetCenter(
@@ -52,7 +52,7 @@ void WireMeshObject::AddTriangle(int i1, int i2, int i3)
 
 int WireMeshObject::AddEdge(EdgeProperty permanent, EdgeProperty visibility)
 {
-    std::unique_ptr<Edge> e(new Edge(visibility, permanent));
+    std::unique_ptr<Edge> e(std::make_unique<Edge>(visibility, permanent));
 
     edges.push_back(std::move(e));
 
