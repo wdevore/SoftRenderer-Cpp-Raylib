@@ -64,7 +64,7 @@ void Pipeline::End()
 {
     //------------------------------------------------------------------
     // Draw the Texture2D (which resides in GPU memory and was updated
-    // with your pixel buffer on line 83) onto the application window
+    // with your pixel buffer) onto the application window
     // at coordinates (0, 0) Your PutPixel calls only change data in a
     // std::vector (RAM). canvas.Update() uploads that RAM to the GPU.
     // This line finally makes that GPU texture visible on the screen.
@@ -74,23 +74,24 @@ void Pipeline::End()
 
 void Pipeline::Render()
 {
-    painting.DrawBresenhamLine(canvas, 0, 0, 100, 100, PaintColoring::CColor::Red);
+    for (auto &obj : db->GetObjects())
+    {
+        // Reset the object from previous rendering pass.
+        obj->reset();
 
-    // for (auto &obj : db->GetObjects())
-    // {
-    //     // Reset the object from previous rendering pass.
-    //     obj->reset();
-
-    //     auto *oc = dynamic_cast<LineObject *>(obj.get());
-    //     if (oc != nullptr)
-    //     {
-    //         RenderLineObject(oc);
-    //     }
-    // }
+        if (obj->IsOfType(Object3D::ObjectType::Line))
+        {
+            auto lo = static_cast<LineObject *>(obj.get());
+            RenderLineObject(lo);
+        }
+    }
 }
 
 void Pipeline::RenderLineObject(LineObject *lo)
 {
+    // painting.DrawBresenhamLine(canvas, lo->vertices[0].x, lo->vertices[0].y, lo->vertices[1].x, lo->vertices[1].y, lo->color);
+    // return;
+
     // Ask the object for a matrix that will transform it
     // from [object/model/local]-space to world-space.
     modelToWorld = lo->GetModelToWorldMatrix();

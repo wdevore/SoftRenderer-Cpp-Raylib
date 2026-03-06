@@ -8,6 +8,7 @@
 
 #include "Canvas.h"
 #include "Pipeline.h"
+#include "CColor.h"
 
 #include "test_bresenham_lines.h"
 #include "test_wu_blended_lines.h"
@@ -80,7 +81,8 @@ int main(int argc, char *argv[])
     SetTargetFPS(60);
 
     std::unique_ptr<Database> db = std::make_unique<Database>();
-    db->AddTripod(5.0f);
+    // db->AddTripod(5.0f);
+    db->AddLine("DiagLine", 0.0f, 0.0f, 1.0f, 10.0f, 0.0f, 1.0f, PaintColoring::CColor::Red);
 
     // TestBresenhamLines lines;
     // TestWublendedLines lines;

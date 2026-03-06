@@ -2,6 +2,7 @@
 
 LineObject::LineObject(PaintColoring::CColor bg, PaintColoring::CColor fg)
 {
+    type = ObjectType::Line;
     this->color = fg;
     wuColor.initialize(bg, fg, 8);
     name = "LineObject";

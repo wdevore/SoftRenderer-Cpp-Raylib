@@ -2,10 +2,12 @@
 
 WireMeshObject::WireMeshObject(/* args */)
 {
+    type = ObjectType::WireMesh;
 }
 
 WireMeshObject::WireMeshObject(std::string name)
 {
+    type = ObjectType::WireMesh;
     this->name = name;
 }
 

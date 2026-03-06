@@ -2,10 +2,12 @@
 
 #include <vector>
 #include <memory>
+#include <string>
 
 #include "Object3D.h"
 #include "LightBase.h"
 #include "GlobalIllumination.h"
+#include "CColor.h"
 
 enum Shading
 {
@@ -41,5 +43,9 @@ public:
     void AddObject(std::unique_ptr<Object3D> o);
 
     // ========= Objects ===========
+    void AddLine(std::string name,
+                 float px, float py, float pz,
+                 float qx, float qy, float qz,
+                 const PaintColoring::CColor &color);
     void AddTripod(float scale);
 };
