@@ -4,25 +4,60 @@
 
 #include "CColor.h"
 
-class WuColor
+namespace PaintColoring
 {
-private:
-    /* data */
-public:
-    std::vector<PaintColoring::CColor> wuIntensities{};
+    class WuColor
+    {
+    private:
+        /* data */
+    public:
+        std::vector<PaintColoring::CColor> wuIntensities{};
+        inline static int Bit8IntensityLevels = 8;
+        inline static int Bit16IntensityLevels = 16;
 
-    PaintColoring::CColor color{};
-    int intensityBits{};
-    int numIntensityLevels{};
+        PaintColoring::CColor color{};
+        int intensityBits{};
+        int numIntensityLevels{};
 
-    WuColor(/* args */);
-    ~WuColor();
+        static const WuColor BgDarkGray;
+        static const WuColor Red;
+        static const WuColor White;
+        static const WuColor Black;
+        static const WuColor Yellow;
+        static const WuColor Green;
+        static const WuColor Blue;
+        static const WuColor Magenta;
+        static const WuColor Cyan;
 
-    /// @brief
-    /// @param bg Sets the background blending color.
-    /// @param fg Sets object's color property
-    /// @param intensityBits
-    void initialize(PaintColoring::CColor bg, PaintColoring::CColor fg, int intensityBits);
-    void setIntensityBits(int numberOfBits);
-    PaintColoring::CColor &GetColor(int weighting);
-};
+        WuColor(/* args */);
+        WuColor(PaintColoring::CColor bg, PaintColoring::CColor fg, int intensityBits);
+        ~WuColor();
+
+        /// @brief
+        /// @param bg Sets the background blending color.
+        /// @param fg Sets object's color property
+        /// @param intensityBits
+        void initialize(PaintColoring::CColor bg, PaintColoring::CColor fg, int intensityBits);
+
+        void setIntensityBits(int numberOfBits);
+
+        PaintColoring::CColor &GetColor(int weighting);
+
+        // ============ Helper methods ===================
+        void SetFromCColor(PaintColoring::CColor c)
+        {
+            initialize(CColor::White, c, 8);
+        }
+    };
+
+    inline const WuColor WuColor::BgDarkGray{CColor::White, CColor::BgDarkGray, 8};
+    inline const WuColor WuColor::Red{CColor::White, CColor::Red, 8};
+    inline const WuColor WuColor::White{CColor::White, CColor::White, 8};
+    inline const WuColor WuColor::Black{CColor::White, CColor::Black, 8};
+    inline const WuColor WuColor::Yellow{CColor::White, CColor::Yellow, 8};
+    inline const WuColor WuColor::Green{CColor::White, CColor::Green, 8};
+    inline const WuColor WuColor::Blue{CColor::White, CColor::Blue, 8};
+    inline const WuColor WuColor::Magenta{CColor::White, CColor::Magenta, 8};
+    inline const WuColor WuColor::Cyan{CColor::White, CColor::Cyan, 8};
+
+}

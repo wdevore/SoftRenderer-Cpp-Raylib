@@ -38,6 +38,7 @@ void Pipeline::Setup()
     canvas.initialize(width, height);
     painting.Initialize(width, height);
 
+    camera.Resize(width, height);
     canvas.SetClearColor(WHITE);
 
     // Set Perspective
@@ -73,6 +74,8 @@ void Pipeline::Begin()
 
 void Pipeline::Update()
 {
+    camera.Update();
+    SetViewSpaceMatrix(camera.GetTransformMatrix4f()); // TODO may remove this in favor of the methods
     canvas.Update();
     painting.Update();
 }
@@ -125,11 +128,14 @@ void Pipeline::RenderLineObject(LineObject *lo)
     transform.set(worldToView);
     transform.mul(modelToWorld);
 
-    RenderLine(lo->vertices[0], lo->vertices[1], lo->color);
+    RenderLine(lo);
 }
 
-void Pipeline::RenderLine(Vertex3f &vP, Vertex3f &vQ, PaintColoring::CColor &color)
+void Pipeline::RenderLine(LineObject *lo)
 {
+    Vertex3f &vP = lo->vertices[0];
+    Vertex3f &vQ = lo->vertices[1];
+
     transform.transform(vP, vOut1); // affine point transform
     transform.transform(vQ, vOut2);
 
@@ -185,9 +191,16 @@ void Pipeline::RenderLine(Vertex3f &vP, Vertex3f &vQ, PaintColoring::CColor &col
         break;
     }
 
-    // Draw the potentially clipped line
-    painting.DrawZBresenhamLine(canvas, std::round(clP.x), std::round(clP.y), std::round(clQ.x), std::round(clQ.y), p0.z, p1.z, color);
-    // drawZBresenhamLine(Math.round(clP.x), Math.round(clP.y), Math.round(clQ.x), Math.round(clQ.y), p0.z, p1.z, wc.color);
+    // Draw the potentially clipped line.
+
+    if (lo->colorType == Object3D::ColorType::Color)
+    {
+        painting.DrawZBresenhamLine(canvas, std::round(clP.x), std::round(clP.y), std::round(clQ.x), std::round(clQ.y), p0.z, p1.z, lo->color);
+    }
+    else
+    {
+        painting.DrawZWuBlendedLine(canvas, std::round(clP.x), std::round(clP.y), std::round(clQ.x), std::round(clQ.y), p0.z, p1.z, lo->wuColor);
+    }
 }
 
 /// @brief Tranform from view-volume to screen-space using an affine transformation.
@@ -195,7 +208,6 @@ void Pipeline::RenderLine(Vertex3f &vP, Vertex3f &vQ, PaintColoring::CColor &col
 /// @param o output
 void Pipeline::ViewportTransform(const Point3f &v, Point3f &o)
 {
-    // Perspective divide
     float x;
     float y;
     if (v.z == 0.0f)
@@ -205,6 +217,7 @@ void Pipeline::ViewportTransform(const Point3f &v, Point3f &o)
     }
     else
     {
+        // Perspective divide
         x = v.x / v.z;
         y = v.y / v.z;
     }
@@ -335,4 +348,19 @@ void Pipeline::MoveCameraBase(float dx, float dy, float dz)
 {
     camera.MoveCameraBase(dx, dy, dz);
     SetViewSpaceMatrix(camera.GetTransformMatrix4f());
+}
+
+void Pipeline::OnMouseDown(int x, int y)
+{
+    camera.OnMouseDown(x, y);
+}
+
+void Pipeline::OnMouseUp()
+{
+    camera.OnMouseUp();
+}
+
+void Pipeline::OnMouseMove(int x, int y)
+{
+    camera.OnMouseMove(x, y);
 }

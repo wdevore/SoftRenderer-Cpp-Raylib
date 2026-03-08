@@ -84,7 +84,8 @@ int main(int argc, char *argv[])
     // db->AddTripod(5.0f);
     // The Z position is negative to make sure it is in front of the camera. The
     // camera is positioned along the +Z half-space.
-    db->AddLine("DiagLine", 0.0f, 0.0f, -1.0f, 2.0f, 0.0f, -1.0f, PaintColoring::CColor::Red);
+    // db->AddLine("DiagLine", 0.0f, 0.0f, -1.0f, 2.0f, 0.0f, -1.0f, PaintColoring::CColor::Red);
+    db->AddTripod(1.0f);
 
     // TestBresenhamLines lines{};
     // TestWublendedLines lines{};
@@ -144,6 +145,19 @@ int main(int argc, char *argv[])
 
             if (IsKeyPressed(KEY_SPACE))
             { /* Toggle Animation/Action */
+            }
+
+            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+            {
+                pipeline.OnMouseDown(GetMouseX(), GetMouseY());
+            }
+            if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
+            {
+                pipeline.OnMouseUp();
+            }
+            if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
+            {
+                pipeline.OnMouseMove(GetMouseX(), GetMouseY());
             }
 
             pipeline.Begin();

@@ -103,6 +103,10 @@ public:
 
     void SetBScreenYOrientation(bool bScreenYOrientation) { this->bScreenYOrientation = bScreenYOrientation; }
 
+    void OnMouseDown(int x, int y);
+    void OnMouseUp();
+    void OnMouseMove(int x, int y);
+
     /// @brief
     /// @param vDir The direction to rotate to.
     void LookInDirection(const Vector3f &vDir);

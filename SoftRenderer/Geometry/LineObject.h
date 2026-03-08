@@ -9,7 +9,7 @@ class LineObject : public Object3D
 private:
     /* data */
 public:
-    WuColor wuColor{};
+    PaintColoring::WuColor wuColor{};
     PaintColoring::CColor color{};
 
     LineObject(PaintColoring::CColor bg, PaintColoring::CColor fg);

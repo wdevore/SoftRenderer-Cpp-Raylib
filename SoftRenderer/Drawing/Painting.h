@@ -75,9 +75,9 @@ public:
     void DrawZBresenhamLine(Canvas &canvas, int xP, int yP, int xQ, int yQ, float zP, float zQ, PaintColoring::CColor color);
 
     // Wu algorithm
-    void DrawWuIndexedLine(Canvas &canvas, int X0, int Y0, int X1, int Y1, WuColor color);
-    void DrawWuBlendedLine(Canvas &canvas, int X0, int Y0, int X1, int Y1, WuColor color);
-    void DrawZWuBlendedLine(Canvas &canvas, int X0, int Y0, int X1, int Y1, float zP, float zQ, WuColor color);
+    void DrawWuIndexedLine(Canvas &canvas, int X0, int Y0, int X1, int Y1, PaintColoring::WuColor color);
+    void DrawWuBlendedLine(Canvas &canvas, int X0, int Y0, int X1, int Y1, PaintColoring::WuColor color);
+    void DrawZWuBlendedLine(Canvas &canvas, int X0, int Y0, int X1, int Y1, float zP, float zQ, PaintColoring::WuColor color);
 
     // Scanline algorithms: Triangle rasterization
     long DrawFlatTriangle(Canvas &canvas, GradientInterpolation &g,

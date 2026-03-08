@@ -23,7 +23,7 @@ void TestWublendedLines::initialize(int width, int height)
 
 void TestWublendedLines::draw(Canvas &canvas)
 {
-    WuColor wuColor{};
+    PaintColoring::WuColor wuColor{};
     PaintColoring::CColor bg{};
     bg.r = 80;
     bg.g = 80;

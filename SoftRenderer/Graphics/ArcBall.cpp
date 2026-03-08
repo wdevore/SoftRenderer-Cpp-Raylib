@@ -52,8 +52,10 @@ void ArcBall::Resize(int width, int height)
 
 void ArcBall::MapScreenCoords(int x, int y)
 {
-    if (!bScreenYOrientation)
+    if (bScreenYOrientation)
         vNow.set(x, height - y, 0.0f);
+    else
+        vNow.set(x, y, 0.0f);
 }
 
 void ArcBall::Update()
@@ -276,6 +278,22 @@ void ArcBall::MoveCameraBase(float dx, float dy, float dz)
 {
     // Modify camera's base vector based on local-space horizontal normal vector.
     vBase.set(vBase.x + (dx * vHorz.x), vBase.y + (dy * vUp.y), vBase.z + (dz * vLos.z));
-    std::cout << "Base: " << vBase.x << ", " << vBase.y << ", " << vBase.z << std::endl;
+    // std::cout << "Base: " << vBase.x << ", " << vBase.y << ", " << vBase.z << std::endl;
     LookAt(vTarget);
+}
+
+void ArcBall::OnMouseDown(int x, int y)
+{
+    MapScreenCoords(x, y);
+    MapMouseToSphere(vNow);
+    vFrom.set(vBallMouse);
+    qDown.set(qNow);
+    bDragging = true;
+}
+
+void ArcBall::OnMouseUp() { bDragging = false; }
+
+void ArcBall::OnMouseMove(int x, int y)
+{
+    MapScreenCoords(x, y);
 }

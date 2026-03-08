@@ -187,7 +187,7 @@ void Painting::DrawZBresenhamLine(Canvas &canvas, int xP, int yP, int xQ, int yQ
 }
 
 /// @brief NOT WORKING
-void Painting::DrawWuIndexedLine(Canvas &canvas, int X0, int Y0, int X1, int Y1, WuColor color)
+void Painting::DrawWuIndexedLine(Canvas &canvas, int X0, int Y0, int X1, int Y1, PaintColoring::WuColor color)
 {
     if (X0 < 0 || X0 > width - 1 || X1 < 0 || X1 > width - 1)
         return;
@@ -357,7 +357,7 @@ void Painting::DrawWuIndexedLine(Canvas &canvas, int X0, int Y0, int X1, int Y1,
     canvas.PutPixel(X1, Y1, c);
 }
 
-void Painting::DrawWuBlendedLine(Canvas &canvas, int X0, int Y0, int X1, int Y1, WuColor color)
+void Painting::DrawWuBlendedLine(Canvas &canvas, int X0, int Y0, int X1, int Y1, PaintColoring::WuColor color)
 {
     if (X0 < 0 || X0 > width - 1 || X1 < 0 || X1 > width - 1)
         return;
@@ -547,7 +547,7 @@ void Painting::DrawWuBlendedLine(Canvas &canvas, int X0, int Y0, int X1, int Y1,
     canvas.PutPixel(X1, Y1, c);
 }
 
-void Painting::DrawZWuBlendedLine(Canvas &canvas, int X0, int Y0, int X1, int Y1, float zP, float zQ, WuColor color)
+void Painting::DrawZWuBlendedLine(Canvas &canvas, int X0, int Y0, int X1, int Y1, float zP, float zQ, PaintColoring::WuColor color)
 {
     if (X0 < 0 || X0 > width - 1 || X1 < 0 || X1 > width - 1)
         return;

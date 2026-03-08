@@ -5,6 +5,7 @@
 
 namespace PaintColoring
 {
+    // CColor can also be the foreground color of a WuColor.
     struct CColor
     {
         int r;

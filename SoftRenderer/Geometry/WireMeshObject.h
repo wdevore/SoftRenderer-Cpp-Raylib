@@ -14,7 +14,7 @@ class WireMeshObject : public Object3D
 private:
     /* data */
 public:
-    WuColor wuC{};
+    PaintColoring::WuColor wuC{};
 
     std::vector<std::unique_ptr<Triangle>> triangles{};
     // A simple edge visibility collection

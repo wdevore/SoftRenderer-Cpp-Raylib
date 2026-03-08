@@ -16,10 +16,18 @@ public:
         WireMesh
     };
 
+    enum class ColorType
+    {
+        Color,
+        WuColor
+    };
+
     Object3D();
     virtual ~Object3D() = 0; // Makes class abstract
 
     std::string name{};
+    ColorType colorType = ColorType::Color;
+
     bool animate{};
 
     Vector3f position{};
@@ -46,6 +54,9 @@ public:
     int GetVertexCount() { return vertices.size(); }
 
     virtual void SetAnimate(bool animate) = 0;
+
+    void SetToCColor() { colorType = ColorType::Color; }
+    void SetToWuColor() { colorType = ColorType::WuColor; }
 
 protected:
     Vector3f p1{};

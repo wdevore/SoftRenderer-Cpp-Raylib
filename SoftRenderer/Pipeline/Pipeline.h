@@ -98,7 +98,7 @@ public:
     // =========== Renderers =================
     void Render();
     void RenderLineObject(LineObject *lo);
-    void RenderLine(Vertex3f &vP, Vertex3f &vQ, PaintColoring::CColor &color);
+    void RenderLine(LineObject *lo);
 
     void ViewportTransform(const Point3f &v, Point3f &o);
 
@@ -115,4 +115,8 @@ public:
 
     // =========== Camera manipulation =================
     void MoveCameraBase(float dx, float dy, float dz);
+
+    void OnMouseDown(int x, int y);
+    void OnMouseUp();
+    void OnMouseMove(int x, int y);
 };
