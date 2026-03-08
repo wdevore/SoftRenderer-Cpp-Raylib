@@ -9,6 +9,7 @@
 #include "LineObject.h"
 #include "Rectangle.h"
 #include "CColor.h"
+#include "ArcBall.h"
 
 // Pipeline takes a vector of vertices, edges and normals.
 //
@@ -32,14 +33,21 @@ private:
 
     std::vector<Vertex3f> transformedVertices{};
 
-    // ArcBall camera;
-
+    // =========== Space mapping matricies ================
     // This matrix represents the transform from view-space to view-volume-space.
     // This is usually the frustum.
     Matrix4f viewToVolume{};
 
-    // Space mapping matricies
+    // This matrix represents the transform from model - space to world - space.
+    // The *modelview matrix is stored in each object as each object potentially
+    // is *located somewhere in world - space.
     Matrix4f modelToWorld;
+
+    // This matrix represents transforms from world-space to view-space. It is
+    // set by getting the camera's transform matrix.
+    // camera.GetTransformMatrix();
+    //
+    // Note: we are talking about camera or view-space NOT view-volume-space.
     Matrix4f worldToView;
 
     Matrix4f transform;
@@ -70,6 +78,11 @@ private:
     float pQy{};
     Maths::Rectangle clipRectangle{};
 
+    // World Clipping planes
+    Plane worldPlaneX{};
+
+    ArcBall camera{};
+
 public:
     Pipeline(int width, int height) : width(width), height(height) {};
     ~Pipeline();
@@ -86,9 +99,20 @@ public:
     void Render();
     void RenderLineObject(LineObject *lo);
     void RenderLine(Vertex3f &vP, Vertex3f &vQ, PaintColoring::CColor &color);
+
     void ViewportTransform(const Point3f &v, Point3f &o);
 
-    // Clip methods
+    float CalcAspectRatio();
+
+    // =========== Clip methods =================
     int CalcClipCode(float x, float y);
     int ClipLine(float Px, float Py, float Qx, float Qy, Point3f &clP, Point3f &clQ);
+
+    /// @brief Set the world-space to view-space matrix. This matrix is retrieved from
+    ///        the camera's transform matrix.
+    /// @param m
+    void SetViewSpaceMatrix(const Matrix4f &m);
+
+    // =========== Camera manipulation =================
+    void MoveCameraBase(float dx, float dy, float dz);
 };

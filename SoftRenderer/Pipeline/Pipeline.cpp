@@ -7,7 +7,7 @@
 
 Pipeline::~Pipeline()
 {
-    std::cout << "Pipeline destroyed." << std::endl;
+    std::cout << "Pipeline destroyed" << std::endl;
 }
 
 void Pipeline::Initialize(std::unique_ptr<Database> db)
@@ -15,11 +15,6 @@ void Pipeline::Initialize(std::unique_ptr<Database> db)
     this->db = std::move(db);
 
     clipRectangle = Maths::Rectangle(0, 0, width - 1, height - 1);
-
-    // Create and initialize camera
-    // camera.lookAt(0.0f, 0.0f, 7.0f, 0.0f, 0.0f, 0.0f);
-
-    // SetViewSpaceMatrix(camera.getTransformMatrix4f());
 }
 
 void Pipeline::InitComplete()
@@ -35,10 +30,7 @@ void Pipeline::InitComplete()
 
     transformedVertices.resize(vertexCount);
 
-    // Setup the view-volume matrix (aka projection matrix)
-    viewToVolume.set(frustum.projection);
-
-    std::cout << "Pipeline initialized." << std::endl;
+    std::cout << "Pipeline initialized" << std::endl;
 }
 
 void Pipeline::Setup()
@@ -47,6 +39,31 @@ void Pipeline::Setup()
     painting.Initialize(width, height);
 
     canvas.SetClearColor(WHITE);
+
+    // Set Perspective
+    float near = 1.0f;
+    float far = 100.0f;
+
+    float aspectRatio = CalcAspectRatio();
+    // First set the perspective so we can retrieve the projection matrix.
+    frustum.SetPerspective(45.0f, aspectRatio, near, far);
+
+    // Setup the view-volume matrix (aka projection matrix)
+    viewToVolume.set(frustum.projection);
+
+    // Create and initialize camera
+    camera.LookAt(0.0f, 0.0f, 15.0f, 0.0f, 0.0f, 0.0f);
+
+    SetViewSpaceMatrix(camera.GetTransformMatrix4f());
+
+    worldPlaneX.SetNormal(-1.0f, 0.0f, 0.0f);
+    Object3D *o = db->GetObject("Plane");
+    if (o != nullptr)
+    {
+        worldPlaneX.SetPoint(o->position);
+    }
+
+    std::cout << "Pipeline setup complete." << std::endl;
 }
 
 void Pipeline::Begin()
@@ -103,7 +120,7 @@ void Pipeline::RenderLineObject(LineObject *lo)
     // matrices; post multiplying.
     //
     // Instead of performing this: modelToWorld*worldToView
-    // we perform this: worldToView*modelToWorld.
+    // we perform this: worldToView*modelToWorl
     transform.setIdentity();
     transform.set(worldToView);
     transform.mul(modelToWorld);
@@ -148,12 +165,12 @@ void Pipeline::RenderLine(Vertex3f &vP, Vertex3f &vQ, PaintColoring::CColor &col
         return;
     case 1:
         // Now we need to calculate the new Z components of the
-        // clipped line. But only if they were clipped.
+        // clipped line. But only if they were clipped
         zrP = 1.0f / p0.z;
         zrQ = 1.0f / p1.z;
         dzr = zrQ - zrP;
         dx = (p1.x - p0.x);
-        // Note: I could also use Y instead.
+        // Note: I could also use Y instead
         // float dy = (p1.y - p0.y);
         // Just make sure you use the corresponding "y" components.
         // first point where u = 0
@@ -201,6 +218,21 @@ void Pipeline::ViewportTransform(const Point3f &v, Point3f &o)
     o.set(x, y, v.z);
 }
 
+float Pipeline::CalcAspectRatio()
+{
+    float aspectRatio;
+    if (width > height)
+    {
+        aspectRatio = (float)width / (float)height;
+    }
+    else
+    {
+        aspectRatio = (float)height / (float)width;
+    }
+
+    return aspectRatio;
+}
+
 // ======================== Clipping ========================================
 /// @brief Generates a 4 bit code. Each bit indicates if x and/or y outside
 ///        the clip rectangle.
@@ -214,8 +246,8 @@ int Pipeline::CalcClipCode(float x, float y)
 
 /// @brief
 ///        0 = both points outside of region.
-///        1 = one point clipped.
-//         2 = none were clipped.
+///        1 = one point clipped
+//         2 = none were clipped
 /// @param Px
 /// @param Py
 /// @param Qx
@@ -292,4 +324,15 @@ int Pipeline::ClipLine(float Px, float Py, float Qx, float Qy, Point3f &clP, Poi
         return 2;
     else
         return 1;
+}
+
+void Pipeline::SetViewSpaceMatrix(const Matrix4f &m)
+{
+    worldToView.set(m);
+}
+
+void Pipeline::MoveCameraBase(float dx, float dy, float dz)
+{
+    camera.MoveCameraBase(dx, dy, dz);
+    SetViewSpaceMatrix(camera.GetTransformMatrix4f());
 }
