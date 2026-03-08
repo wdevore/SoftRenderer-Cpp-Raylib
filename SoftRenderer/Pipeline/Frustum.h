@@ -57,7 +57,14 @@ public:
     float height{};
 
     Matrix4f projection{};
+
+    // The plane is positioned in +Z half-space facing -Z direction. Thus a
+    // vertex 'v' is in front of the plane if 'v' > plane's z-position.
     Plane nearPlane{};
+    // The plane's frontside is facing -Z
+    static inline const Vector3f nearPlaneNormal{0.0f, 0.0f, -1.0f};
+    // The plane's postion is in the +Z half-space
+    static inline const Vector3f nearPlanePosition{0.0f, 0.0f, 1.0f};
 
     Frustum(/* args */);
     ~Frustum();
@@ -66,6 +73,9 @@ public:
     void SetHeight(float top, float bottom);
     void SetDepth(float near, float far);
     void SetNearPlane(float nx, float ny, float nz, float px, float py, float pz);
+    void Set(float left, float right, float bottom,
+             float top, float near, float far);
+    void SetPerspective(float ffov, float faspect, float near, float far);
 
     void BuildProjectionMatrix();
     float GetViewDistance();

@@ -1,6 +1,8 @@
 #include <cmath>
+#include <iostream>
 
 #include "Frustum.h"
+#include "Constants.h"
 
 Frustum::Frustum(/* args */)
 {
@@ -33,6 +35,36 @@ void Frustum::SetNearPlane(float nx, float ny, float nz, float px, float py, flo
 {
     nearPlane.SetNormal(nx, ny, nz);
     nearPlane.SetPoint(px, py, pz);
+}
+
+void Frustum::Set(float left, float right, float bottom, float top, float near, float far)
+{
+    if (near == far || left == right || bottom == top)
+        return;
+
+    SetWidth(left, right);
+    SetHeight(top, bottom);
+    SetDepth(near, far);
+
+    BuildProjectionMatrix();
+
+    // The near plane's frontside is determined by its normal.
+    SetNearPlane(nearPlaneNormal.x, nearPlaneNormal.y, nearPlaneNormal.z, 0.0f, 0.0f, 1.0f);
+}
+
+void Frustum::SetPerspective(float ffov, float faspect, float near, float far)
+{
+    double left, right, bottom, top;
+
+    // Changing the sign of near inverts the mouse motion.
+    right = -near * std::tan((ffov / 2.0f) * (Maths::PI / 180.0f));
+    left = -right;
+    bottom = left / faspect;
+    top = right / faspect;
+
+    std::cout << "Frustum::SetPerspective distance " << (1.0f / std::tan(ffov)) << std::endl;
+
+    Set(left, right, bottom, top, -near, -far);
 }
 
 void Frustum::BuildProjectionMatrix()
