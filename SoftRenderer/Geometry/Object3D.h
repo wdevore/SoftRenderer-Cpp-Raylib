@@ -22,6 +22,8 @@ public:
     std::string name{};
     bool animate{};
 
+    Vector3f position{};
+
     std::vector<Vertex3f> vertices{};
     std::vector<Vertex3f> vertex_normals{};
 
@@ -54,7 +56,6 @@ protected:
 private:
     Matrix4f translation{};
     Matrix4f rotation{};
-    Vector3f position{};
     AxisAngle4f aa{};
 
     // The combined rotation and translation
