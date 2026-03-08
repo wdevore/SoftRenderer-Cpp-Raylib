@@ -82,10 +82,12 @@ int main(int argc, char *argv[])
 
     std::unique_ptr<Database> db = std::make_unique<Database>();
     // db->AddTripod(5.0f);
-    db->AddLine("DiagLine", 0.0f, 0.0f, 1.0f, 10.0f, 0.0f, 1.0f, PaintColoring::CColor::Red);
+    // The Z position is negative to make sure it is in front of the camera. The
+    // camera is positioned along the +Z half-space.
+    db->AddLine("DiagLine", 0.0f, 0.0f, -1.0f, 2.0f, 0.0f, -1.0f, PaintColoring::CColor::Red);
 
-    // TestBresenhamLines lines;
-    // TestWublendedLines lines;
+    // TestBresenhamLines lines{};
+    // TestWublendedLines lines{};
     // lines.initialize(screenWidth, screenHeight);
 
     try
@@ -104,23 +106,34 @@ int main(int argc, char *argv[])
             // ===============================================================
             if (IsKeyDown(KEY_W)) // Move Camera Forward
             {
-                std::cout << "Moving camera forward..." << std::endl;
+                // Moves the camera up in the camera's plane
+                pipeline.MoveCameraBase(0.0f, -0.05f, 0.0f);
             }
             if (IsKeyDown(KEY_S))
-            { /* Move Camera Backward */
+            {
+                // Moves the camera down in the camera's plane
+                pipeline.MoveCameraBase(0.0f, 0.05f, 0.0f);
             }
             if (IsKeyDown(KEY_A))
-            { /* Move Camera Left */
+            {
+                // Moves the camera left in the camera's plane
+                pipeline.MoveCameraBase(-0.05f, 0.0f, 0.0f);
             }
             if (IsKeyDown(KEY_D))
-            { /* Move Camera Right */
+            {
+                // Moves the camera right in the camera's plane
+                pipeline.MoveCameraBase(0.05f, 0.0f, 0.0f);
             }
 
             if (IsKeyDown(KEY_UP))
-            { /* Rotate Up */
+            {
+                // Moves the camera forward in the camera's plane
+                pipeline.MoveCameraBase(0.0f, 0.0f, 0.05f);
             }
             if (IsKeyDown(KEY_DOWN))
-            { /* Rotate Down */
+            {
+                // Moves the camera backward in the camera's plane
+                pipeline.MoveCameraBase(0.0f, 0.0f, -0.05f);
             }
             if (IsKeyDown(KEY_LEFT))
             { /* Rotate Left */
