@@ -7,6 +7,8 @@
 #include "Point3f.h"
 #include "AxisAngle4f.h"
 
+class Quat4f;
+
 class Matrix4f
 {
 public:
@@ -58,6 +60,9 @@ public:
     void transform(Vector3f &normal) const;
 
     void setRotation(AxisAngle4f a1);
+    /// @brief
+    /// @param q Must be a unit quaternion
+    void setRotation(const Quat4f &q);
 
     bool equals(const Matrix4f &m1) const;
     bool epsilonEquals(const Matrix4f &m1, float epsilon) const;

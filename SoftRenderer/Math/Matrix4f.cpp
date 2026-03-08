@@ -1,4 +1,5 @@
 #include "Matrix4f.h"
+#include "Quat4f.h"
 #include <cmath>
 #include <sstream>
 
@@ -346,6 +347,42 @@ void Matrix4f::setRotation(AxisAngle4f a1)
     m13 = 0.0f; // m[13]
     m23 = 0.0f; // m[14]
     m33 = 1.0f; // m[15]
+}
+
+void Matrix4f::setRotation(const Quat4f &q)
+{
+    float x = q.x;
+    float y = q.y;
+    float z = q.z;
+    float w = q.w;
+
+    float x2 = x * x;
+    float y2 = y * y;
+    float z2 = z * z;
+
+    // Row 0
+    m00 = 1.0f - 2.0f * (y2 + z2);
+    m01 = 2.0f * (x * y - z * w);
+    m02 = 2.0f * (x * z + y * w);
+    m03 = 0.0f;
+
+    // Row 1
+    m10 = 2.0f * (x * y + z * w);
+    m11 = 1.0f - 2.0f * (x2 + z2);
+    m12 = 2.0f * (y * z - x * w);
+    m13 = 0.0f;
+
+    // Row 2
+    m20 = 2.0f * (x * z - y * w);
+    m21 = 2.0f * (y * z + x * w);
+    m22 = 1.0f - 2.0f * (x2 + y2);
+    m23 = 0.0f;
+
+    // Row 3
+    m30 = 0.0f;
+    m31 = 0.0f;
+    m32 = 0.0f;
+    m33 = 1.0f;
 }
 
 std::string Matrix4f::toString() const
