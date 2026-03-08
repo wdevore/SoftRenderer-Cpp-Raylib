@@ -33,6 +33,7 @@ public:
     void sub(const Point3f &p1, const Point3f &p2);
     void scale(float s);
     void scaleAdd(float s, const Vector3f &v1, const Vector3f &v2);
+    void negate();
 
     bool equals(const Vector3f &v1) const;
     bool epsilonEquals(const Vector3f &v1, float epsilon) const;

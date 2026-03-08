@@ -123,6 +123,13 @@ void Vector3f::scaleAdd(float s, const Vector3f &v1, const Vector3f &v2)
     z = s * v1.z + v2.z;
 }
 
+void Vector3f::negate()
+{
+    x = -x;
+    y = -y;
+    z = -z;
+}
+
 std::string Vector3f::toString() const
 {
     std::stringstream ss;
