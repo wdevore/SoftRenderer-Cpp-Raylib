@@ -47,5 +47,9 @@ public:
                  float px, float py, float pz,
                  float qx, float qy, float qz,
                  const PaintColoring::CColor &color);
+
     void AddTripod(float scale);
+    void AddPlane(float width, float height,
+                  float px, float py, float pz,
+                  int r, int g, int b);
 };

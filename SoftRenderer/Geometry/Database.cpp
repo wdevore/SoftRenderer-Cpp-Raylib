@@ -108,3 +108,26 @@ void Database::AddTripod(float scale)
     o->addVertex(Vertex3f{0.0f, -scale, 0.0f});
     AddObject(std::move(o));
 }
+
+// NOT COMPLETE YET
+void Database::AddPlane(float width, float height, float px, float py, float pz, int r, int g, int b)
+{
+    std::unique_ptr<Object3D> o;
+
+    o = std::make_unique<WireMeshObject>();
+    o->name = "Plane"; // +Z
+
+    o->setPosition(px, py, pz);
+    // o->setOrientation(-90.0f, 0.0f, 1.0f, 0.0f);
+
+    Vertex3f p1{};
+
+    p1.set(-width / 2, -height / 2, 0.0f); // 1
+    o->addVertex(p1);
+    p1.set(width / 2, -height / 2, 0.0f); // 2
+    o->addVertex(p1);
+    p1.set(width / 2, height / 2, 0.0f); // 3
+    o->addVertex(p1);
+    p1.set(-width / 2, height / 2, 0.0f); // 4
+    o->addVertex(p1);
+}
