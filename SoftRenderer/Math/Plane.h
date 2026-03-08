@@ -9,9 +9,7 @@ private:
     /* data */
 public:
     Vector3f normal{};
-    Vector3f transformedNormal{};
-    Point3f point{};
-    Vector3f transformedPoint{};
+    Point3f position{};
     Vector3f intersection{};
     Vector3f u{};
     Vector3f w{};
@@ -25,5 +23,5 @@ public:
     void SetPoint(const Point3f &p);
     int WhereIsPoint(const Point3f &p);
     int Intersect(const Point3f &vP, const Point3f &vQ);
-    int ClipToFront(Point3f vP, Point3f vQ, Point3f clP, Point3f clQ);
+    int ClipToFront(const Point3f &vP, const Point3f &vQ, Point3f &clP, Point3f &clQ);
 };

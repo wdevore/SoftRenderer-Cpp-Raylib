@@ -15,29 +15,25 @@ void Plane::SetNormal(float x, float y, float z)
 {
     normal.set(x, y, z);
     normal.normalize();
-    transformedNormal.set(normal);
 }
 
 void Plane::SetPoint(float x, float y, float z)
 {
-    point.set(x, y, z);
-    transformedPoint.set(point);
+    position.set(x, y, z);
 }
 
 void Plane::SetPoint(const Vector3f &v)
 {
-    point.set(v.x, v.y, v.z);
-    transformedPoint.set(point);
+    position.set(v.x, v.y, v.z);
 }
 
 void Plane::SetPoint(const Point3f &p)
 {
-    point.set(p);
-    transformedPoint.set(point);
+    position.set(p);
 }
 
 /// @brief Determine if point `p` is in front of plane or on the back side.
-/// @param p point to be tested
+/// @param p point to be tested, for example p could be the camera's position.
 /// @return
 /// ```
 /// 0 = coplanar, neither front or back
@@ -46,25 +42,44 @@ void Plane::SetPoint(const Point3f &p)
 /// ```
 int Plane::WhereIsPoint(const Point3f &p)
 {
-    w.sub(p, transformedPoint);
-    float d = transformedNormal.dot(w);
+    // In 3D mathematics, the "front" or "back" of a plane is determined by the
+    // direction of its normal vector(n).
+    // The standard way to check this is by taking the dot product between the
+    // plane's normal and a vector pointing from the plane to your point (or the camera).
+    // The Direction of View:
+    // In rendering, if you are calculating the dot product between the
+    // plane normal and the view vector (camera direction):
+    // If n . V < 0, the plane is facing the camera (front-facing).
+    // If n . V > 0, the plane is facing away from the camera (back-facing).
+
+    // Create vector pointing from the plane to your point
+    w.sub(p, position);
+
+    float d = normal.dot(w);
+
+    // 1) Front (Positive Half-space): If the dot product is greater than zero.
+    // 2) Back (Negative Half-space): If the dot product is less than zero.
+    // 3) On the Plane: If the dot product is exactly zero. (Coplanar)
+
     if (std::abs(d) < Maths::EPSILON)
     {
-        // it is coplanar
+        // it is coplanar #3
         return 0;
     }
+
     if (d < 0.0f)
-        return 1; // backside
-    return 2;     // frontside
+        return 1; // backside #2
+
+    return 2; // frontside #3
 }
 
 int Plane::Intersect(const Point3f &vP, const Point3f &vQ)
 {
     u.sub(vQ, vP);
-    w.sub(vP, transformedPoint);
+    w.sub(vP, position);
 
-    float d = transformedNormal.dot(u);
-    float n = -transformedNormal.dot(w);
+    float d = normal.dot(u);
+    float n = -normal.dot(w);
 
     if (std::abs(d) < Maths::EPSILON)
     {
@@ -94,7 +109,7 @@ int Plane::Intersect(const Point3f &vP, const Point3f &vQ)
     return 1;
 }
 
-int Plane::ClipToFront(Point3f vP, Point3f vQ, Point3f clP, Point3f clQ)
+int Plane::ClipToFront(const Point3f &vP, const Point3f &vQ, Point3f &clP, Point3f &clQ)
 {
     // Clip line to a world plane
     int iP = WhereIsPoint(vP);
