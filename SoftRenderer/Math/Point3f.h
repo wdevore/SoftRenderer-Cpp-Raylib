@@ -24,6 +24,9 @@ public:
     float distanceSquared(const Point3f &p) const;
 
     void add(const Vector3f &v);
+    void add(const Point3f &p);
+    void add(const Point3f &p1, const Point3f &p2);
+    void add(const Vector3f &v, const Point3f &p);
     void sub(const Vector3f &v);
     void sub(const Point3f &p1, const Point3f &p2);
     void scale(float s);
@@ -31,5 +34,8 @@ public:
     bool equals(const Point3f &p1) const;
     bool epsilonEquals(const Point3f &p1, float epsilon) const;
 
-    std::string toString() const;
+    friend std::ostream &operator<<(std::ostream &os, const Point3f &o)
+    {
+        return os << "(" << o.x << ", " << o.y << ", " << o.z << ")";
+    }
 };

@@ -95,6 +95,13 @@ void Vector3f::sub(const Vector3f &v1, const Vector3f &v2)
     z = v1.z - v2.z;
 }
 
+void Vector3f::sub(const Point3f &v1)
+{
+    x -= v1.x;
+    y -= v1.y;
+    z -= v1.z;
+}
+
 void Vector3f::sub(const Point3f &p, const Vector3f &v)
 {
     x = p.x - v.x;
@@ -128,13 +135,6 @@ void Vector3f::negate()
     x = -x;
     y = -y;
     z = -z;
-}
-
-std::string Vector3f::toString() const
-{
-    std::stringstream ss;
-    ss << "(" << x << ", " << y << ", " << z << ")";
-    return ss.str();
 }
 
 bool Vector3f::equals(const Vector3f &v1) const

@@ -35,20 +35,18 @@ public:
     std::vector<Vertex3f> vertices{};
     std::vector<Vertex3f> vertex_normals{};
 
-    int r{};
-    int g{};
-    int b{};
-    int a{};
-
     void reset();
     void addVertex(Vertex3f v);
-    void setColor(int r, int g, int b, int a = 255);
 
     void setPosition(float x, float y, float z);
     void setOrientation(float x, float y, float z, float angle);
 
+    // ========== Transforms ===============
     Matrix4f &GetModelToWorldMatrix();
+
+    // ========== Types ===============
     ObjectType GetType() const { return type; }
+    void SetType(ObjectType type) { this->type = type; }
     bool IsOfType(ObjectType type) const { return this->type == type; }
 
     int GetVertexCount() { return vertices.size(); }

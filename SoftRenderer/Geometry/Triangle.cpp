@@ -66,11 +66,10 @@ void Triangle::SetNormal(Vertex3f p1, Vertex3f p2, Vertex3f p3)
 
 void Triangle::SetCenter(Vertex3f p1, Vertex3f p2, Vertex3f p3)
 {
-    // get center of triangle
-    tv1.set(p1.x + p2.x, p1.y + p2.y, p1.z + p2.z);
-    tv1.scale(1.0f / 2.0f);
-    tv2.set(p1.x + p3.x, p1.y + p3.y, p1.z + p3.z);
-    tv2.scale(1.0f / 2.0f);
-    center.set(tv1.x + tv2.x, tv1.y + tv2.y, tv1.z + tv2.z);
-    center.scale(1.0f / 2.0f);
+    // The centroid of a triangle is simply the average of its three vertices:
+    // (p1 + p2 + p3) / 3.
+    center.set(
+        (p1.x + p2.x + p3.x) / 3.0f,
+        (p1.y + p2.y + p3.y) / 3.0f,
+        (p1.z + p2.z + p3.z) / 3.0f);
 }

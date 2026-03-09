@@ -2,8 +2,6 @@
 #include <cmath>
 
 #include "Pipeline.h"
-#include "LineObject.h"
-#include "Painting.h"
 
 Pipeline::~Pipeline()
 {
@@ -99,19 +97,29 @@ void Pipeline::Render()
         // Reset the object from previous rendering pass.
         obj->reset();
 
-        if (obj->IsOfType(Object3D::ObjectType::Line))
+        switch (obj->GetType())
+        {
+        case Object3D::ObjectType::Line:
         {
             auto lo = static_cast<LineObject *>(obj.get());
             RenderLineObject(lo);
+            break;
+        }
+        case Object3D::ObjectType::WireMesh:
+        {
+            auto mo = static_cast<WireMeshObject *>(obj.get());
+            RenderWireMeshObject(mo);
+            break;
+        }
+
+        default:
+            break;
         }
     }
 }
 
 void Pipeline::RenderLineObject(LineObject *lo)
 {
-    // painting.DrawBresenhamLine(canvas, lo->vertices[0].x, lo->vertices[0].y, lo->vertices[1].x, lo->vertices[1].y, lo->color);
-    // return;
-
     // Ask the object for a matrix that will transform it
     // from [object/model/local]-space to world-space.
     modelToWorld = lo->GetModelToWorldMatrix();
@@ -128,14 +136,11 @@ void Pipeline::RenderLineObject(LineObject *lo)
     transform.set(worldToView);
     transform.mul(modelToWorld);
 
-    RenderLine(lo);
+    RenderLine(lo->vertices[0], lo->vertices[1], lo->colorType, lo->color, lo->wuColor);
 }
 
-void Pipeline::RenderLine(LineObject *lo)
+void Pipeline::RenderLine(const Vertex3f &vP, const Vertex3f &vQ, Object3D::ColorType colorType, PaintColoring::CColor &color, PaintColoring::WuColor &wuColor)
 {
-    Vertex3f &vP = lo->vertices[0];
-    Vertex3f &vQ = lo->vertices[1];
-
     transform.transform(vP, vOut1); // affine point transform
     transform.transform(vQ, vOut2);
 
@@ -193,57 +198,81 @@ void Pipeline::RenderLine(LineObject *lo)
 
     // Draw the potentially clipped line.
 
-    if (lo->colorType == Object3D::ColorType::Color)
+    if (colorType == Object3D::ColorType::Color)
     {
-        painting.DrawZBresenhamLine(canvas, std::round(clP.x), std::round(clP.y), std::round(clQ.x), std::round(clQ.y), p0.z, p1.z, lo->color);
+        painting.DrawZBresenhamLine(canvas, std::round(clP.x), std::round(clP.y), std::round(clQ.x), std::round(clQ.y), p0.z, p1.z, color);
     }
     else
     {
-        painting.DrawZWuBlendedLine(canvas, std::round(clP.x), std::round(clP.y), std::round(clQ.x), std::round(clQ.y), p0.z, p1.z, lo->wuColor);
+        painting.DrawZWuBlendedLine(canvas, std::round(clP.x), std::round(clP.y), std::round(clQ.x), std::round(clQ.y), p0.z, p1.z, wuColor);
     }
 }
 
-/// @brief Tranform from view-volume to screen-space using an affine transformation.
-/// @param v
-/// @param o output
-void Pipeline::ViewportTransform(const Point3f &v, Point3f &o)
+void Pipeline::RenderWireMeshObject(WireMeshObject *mo)
 {
-    float x;
-    float y;
-    if (v.z == 0.0f)
-    {
-        x = v.x;
-        y = v.y;
-    }
-    else
-    {
-        // Perspective divide
-        x = v.x / v.z;
-        y = v.y / v.z;
-    }
+    // Ask the object for a matrix that will transform it
+    // from [object/model/local]-space to world-space.
+    modelToWorld = mo->GetModelToWorldMatrix();
 
-    // Viewport scale and map
-    x = (width / 2.0f) * (x + 1.0f);
-    y = (height / 2.0f) * (y + 1.0f);
+    // Transform the vertices from model-space to world-space and
+    // then into view/camera-space.
+    //
+    // Note: the order of the multiplication using column-major
+    // matrices; post multiplying.
+    //
+    // Instead of performing this: modelToWorld*worldToView
+    // we perform this: worldToView*modelToWorld
+    transform.setIdentity();
+    transform.set(worldToView);
+    transform.mul(modelToWorld);
+    // std::cout << "transform: " << transform << std::endl;
 
-    // Device specific vertical flip
-    y = height - y;
-    o.set(x, y, v.z);
+    RenderAsWireFrame(mo);
 }
 
-float Pipeline::CalcAspectRatio()
+void Pipeline::RenderAsWireFrame(WireMeshObject *mo)
 {
-    float aspectRatio;
-    if (width > height)
-    {
-        aspectRatio = (float)width / (float)height;
-    }
-    else
-    {
-        aspectRatio = (float)height / (float)width;
-    }
+    auto &v = mo->vertices;
+    PaintColoring::CColor normalColor = PaintColoring::CColor::Red;
 
-    return aspectRatio;
+    // Calculate Camera Position in Model Space
+    // transform contains ModelView matrix at this point
+    modelViewInv.set(transform);
+    modelViewInv.invert();
+    modelViewInv.transform(origin, cameraModel);
+
+    for (auto &t : mo->triangles)
+    {
+        // 1. Backface Culling (Model Space)
+        auto n = t->GetNormal();
+        v2.set(cameraModel);
+        v2.sub(t->GetCenter());
+
+        float dot = n.dot(v2);
+
+        if (dot < 0.0f)
+        {
+            continue;
+        }
+
+        // 2. Render Triangle Edges
+        RenderLine(v[t->i1], v[t->i2], mo->colorType, mo->color, mo->wuColor);
+        RenderLine(v[t->i2], v[t->i3], mo->colorType, mo->color, mo->wuColor);
+        RenderLine(v[t->i3], v[t->i1], mo->colorType, mo->color, mo->wuColor);
+
+        // 3. Render Normals
+        // Construct the normal line segment in Model Space
+        Vertex3f normalStart = t->GetCenter();
+
+        // Scale normal
+        scaledNormal.set(n);
+        scaledNormal.scale(0.2f); // Length of normal visual
+
+        normalEnd.set(normalStart);
+        normalEnd.add(scaledNormal);
+
+        RenderLine(normalStart, normalEnd, Object3D::ColorType::Color, normalColor, wuNormalColor);
+    }
 }
 
 // ======================== Clipping ========================================
@@ -339,11 +368,57 @@ int Pipeline::ClipLine(float Px, float Py, float Qx, float Qy, Point3f &clP, Poi
         return 1;
 }
 
+// ======================== View ========================================
+
+/// @brief Tranform from view-volume to screen-space using an affine transformation.
+/// @param v
+/// @param o output
+void Pipeline::ViewportTransform(const Point3f &v, Point3f &o)
+{
+    float x;
+    float y;
+    if (v.z == 0.0f)
+    {
+        x = v.x;
+        y = v.y;
+    }
+    else
+    {
+        // Perspective divide
+        x = v.x / v.z;
+        y = v.y / v.z;
+    }
+
+    // Viewport scale and map
+    x = (width / 2.0f) * (x + 1.0f);
+    y = (height / 2.0f) * (y + 1.0f);
+
+    // Device specific vertical flip
+    y = height - y;
+    o.set(x, y, v.z);
+}
+
+float Pipeline::CalcAspectRatio()
+{
+    float aspectRatio;
+    if (width > height)
+    {
+        aspectRatio = (float)width / (float)height;
+    }
+    else
+    {
+        aspectRatio = (float)height / (float)width;
+    }
+
+    return aspectRatio;
+}
+
 void Pipeline::SetViewSpaceMatrix(const Matrix4f &m)
 {
     worldToView.set(m);
 }
 
+// ======================== Camera ========================================
 void Pipeline::MoveCameraBase(float dx, float dy, float dz)
 {
     camera.MoveCameraBase(dx, dy, dz);

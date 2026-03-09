@@ -137,6 +137,7 @@ public:
     ///        position returned must be in world-space.
     /// @return
     Point3f &GetWorldPosition();
+    Vector3f &GetDirection() { return vDirection; }
 
     void MoveCameraBase(float dx, float dy, float dz);
 };

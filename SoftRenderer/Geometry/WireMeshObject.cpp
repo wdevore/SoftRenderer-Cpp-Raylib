@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "WireMeshObject.h"
 
 WireMeshObject::WireMeshObject(/* args */)
@@ -18,7 +20,8 @@ WireMeshObject::~WireMeshObject()
 
 void WireMeshObject::Initialize(PaintColoring::CColor bg, PaintColoring::CColor fg, int intensityBits)
 {
-    wuC.initialize(bg, fg, intensityBits);
+    color = fg;
+    wuColor.initialize(bg, fg, intensityBits);
 }
 
 void WireMeshObject::SetAnimate(bool animate)
@@ -41,15 +44,25 @@ void WireMeshObject::AddTriangle(int i1, int i2, int i3)
     t->Initialize();
 
     t->SetCenter(
-        (Vertex3f)vertices[i1 - 1],
-        (Vertex3f)vertices[i2 - 1],
-        (Vertex3f)vertices[i3 - 1]);
+        vertices[i1 - 1],
+        vertices[i2 - 1],
+        vertices[i3 - 1]);
     t->SetNormal(
-        (Vertex3f)vertices[i1 - 1],
-        (Vertex3f)vertices[i2 - 1],
-        (Vertex3f)vertices[i3 - 1]);
+        vertices[i1 - 1],
+        vertices[i2 - 1],
+        vertices[i3 - 1]);
+    std::cout << "Add Triangle: " << *t << std::endl;
 
     triangles.push_back(std::move(t));
+}
+
+Triangle &WireMeshObject::GetTriangle(int index)
+{
+    if (index < 0)
+    {
+        index = triangles.size() - 1;
+    }
+    return *triangles[index];
 }
 
 int WireMeshObject::AddEdge(EdgeProperty permanent, EdgeProperty visibility)

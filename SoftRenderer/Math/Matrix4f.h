@@ -57,6 +57,7 @@ public:
 
     void transform(Point3f &point) const;
     void transform(const Point3f &point, Point3f &pointOut) const;
+    void transform(const Vector3f &point, Vector3f &pointOut) const;
     void transform(Vector3f &normal) const;
 
     void setRotation(AxisAngle4f a1);
@@ -68,4 +69,13 @@ public:
     bool epsilonEquals(const Matrix4f &m1, float epsilon) const;
 
     std::string toString() const;
+    friend std::ostream &operator<<(std::ostream &os, const Matrix4f &o)
+    {
+        os << "|" << o.m00 << "," << o.m01 << "," << o.m02 << "," << o.m03 << "|"
+           << "|" << o.m10 << "," << o.m11 << "," << o.m12 << "," << o.m13 << "|"
+           << "|" << o.m20 << "," << o.m21 << "," << o.m22 << "," << o.m23 << "|"
+           << "|" << o.m30 << "," << o.m31 << "," << o.m32 << "," << o.m33 << "|";
+
+        return os;
+    }
 };

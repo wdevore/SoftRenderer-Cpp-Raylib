@@ -48,7 +48,11 @@ public:
                  float qx, float qy, float qz,
                  const PaintColoring::CColor &color);
 
-    void AddTripod(float scale);
+    void AddTripodAxies(float scale);
+    void AddTetrahedron(float px, float py, float pz,
+                        float height, float baseScale, bool animate,
+                        const PaintColoring::CColor &color);
+
     void AddPlane(float width, float height,
                   float px, float py, float pz,
                   int r, int g, int b);

@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <ostream>
 
 class Point3f;
 
@@ -27,16 +28,23 @@ public:
 
     void add(const Vector3f &v1);
     void add(const Vector3f &v1, const Vector3f &v2);
+
     void sub(const Vector3f &v1);
     void sub(const Vector3f &v1, const Vector3f &v2);
+    void sub(const Point3f &v1);
     void sub(const Point3f &p, const Vector3f &v);
     void sub(const Point3f &p1, const Point3f &p2);
+
     void scale(float s);
     void scaleAdd(float s, const Vector3f &v1, const Vector3f &v2);
+
     void negate();
 
     bool equals(const Vector3f &v1) const;
     bool epsilonEquals(const Vector3f &v1, float epsilon) const;
 
-    std::string toString() const;
+    friend std::ostream &operator<<(std::ostream &os, const Vector3f &o)
+    {
+        return os << "(" << o.x << " : " << o.y << " : " << o.z << ")";
+    }
 };

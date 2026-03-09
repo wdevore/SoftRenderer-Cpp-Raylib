@@ -25,14 +25,6 @@ void Object3D::addVertex(Vertex3f v)
     vertices.push_back(v);
 }
 
-void Object3D::setColor(int r, int g, int b, int a)
-{
-    this->r = r;
-    this->g = g;
-    this->b = b;
-    this->a = a;
-}
-
 void Object3D::setPosition(float x, float y, float z)
 {
     position.set(x, y, z);

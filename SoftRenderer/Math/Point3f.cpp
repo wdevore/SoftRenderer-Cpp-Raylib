@@ -52,6 +52,27 @@ void Point3f::add(const Vector3f &v)
     z += v.z;
 }
 
+void Point3f::add(const Point3f &p)
+{
+    x += p.x;
+    y += p.y;
+    z += p.z;
+}
+
+void Point3f::add(const Point3f &p1, const Point3f &p2)
+{
+    x = p1.x + p2.x;
+    y = p1.y + p2.y;
+    z = p1.z + p2.z;
+}
+
+void Point3f::add(const Vector3f &v, const Point3f &p)
+{
+    x = v.x + p.x;
+    y = v.y + p.y;
+    z = v.z + p.z;
+}
+
 void Point3f::sub(const Vector3f &v)
 {
     x -= v.x;
@@ -71,13 +92,6 @@ void Point3f::scale(float s)
     x *= s;
     y *= s;
     z *= s;
-}
-
-std::string Point3f::toString() const
-{
-    std::stringstream ss;
-    ss << "(" << x << ", " << y << ", " << z << ")";
-    return ss.str();
 }
 
 bool Point3f::equals(const Point3f &p1) const

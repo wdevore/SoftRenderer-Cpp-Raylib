@@ -85,7 +85,7 @@ int main(int argc, char *argv[])
     // The Z position is negative to make sure it is in front of the camera. The
     // camera is positioned along the +Z half-space.
     // db->AddLine("DiagLine", 0.0f, 0.0f, -1.0f, 2.0f, 0.0f, -1.0f, PaintColoring::CColor::Red);
-    db->AddTripod(1.0f);
+    db->AddTetrahedron(0.0f, 0.0f, 0.0f, 1.0f, 1.0f, false, PaintColoring::CColor::Blue);
 
     // TestBresenhamLines lines{};
     // TestWublendedLines lines{};

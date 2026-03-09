@@ -41,11 +41,13 @@ public:
     Vector3f &CalcNonNormalized(const Vertex3f &p1, const Vertex3f &p2, const Vertex3f &p3);
     void SetNormal(Vector3f v);
     void SetNormal(Vertex3f p1, Vertex3f p2, Vertex3f p3);
+    Vector3f &GetNormal() { return normal; }
 
     void SetCenter(Vertex3f p1, Vertex3f p2, Vertex3f p3);
+    Vertex3f &GetCenter() { return center; }
 
     friend std::ostream &operator<<(std::ostream &os, const Triangle &t)
     {
-        return os << t.i1 << " : " << t.i2 << " : " << t.i3;
+        return os << t.i1 + 1 << " : " << t.i2 + 1 << " : " << t.i3 + 1 << " N: " << t.normal << " C: " << t.center;
     }
 };
