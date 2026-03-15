@@ -11,4 +11,9 @@ public:
     ~PointLight();
 
     Vector3f &CalcLightRay(const Point3f &p) override;
+    Vector3f &CalcLightRay() override
+    {
+        direction.set(0.0f, 0.0f, 0.0f);
+        return direction;
+    }
 };

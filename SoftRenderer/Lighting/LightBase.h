@@ -2,6 +2,7 @@
 
 #include "Point3f.h"
 #include "Vector3f.h"
+#include "WuColor.h"
 
 // There are two kinds of lights that I support:
 // 1) Point light source. Some call it an Omni-directional light.
@@ -36,28 +37,53 @@ protected:
     Point3f target{};
     Vector3f direction{};
 
-    int r{};
-    int g{};
-    int b{};
-
 public:
+    enum class LightType
+    {
+        Point,
+        Directional
+    };
+
+    std::string name{};
+    PaintColoring::CColor color{};
+    LightType type{LightType::Point};
+
     float Ip{1.0f};
 
     LightBase(/* args */);
-    virtual ~LightBase() = 0; // Makes class abstract
+    virtual ~LightBase(); // Makes class abstract
 
     void SetDirection(float bx, float by, float bz, float tx, float ty, float tz);
     void SetDirection(float bx, float by, float bz);
-    void SetColor(int r, int g, int b);
-    void SetBase(float x, float y, float z) { base.set(x, y, z); };
+    void SetColor(PaintColoring::CColor &color);
+    void SetIntensity(float Ip) { this->Ip = Ip; }
 
-    int R() { return r; };
-    int G() { return g; };
-    int B() { return b; };
+    /// @brief Set position of light
+    /// @param x
+    /// @param y
+    /// @param z
+    void SetBase(float x, float y, float z)
+    {
+        base.set(x, y, z);
+    };
 
-    Point3f &GetBase() { return base; };
-    Point3f &GetTarget() { return target; };
-    Vector3f &GetDirection() { return direction; };
+    float GetIntensity() { return Ip; };
+
+    Point3f &GetBase()
+    {
+        return base;
+    };
+    Point3f &GetTarget()
+    {
+        return target;
+    };
+    Vector3f &GetDirection()
+    {
+        return direction;
+    };
+
+    bool IsTypeOf(const LightType &type) { return this->type == type; };
 
     virtual Vector3f &CalcLightRay(const Point3f &p) = 0;
+    virtual Vector3f &CalcLightRay() = 0;
 };

@@ -17,7 +17,6 @@ public:
     PaintColoring::WuColor wuColor{};
     PaintColoring::CColor color{};
 
-    std::vector<std::unique_ptr<Triangle>> triangles{};
     // A simple edge visibility collection
     std::vector<std::unique_ptr<Edge>> edges{};
 
@@ -25,12 +24,13 @@ public:
     WireMeshObject(std::string name);
     ~WireMeshObject();
 
-    void Initialize(PaintColoring::CColor bg, PaintColoring::CColor fg, int intensityBits);
+    void Initialize(PaintColoring::CColor bg, PaintColoring::CColor fg, int intensityBits) override;
+
     void SetAnimate(bool animate) override;
 
     int GetTriangleCount() { return triangles.size(); }
     void AddVertex(Vertex3f v);
-    void AddTriangle(int i1, int i2, int i3);
+
     /// @brief
     /// @param index if -1 then return last added Triangle
     /// @return

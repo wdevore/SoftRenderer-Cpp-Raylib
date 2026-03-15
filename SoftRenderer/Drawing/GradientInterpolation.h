@@ -20,14 +20,15 @@ public:
     float aOneOverZ1{};
     float aOneOverZ2{};
     float aOneOverZ3{};
-    float dOneOverZdX, dOneOverZdY{};
+    float dOneOverZdX{};
+    float dOneOverZdY{};
 
     int intGradientType{};
 
     GradientInterpolation(/* args */);
     ~GradientInterpolation();
 
-    void set(Vertex3f p1, Vertex3f p2, Vertex3f p3);
+    void Set(Vertex3f p1, Vertex3f p2, Vertex3f p3);
 
     friend std::ostream &operator<<(std::ostream &os, const GradientInterpolation &g)
     {

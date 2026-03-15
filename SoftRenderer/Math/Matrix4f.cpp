@@ -406,16 +406,6 @@ void Matrix4f::setRotation(const Quat4f &q)
     m33 = 1.0f;
 }
 
-std::string Matrix4f::toString() const
-{
-    std::stringstream ss;
-    ss << m00 << ", " << m01 << ", " << m02 << ", " << m03 << "\n"
-       << m10 << ", " << m11 << ", " << m12 << ", " << m13 << "\n"
-       << m20 << ", " << m21 << ", " << m22 << ", " << m23 << "\n"
-       << m30 << ", " << m31 << ", " << m32 << ", " << m33;
-    return ss.str();
-}
-
 bool Matrix4f::equals(const Matrix4f &m1) const
 {
     return m00 == m1.m00 && m01 == m1.m01 && m02 == m1.m02 && m03 == m1.m03 &&

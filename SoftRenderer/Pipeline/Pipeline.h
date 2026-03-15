@@ -12,6 +12,7 @@
 #include "WuColor.h"
 #include "ArcBall.h"
 #include "WireMeshObject.h"
+#include "FlatShaded.h"
 
 // Pipeline takes a vector of vertices, edges and normals.
 //
@@ -60,12 +61,15 @@ private:
 
     Matrix4f transform{};
 
+    PaintColoring::CColor shadedColor{};
+
     // Working variables
     Vertex3f vOut1{};
     Vertex3f vOut2{};
     Vector3f v1{};
     Vector3f v2{};
     Vector3f v3{};
+    Vector3f normal{};
 
     Point3f p0{};
     Point3f p1{};
@@ -93,6 +97,7 @@ private:
     Plane worldPlaneX{};
 
     ArcBall camera{};
+    std::vector<std::unique_ptr<LightBase>> lights{};
 
     // ============= Debug or Visuals ===============
     PaintColoring::WuColor wuNormalColor = PaintColoring::WuColor::Red;
@@ -113,8 +118,10 @@ public:
     void Render();
     void RenderLineObject(LineObject *lo);
     void RenderLine(const Vertex3f &vP, const Vertex3f &vQ, Object3D::ColorType colorType, PaintColoring::CColor &color, PaintColoring::WuColor &wuColor);
-    void RenderWireMeshObject(WireMeshObject *mo);
-    void RenderAsWireFrame(WireMeshObject *mo);
+    void RenderWireMeshObject(WireMeshObject *o);
+    void RenderAsWireFrame(WireMeshObject *o);
+    void RenderFlatShadedObject(FlatShaded *o);
+    void RenderAsFlatShaded(FlatShaded *o);
 
     // =========== Clip methods =================
     int CalcClipCode(float x, float y);

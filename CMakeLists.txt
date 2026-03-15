@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.31.0)
 project(SoftRenderer-Cpp-Raylib)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -15,4 +15,8 @@ endif()
 
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/SoftRenderer/CMakeLists.txt")
     add_subdirectory(SoftRenderer)
+endif()
+
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/PipelineRenderer/CMakeLists.txt")
+    add_subdirectory(PipelineRenderer) 
 endif()

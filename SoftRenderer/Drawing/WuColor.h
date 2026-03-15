@@ -19,15 +19,15 @@ namespace PaintColoring
         int intensityBits{};
         int numIntensityLevels{};
 
-        static const WuColor BgDarkGray;
-        static const WuColor Red;
-        static const WuColor White;
-        static const WuColor Black;
-        static const WuColor Yellow;
-        static const WuColor Green;
-        static const WuColor Blue;
-        static const WuColor Magenta;
-        static const WuColor Cyan;
+        static WuColor BgDarkGray;
+        static WuColor Red;
+        static WuColor White;
+        static WuColor Black;
+        static WuColor Yellow;
+        static WuColor Green;
+        static WuColor Blue;
+        static WuColor Magenta;
+        static WuColor Cyan;
 
         WuColor(/* args */);
         WuColor(PaintColoring::CColor bg, PaintColoring::CColor fg, int intensityBits);
@@ -50,14 +50,14 @@ namespace PaintColoring
         }
     };
 
-    inline const WuColor WuColor::BgDarkGray{CColor::White, CColor::BgDarkGray, 8};
-    inline const WuColor WuColor::Red{CColor::White, CColor::Red, 8};
-    inline const WuColor WuColor::White{CColor::White, CColor::White, 8};
-    inline const WuColor WuColor::Black{CColor::White, CColor::Black, 8};
-    inline const WuColor WuColor::Yellow{CColor::White, CColor::Yellow, 8};
-    inline const WuColor WuColor::Green{CColor::White, CColor::Green, 8};
-    inline const WuColor WuColor::Blue{CColor::White, CColor::Blue, 8};
-    inline const WuColor WuColor::Magenta{CColor::White, CColor::Magenta, 8};
-    inline const WuColor WuColor::Cyan{CColor::White, CColor::Cyan, 8};
+    inline WuColor WuColor::BgDarkGray{CColor::White, CColor::BgDarkGray, 8};
+    inline WuColor WuColor::Red{CColor::White, CColor::Red, 8};
+    inline WuColor WuColor::White{CColor::White, CColor::White, 8};
+    inline WuColor WuColor::Black{CColor::White, CColor::Black, 8};
+    inline WuColor WuColor::Yellow{CColor::White, CColor::Yellow, 8};
+    inline WuColor WuColor::Green{CColor::White, CColor::Green, 8};
+    inline WuColor WuColor::Blue{CColor::White, CColor::Blue, 8};
+    inline WuColor WuColor::Magenta{CColor::White, CColor::Magenta, 8};
+    inline WuColor WuColor::Cyan{CColor::White, CColor::Cyan, 8};
 
 }

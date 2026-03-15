@@ -2,9 +2,12 @@
 
 #include <vector>
 #include <string>
+#include <memory>
 
 #include "Matrix4f.h"
 #include "Vertex3f.h"
+#include "Triangle.h"
+#include "CColor.h"
 
 class Object3D
 {
@@ -13,7 +16,8 @@ public:
     {
         Base,
         Line,
-        WireMesh
+        WireMesh,
+        FlatShaded
     };
 
     enum class ColorType
@@ -32,8 +36,11 @@ public:
 
     Vector3f position{};
 
+    virtual void Initialize(PaintColoring::CColor bg, PaintColoring::CColor fg, int intensityBits) = 0;
+
     std::vector<Vertex3f> vertices{};
-    std::vector<Vertex3f> vertex_normals{};
+    std::vector<Vertex3f> vertexNormals{};
+    std::vector<std::unique_ptr<Triangle>> triangles{};
 
     void reset();
     void addVertex(Vertex3f v);
@@ -43,11 +50,14 @@ public:
 
     // ========== Transforms ===============
     Matrix4f &GetModelToWorldMatrix();
+    Matrix4f &GetNormalTransformMatrix();
 
     // ========== Types ===============
     ObjectType GetType() const { return type; }
     void SetType(ObjectType type) { this->type = type; }
     bool IsOfType(ObjectType type) const { return this->type == type; }
+
+    virtual void AddTriangle(int i1, int i2, int i3);
 
     int GetVertexCount() { return vertices.size(); }
 

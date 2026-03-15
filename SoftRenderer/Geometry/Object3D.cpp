@@ -3,6 +3,7 @@
 
 #include "Object3D.h"
 #include "Vertex3f.h"
+#include "Triangle.h"
 
 Object3D::Object3D()
 {
@@ -71,4 +72,32 @@ Matrix4f &Object3D::GetModelToWorldMatrix()
      */
 
     return transform;
+}
+
+Matrix4f &Object3D::GetNormalTransformMatrix()
+{
+    return GetModelToWorldMatrix();
+}
+
+/// @brief
+/// @param i1 is 1-based
+/// @param i2 is 1-based
+/// @param i3 is 1-based
+/// @param triangles Triangle collection
+void Object3D::AddTriangle(int i1, int i2, int i3)
+{
+    std::unique_ptr<Triangle> t(std::make_unique<Triangle>(i1 - 1, i2 - 1, i3 - 1));
+    t->Initialize();
+
+    t->SetCenter(
+        vertices[i1 - 1],
+        vertices[i2 - 1],
+        vertices[i3 - 1]);
+    t->SetNormal(
+        vertices[i1 - 1],
+        vertices[i2 - 1],
+        vertices[i3 - 1]);
+    std::cout << "Object3D::Add Triangle: " << *t << std::endl;
+
+    triangles.push_back(std::move(t));
 }

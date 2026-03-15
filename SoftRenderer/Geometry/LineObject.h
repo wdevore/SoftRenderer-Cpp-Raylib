@@ -15,5 +15,7 @@ public:
     LineObject(PaintColoring::CColor bg, PaintColoring::CColor fg);
     ~LineObject();
 
+    void Initialize(PaintColoring::CColor bg, PaintColoring::CColor fg, int intensityBits) override;
+
     void SetAnimate(bool animate) override;
 };

@@ -6,12 +6,7 @@
 #include <iostream>
 #include <exception>
 
-#include "Canvas.h"
 #include "Pipeline.h"
-#include "CColor.h"
-
-#include "test_bresenham_lines.h"
-#include "test_wu_blended_lines.h"
 
 int main(int argc, char *argv[])
 {
@@ -25,10 +20,10 @@ int main(int argc, char *argv[])
     {
         std::cout << "State file found in current directory." << std::endl;
     }
-    else if (FileExists("../SoftRenderer/window.state"))
+    else if (FileExists("../PipelineRenderer/window.state"))
     {
-        std::cout << "State file found in SoftRenderer folder." << std::endl;
-        configPath = "../SoftRenderer/window.state";
+        std::cout << "State file found in PipelineRenderer folder." << std::endl;
+        configPath = "../PipelineRenderer/window.state";
     }
     else
     {
@@ -46,7 +41,7 @@ int main(int argc, char *argv[])
     }
 
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-    InitWindow(screenWidth, screenHeight, "Software Renderer - Raylib");
+    InitWindow(screenWidth, screenHeight, "Pipeline Renderer - Raylib");
 
     if (argc >= 3)
     {
@@ -80,28 +75,13 @@ int main(int argc, char *argv[])
 
     SetTargetFPS(60);
 
-    std::unique_ptr<Database> db = std::make_unique<Database>();
-    // db->AddTripod(5.0f);
-    // The Z position is negative to make sure it is in front of the camera. The
-    // camera is positioned along the +Z half-space.
-    // db->AddLine("DiagLine", 0.0f, 0.0f, -1.0f, 2.0f, 0.0f, -1.0f, PaintColoring::CColor::Red);
-    // db->AddTetrahedron(0.0f, 0.0f, 0.0f, 1.0f, 1.0f, false, PaintColoring::CColor::Blue);
-
-    db->AddFlatTriangle(2.0f, 2.0f, 0.0f, 0.0f, 0.5f, false, PaintColoring::CColor::LightGreen);
-    // db->AddPointLight("Light0", 4.0f, 5.0f, 4.0f, 1.0f, PaintColoring::CColor::Orange);
-    db->AddPointLight("Light0", 1.0f, 1.2f, 1.0f, 1.0f, PaintColoring::CColor::Orange);
-
-    // TestBresenhamLines lines{};
-    // TestWublendedLines lines{};
-    // lines.initialize(screenWidth, screenHeight);
-
     try
     {
         Pipeline pipeline{screenWidth, screenHeight};
-        pipeline.Initialize(std::move(db));
-        pipeline.InitComplete();
+        // pipeline.Initialize(std::move(db));
+        // pipeline.InitComplete();
 
-        // Initialize Canvas
+        // // Initialize Canvas
         pipeline.Setup();
 
         while (!WindowShouldClose())
@@ -112,33 +92,33 @@ int main(int argc, char *argv[])
             if (IsKeyDown(KEY_W)) // Move Camera Forward
             {
                 // Moves the camera up in the camera's plane
-                pipeline.MoveCameraBase(0.0f, -0.05f, 0.0f);
+                // pipeline.MoveCameraBase(0.0f, -0.05f, 0.0f);
             }
             if (IsKeyDown(KEY_S))
             {
                 // Moves the camera down in the camera's plane
-                pipeline.MoveCameraBase(0.0f, 0.05f, 0.0f);
+                // pipeline.MoveCameraBase(0.0f, 0.05f, 0.0f);
             }
             if (IsKeyDown(KEY_A))
             {
                 // Moves the camera left in the camera's plane
-                pipeline.MoveCameraBase(-0.05f, 0.0f, 0.0f);
+                // pipeline.MoveCameraBase(-0.05f, 0.0f, 0.0f);
             }
             if (IsKeyDown(KEY_D))
             {
                 // Moves the camera right in the camera's plane
-                pipeline.MoveCameraBase(0.05f, 0.0f, 0.0f);
+                // pipeline.MoveCameraBase(0.05f, 0.0f, 0.0f);
             }
 
             if (IsKeyDown(KEY_UP))
             {
                 // Moves the camera forward in the camera's plane
-                pipeline.MoveCameraBase(0.0f, 0.0f, 0.05f);
+                // pipeline.MoveCameraBase(0.0f, 0.0f, 0.05f);
             }
             if (IsKeyDown(KEY_DOWN))
             {
                 // Moves the camera backward in the camera's plane
-                pipeline.MoveCameraBase(0.0f, 0.0f, -0.05f);
+                // pipeline.MoveCameraBase(0.0f, 0.0f, -0.05f);
             }
             if (IsKeyDown(KEY_LEFT))
             { /* Rotate Left */
@@ -153,22 +133,22 @@ int main(int argc, char *argv[])
 
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
             {
-                pipeline.OnMouseDown(GetMouseX(), GetMouseY());
+                // pipeline.OnMouseDown(GetMouseX(), GetMouseY());
             }
             if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
             {
-                pipeline.OnMouseUp();
+                // pipeline.OnMouseUp();
             }
             if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
             {
-                pipeline.OnMouseMove(GetMouseX(), GetMouseY());
+                // pipeline.OnMouseMove(GetMouseX(), GetMouseY());
             }
 
             pipeline.Begin();
 
             // ===============================================================
             // Rasterize your sceen
-            pipeline.Render();
+            // pipeline.Render();
             // ===============================================================
 
             // lines.draw(canvas);
@@ -182,7 +162,7 @@ int main(int argc, char *argv[])
             // ===============================================================
             // Raylib
             // ===============================================================
-            DrawText("SoftRenderer is running.", 10, 10, 20, DARKGRAY);
+            DrawText("Pipeline Renderer is running.", 10, 10, 20, DARKGRAY);
 
             // --- Manual way of drawing FPS
             // const char *fpsText = TextFormat("FPS: %i", GetFPS());

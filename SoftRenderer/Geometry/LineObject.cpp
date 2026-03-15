@@ -12,6 +12,10 @@ LineObject::~LineObject()
 {
 }
 
+void LineObject::Initialize(PaintColoring::CColor bg, PaintColoring::CColor fg, int intensityBits)
+{
+}
+
 void LineObject::SetAnimate(bool animate)
 {
     this->animate = animate;

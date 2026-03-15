@@ -13,18 +13,24 @@ namespace PaintColoring
         int b;
         int a;
 
-        static const CColor BgDarkGray;
-        static const CColor Red;
-        static const CColor White;
-        static const CColor Black;
-        static const CColor Yellow;
-        static const CColor Green;
-        static const CColor Blue;
-        static const CColor Magenta;
-        static const CColor Cyan;
+        static CColor BgDarkGray;
+        static CColor Red;
+        static CColor White;
+        static CColor Black;
+        static CColor Yellow;
+        static CColor Green;
+        static CColor Blue;
+        static CColor Magenta;
+        static CColor Cyan;
+
+        static CColor LightGreen;
+        static CColor Orange;
 
         CColor() : r(128), g(128), b(128), a(255) {}
         CColor(int r, int g, int b, int a = 255) : r(r), g(g), b(b), a(a) {}
+
+        void Set(CColor color);
+        void Set(int r, int g, int b, int a = 255);
 
         friend std::ostream &operator<<(std::ostream &os, const CColor &c)
         {
@@ -32,14 +38,17 @@ namespace PaintColoring
         }
     };
 
-    inline const CColor CColor::BgDarkGray{80, 80, 80, 255};
-    inline const CColor CColor::Red{255, 0, 0, 255};
-    inline const CColor CColor::White{255, 255, 255, 255};
-    inline const CColor CColor::Black{0, 0, 0, 255};
-    inline const CColor CColor::Yellow{255, 255, 0, 255};
-    inline const CColor CColor::Green{0, 255, 0, 255};
-    inline const CColor CColor::Blue{0, 0, 255, 255};
-    inline const CColor CColor::Magenta{255, 0, 255, 255};
-    inline const CColor CColor::Cyan{0, 255, 255, 255};
+    inline CColor CColor::BgDarkGray{80, 80, 80, 255};
+    inline CColor CColor::Red{255, 0, 0, 255};
+    inline CColor CColor::White{255, 255, 255, 255};
+    inline CColor CColor::Black{0, 0, 0, 255};
+    inline CColor CColor::Yellow{255, 255, 0, 255};
+    inline CColor CColor::Green{0, 255, 0, 255};
+    inline CColor CColor::Blue{0, 0, 255, 255};
+    inline CColor CColor::Magenta{255, 0, 255, 255};
+    inline CColor CColor::Cyan{0, 255, 255, 255};
+
+    inline CColor CColor::LightGreen{64, 255, 64, 255};
+    inline CColor CColor::Orange{255, 128, 0, 255};
 
 } // namespace Drawing

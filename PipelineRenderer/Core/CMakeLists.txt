@@ -2,15 +2,14 @@ cmake_minimum_required(VERSION 3.31.0)
 
 file(GLOB DIR_SOURCES CONFIGURE_DEPENDS *.cpp)
 
-add_library(LightingLib STATIC
+add_library(CoreLib STATIC
     ${DIR_SOURCES}
 )
 
-target_include_directories(LightingLib 
+target_include_directories(CoreLib
     PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-target_link_libraries(LightingLib 
-    PUBLIC MathLib
-    PUBLIC DrawingLib
+target_link_libraries(CoreLib
+  PUBLIC raylib
 )

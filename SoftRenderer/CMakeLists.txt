@@ -44,11 +44,11 @@ target_include_directories(SoftRenderer
 )
 
 target_link_libraries(SoftRenderer
-  MathLib
-  DrawingLib
-  GeometryLib
-  GraphicsLib
-  PipelineLib
-  LightingLib
-  raylib
+  PUBLIC MathLib
+  PUBLIC DrawingLib
+  PUBLIC GeometryLib
+  PUBLIC GraphicsLib
+  PUBLIC PipelineLib
+  PUBLIC LightingLib
+  PUBLIC raylib
   )

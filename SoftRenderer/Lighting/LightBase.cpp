@@ -22,9 +22,7 @@ void LightBase::SetDirection(float bx, float by, float bz)
     direction.normalize();
 }
 
-void LightBase::SetColor(int r, int g, int b)
+void LightBase::SetColor(PaintColoring::CColor &color)
 {
-    this->r = r;
-    this->g = g;
-    this->b = b;
+    color.Set(color);
 }

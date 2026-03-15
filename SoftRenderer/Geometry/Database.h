@@ -24,13 +24,14 @@ private:
     int triCount{};
 
     std::vector<std::unique_ptr<Object3D>> objects{};
-    GlobalIllumination illumination{};
 
     std::vector<std::unique_ptr<LightBase>> lights{};
 
 public:
     Database(/* args */);
     ~Database();
+
+    GlobalIllumination globalIllumination{};
 
     int GetVertexCount() { return vertexCount; }
     int GetTriCount() { return triCount; }
@@ -56,4 +57,23 @@ public:
     void AddPlane(float width, float height,
                   float px, float py, float pz,
                   int r, int g, int b);
+
+    void AddFlatPlane(float width, float height,
+                      float px, float py, float pz,
+                      bool animate,
+                      const PaintColoring::CColor &color);
+
+    void AddFlatTriangle(float width, float height,
+                         float px, float py, float pz,
+                         bool animate,
+                         const PaintColoring::CColor &color);
+
+    void AddLineSphere(std::string name, float divisions, float radius,
+                       float px, float py, float pz,
+                       PaintColoring::CColor &color);
+
+    void AddPointLight(std::string name,
+                       float px, float py, float pz,
+                       float intensity,
+                       PaintColoring::CColor &color);
 };

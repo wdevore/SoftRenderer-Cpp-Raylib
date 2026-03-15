@@ -68,7 +68,6 @@ public:
     bool equals(const Matrix4f &m1) const;
     bool epsilonEquals(const Matrix4f &m1, float epsilon) const;
 
-    std::string toString() const;
     friend std::ostream &operator<<(std::ostream &os, const Matrix4f &o)
     {
         os << "|" << o.m00 << "," << o.m01 << "," << o.m02 << "," << o.m03 << "|"

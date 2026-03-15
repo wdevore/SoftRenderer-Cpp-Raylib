@@ -8,7 +8,7 @@ GradientInterpolation::~GradientInterpolation()
 {
 }
 
-void GradientInterpolation::set(Vertex3f p1, Vertex3f p2, Vertex3f p3)
+void GradientInterpolation::Set(Vertex3f p1, Vertex3f p2, Vertex3f p3)
 {
     X1 = p2.x - p3.x;
     X0 = p1.x - p3.x;

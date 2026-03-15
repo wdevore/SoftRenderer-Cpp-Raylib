@@ -101,14 +101,20 @@ void Pipeline::Render()
         {
         case Object3D::ObjectType::Line:
         {
-            auto lo = static_cast<LineObject *>(obj.get());
-            RenderLineObject(lo);
+            auto o = static_cast<LineObject *>(obj.get());
+            RenderLineObject(o);
             break;
         }
         case Object3D::ObjectType::WireMesh:
         {
-            auto mo = static_cast<WireMeshObject *>(obj.get());
-            RenderWireMeshObject(mo);
+            auto o = static_cast<WireMeshObject *>(obj.get());
+            RenderWireMeshObject(o);
+            break;
+        }
+        case Object3D::ObjectType::FlatShaded:
+        {
+            auto o = static_cast<FlatShaded *>(obj.get());
+            RenderFlatShadedObject(o);
             break;
         }
 
@@ -272,6 +278,128 @@ void Pipeline::RenderAsWireFrame(WireMeshObject *mo)
         normalEnd.add(scaledNormal);
 
         RenderLine(normalStart, normalEnd, Object3D::ColorType::Color, normalColor, wuNormalColor);
+    }
+}
+
+void Pipeline::RenderFlatShadedObject(FlatShaded *o)
+{
+    modelToWorld = o->GetModelToWorldMatrix();
+
+    transform.setIdentity();
+    transform.set(worldToView);
+    transform.mul(modelToWorld);
+
+    RenderAsFlatShaded(o);
+}
+
+void Pipeline::RenderAsFlatShaded(FlatShaded *o)
+{
+    auto &v = o->vertices;
+    auto &vn = o->vertexNormals;
+
+    Matrix4f normalTransform = o->GetNormalTransformMatrix();
+
+    for (auto &t : o->triangles)
+    {
+
+        // Transform vertices to view-space using affine point
+        // transform.
+        // For now we will drop the face if any one of the vertices
+        // is on the wrong side of the clipping plane.
+        transform.transform(v[t->i1], transformedVertices[t->i1]);
+
+        int side = frustum.nearPlane.WhereIsPoint(transformedVertices[t->i1]);
+        if (side == 1)
+            continue;
+        transform.transform(v[t->i2], transformedVertices[t->i2]);
+        side = frustum.nearPlane.WhereIsPoint(transformedVertices[t->i2]);
+        if (side == 1)
+            continue;
+        transform.transform(v[t->i3], transformedVertices[t->i3]);
+        side = frustum.nearPlane.WhereIsPoint(transformedVertices[t->i3]);
+        if (side == 1)
+            continue;
+
+        // Now transform from view-space to view-volume space in preperation for
+        // transforming to viewport-space.
+        viewToVolume.transform(transformedVertices[t->i1], transformedVertices[t->i1]);
+        viewToVolume.transform(transformedVertices[t->i2], transformedVertices[t->i2]);
+        viewToVolume.transform(transformedVertices[t->i3], transformedVertices[t->i3]);
+
+        // Finally we transform from view-volume-space to viewport-space.
+        ViewportTransform(transformedVertices[t->i1], p1);
+        ViewportTransform(transformedVertices[t->i2], p2);
+        ViewportTransform(transformedVertices[t->i3], p3);
+
+        // Perform 2D backface culling.
+        v1.sub(p2, p1);
+        v2.sub(p3, p1);
+        v3.cross(v1, v2);
+
+        if (v3.z > 0.0f)
+        {
+            continue; // skip. triangle not visible.
+        }
+        else
+        {
+            // Transform face's normal based on the object's
+            // world transform. I don't use the view-space transform because
+            // I don't want the normal in view-space as I want it
+            // in world-space. Why? Because if I use the view-space
+            // transform (aka camera transform) then when I move
+            // the camera the lighting on the face changes with the camera and it
+            // should be independent. However, if I always want the
+            // face to be lit while it is facing the camera then
+            // I WOULD use the view-space matrix.
+            modelToWorld.transform(t->GetNormal(), normal);
+
+            // We are dealing with a front facing triangle.
+            //
+            // We need to compute the color of triangle based on a lighting model. Our
+            // lighting model is a simple Lambertian approach I(n)= Kd*Ia + Kd*Ip(N.L).
+            // We apply this to each color component.
+            // Color is now thought of as a color scaled by an itensity that ranges from 0 -> 1.
+
+            float I = 0.0f; // Intensity
+
+            for (auto &light : lights)
+            {
+                if (light->IsTypeOf(LightBase::LightType::Point))
+                {
+                    // Transform the triangle center into world-space for computation.
+                    // TODO Note: we should only transform the center once.
+                    modelToWorld.transform(t->GetCenter(), p0);
+                    v1.set(light->CalcLightRay(p0));
+                }
+                else if (light->IsTypeOf(LightBase::LightType::Directional))
+                {
+                    v1.set(light->CalcLightRay());
+                }
+                I += db->globalIllumination.CalcPartialLambertIntensity(normal, v1, light->GetIntensity());
+            }
+
+            I = db->globalIllumination.CalcIntensity(I);
+
+            // scale color components based on intensity.
+            shadedColor.Set(std::round(o->color.r * I), std::round(o->color.g * I), std::round(o->color.b * I));
+
+            // Get gradient and Edges(Top, middle, bottom, flagMiddleisLeft)
+            transformedVertices[0].set(p1);
+            transformedVertices[1].set(p2);
+            transformedVertices[2].set(p3);
+            GradientInterpolation gradients = o->GetGradients(
+                transformedVertices[0],
+                transformedVertices[1],
+                transformedVertices[2],
+                t->i1, t->i2, t->i3);
+
+            bool isMiddleLeft = o->IsMiddleLeft();
+            EdgeInterpolation TM = o->GetTopToMiddle();
+            EdgeInterpolation TB = o->GetTopToBottom();
+            EdgeInterpolation MB = o->GetMiddleToBottom();
+
+            painting.DrawFlatTriangle(canvas, gradients, TM, TB, MB, isMiddleLeft, shadedColor);
+        }
     }
 }
 
