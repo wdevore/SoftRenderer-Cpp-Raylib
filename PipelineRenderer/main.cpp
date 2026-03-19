@@ -148,10 +148,8 @@ int main(int argc, char *argv[])
 
             // ===============================================================
             // Rasterize your sceen
-            // pipeline.Render();
+            pipeline.Render();
             // ===============================================================
-
-            // lines.draw(canvas);
 
             pipeline.Update();
 

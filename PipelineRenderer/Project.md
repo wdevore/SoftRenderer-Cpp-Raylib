@@ -1,14 +1,15 @@
 # Description
 A simple pipeline software rasterizer.
 
-# Requirements
+# 3D Objects
+A 3D object is split into two parts:
+- Vertices
+- Indices
 
-Begin by copying SimpleWindow project and renaming it to SoftRenderer.
+Vertices are stored in a single collection, but virtually broken into groups. For example, a Cube and Plane both have their vertices in a single collection but there indices are stored in separate objects.
 
-# Switching projects
-See README.md in root folder on switching to new SoftRenderer project.
+Thus objects simply hold integer references back to the vertex collection.
 
-# Creating subfolders
-- I want to create an empty Canvas class that will wrap my Image canvas.
-- I want the code in a new sub folder called "Drawing".
-- I want all the Image and Texture2D code within the Canvas class.
+When rendering all vertices are transformed into a separate transformed collection.
+
+Transforming can be done in several steps depending on what the vertices are used for.

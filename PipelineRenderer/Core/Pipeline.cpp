@@ -12,31 +12,35 @@ void Pipeline::Setup()
     canvas.initialize(width, height);
     // painting.Initialize(width, height);
 
-    // camera.Resize(width, height);
     canvas.SetClearColor(WHITE);
 
     // Set Perspective
     float near = 1.0f;
     float far = 100.0f;
+    camera.Resize(width, height);
 
-    // float aspectRatio = CalcAspectRatio();
-    // // First set the perspective so we can retrieve the projection matrix.
-    // frustum.SetPerspective(45.0f, aspectRatio, near, far);
+    // =============================================
+    // Model/View/Projection Matrix setup
+    // Model: triangle's transform      <== Changes on transformations
+    // View: camera's transform         <== Changes on transformations
+    // Projection: frustum's transform  <== Constant
+    // =============================================
 
-    // // Setup the view-volume matrix (aka projection matrix)
-    // viewToVolume.set(frustum.projection);
+    // --------- View ------------------------------
+    // The View matrix is based on the camera. Create and initialize camera
+    // (aka ArcBall)
+    camera.LookAt(0.0f, 0.0f, 15.0f, 0.0f, 0.0f, 0.0f);
+    SetViewSpaceMatrix(camera.GetTransformMatrix4f());
 
-    // // Create and initialize camera
-    // camera.LookAt(0.0f, 0.0f, 15.0f, 0.0f, 0.0f, 0.0f);
+    // --------- Projection ------------------------
+    float aspectRatio = CalcAspectRatio();
+    // First set the perspective so we can retrieve the projection matrix.
+    frustum.SetPerspective(45.0f, aspectRatio, near, far);
 
-    // SetViewSpaceMatrix(camera.GetTransformMatrix4f());
+    // Setup the view-volume matrix (aka projection matrix)
+    viewToVolume.set(frustum.projection);
 
-    // worldPlaneX.SetNormal(-1.0f, 0.0f, 0.0f);
-    // Object3D *o = db->GetObject("Plane");
-    // if (o != nullptr)
-    // {
-    //     worldPlaneX.SetPoint(o->position);
-    // }
+    zb.Initialize(width, height);
 
     std::cout << "Pipeline setup complete." << std::endl;
 }
@@ -48,10 +52,11 @@ void Pipeline::Begin()
 
 void Pipeline::Update()
 {
-    // camera.Update();
+    camera.Update();
     // SetViewSpaceMatrix(camera.GetTransformMatrix4f()); // TODO may remove this in favor of the methods
-    canvas.Update();
-    // painting.Update();
+    canvas.Update(); // Updates color buffer
+
+    zb.reset();
 }
 
 void Pipeline::End()
@@ -63,5 +68,33 @@ void Pipeline::End()
     // std::vector (RAM). canvas.Update() uploads that RAM to the GPU.
     // This line finally makes that GPU texture visible on the screen.
     //------------------------------------------------------------------
-    canvas.Blit(0, 0);
+    canvas.Blit(0, 0); // Copies color buffer to screen
+}
+
+void Pipeline::Render()
+{
+    // Because the camera is dynamic retrieve the latest Projection matrix.
+
+    // Loop through all objects.
+    //    For each object retrieve the Model matrix.
+}
+
+float Pipeline::CalcAspectRatio()
+{
+    float aspectRatio;
+    if (width > height)
+    {
+        aspectRatio = (float)width / (float)height;
+    }
+    else
+    {
+        aspectRatio = (float)height / (float)width;
+    }
+
+    return aspectRatio;
+}
+
+void Pipeline::SetViewSpaceMatrix(const Matrix4f &m)
+{
+    worldToView.set(m);
 }

@@ -27,16 +27,19 @@ if(NOT TARGET raylib)
   FetchContent_MakeAvailable(raylib)
 endif()
 
-# add_subdirectory(Maths)
+add_subdirectory(Maths)
+add_subdirectory(Objects3D)
 add_subdirectory(Core)
 
 target_include_directories(PipelineRenderer
-    # PRIVATE Maths
+    PRIVATE Maths
+    PRIVATE Objects3D
     PRIVATE Core
 )
 
 target_link_libraries(PipelineRenderer
-  # MathsLib
+  PUBLIC MathsLib
+  PUBLIC Objects3DLib
   PUBLIC CoreLib
   PUBLIC raylib
   )

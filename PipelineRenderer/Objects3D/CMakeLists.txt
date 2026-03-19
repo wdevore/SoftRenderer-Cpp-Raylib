@@ -2,15 +2,14 @@ cmake_minimum_required(VERSION 3.31.0)
 
 file(GLOB DIR_SOURCES CONFIGURE_DEPENDS *.cpp)
 
-add_library(CoreLib STATIC
+add_library(Objects3DLib STATIC
     ${DIR_SOURCES}
 )
 
-target_include_directories(CoreLib
+target_include_directories(Objects3DLib
     PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-target_link_libraries(CoreLib
+target_link_libraries(Objects3DLib
   PUBLIC MathsLib
-  PUBLIC raylib
 )
