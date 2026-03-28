@@ -1,6 +1,8 @@
 # SoftRenderer-Cpp-Raylib
 A port of my Java software renderer to Cpp and Raylib
 
+This also includes a C++ version of Pikuma's software renderer. "3D Programming from scratch". It doesn't not include Textures.
+
 # Building and Running
 
 This repository uses a root `CMakeLists.txt` to manage sub-projects. You do not need to edit `settings.json` to switch projects.
