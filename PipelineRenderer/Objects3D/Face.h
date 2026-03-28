@@ -4,6 +4,15 @@
 
 struct Face
 {
-    Vector3f indices[3] = {Vector3f{}, Vector3f{}, Vector3f{}};
+    int i1;
+    int i2;
+    int i3;
     Vector3f normal{};
+
+    void Set(int i1, int i2, int i3)
+    {
+        this->i1 = i1;
+        this->i2 = i2;
+        this->i3 = i3;
+    }
 };

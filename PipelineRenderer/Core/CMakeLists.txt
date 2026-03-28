@@ -12,5 +12,6 @@ target_include_directories(CoreLib
 
 target_link_libraries(CoreLib
   PUBLIC MathsLib
+  PUBLIC Objects3DLib
   PUBLIC raylib
 )

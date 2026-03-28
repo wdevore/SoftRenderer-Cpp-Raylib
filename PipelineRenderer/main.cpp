@@ -5,8 +5,12 @@
 #include <fstream>
 #include <iostream>
 #include <exception>
+#include <memory>
 
 #include "Pipeline.h"
+#include "CubeObject.h"
+#include "Tetrahedron.h"
+#include "LineObject.h"
 
 int main(int argc, char *argv[])
 {
@@ -78,11 +82,19 @@ int main(int argc, char *argv[])
     try
     {
         Pipeline pipeline{screenWidth, screenHeight};
-        // pipeline.Initialize(std::move(db));
-        // pipeline.InitComplete();
 
-        // // Initialize Canvas
+        // Initialize Canvas
         pipeline.Setup();
+
+        // std::unique_ptr<Object3D> cube = std::make_unique<CubeObject>();
+        // cube->Build(pipeline.vertices);
+        std::unique_ptr<Object3D> tetra = std::make_unique<Tetrahedron>();
+        tetra->Build(pipeline.vertices);
+        // std::unique_ptr<Object3D> line = std::make_unique<LineObject>();
+        // line->Build(pipeline.vertices);
+
+        // pipeline.AddObject(std::move(cube));
+        pipeline.AddObject(std::move(tetra));
 
         while (!WindowShouldClose())
         {
@@ -92,33 +104,33 @@ int main(int argc, char *argv[])
             if (IsKeyDown(KEY_W)) // Move Camera Forward
             {
                 // Moves the camera up in the camera's plane
-                // pipeline.MoveCameraBase(0.0f, -0.05f, 0.0f);
+                pipeline.MoveCameraBase(0.0f, -0.05f, 0.0f);
             }
             if (IsKeyDown(KEY_S))
             {
                 // Moves the camera down in the camera's plane
-                // pipeline.MoveCameraBase(0.0f, 0.05f, 0.0f);
+                pipeline.MoveCameraBase(0.0f, 0.05f, 0.0f);
             }
             if (IsKeyDown(KEY_A))
             {
                 // Moves the camera left in the camera's plane
-                // pipeline.MoveCameraBase(-0.05f, 0.0f, 0.0f);
+                pipeline.MoveCameraBase(-0.05f, 0.0f, 0.0f);
             }
             if (IsKeyDown(KEY_D))
             {
                 // Moves the camera right in the camera's plane
-                // pipeline.MoveCameraBase(0.05f, 0.0f, 0.0f);
+                pipeline.MoveCameraBase(0.05f, 0.0f, 0.0f);
             }
 
             if (IsKeyDown(KEY_UP))
             {
                 // Moves the camera forward in the camera's plane
-                // pipeline.MoveCameraBase(0.0f, 0.0f, 0.05f);
+                pipeline.MoveCameraBase(0.0f, 0.0f, 0.05f);
             }
             if (IsKeyDown(KEY_DOWN))
             {
                 // Moves the camera backward in the camera's plane
-                // pipeline.MoveCameraBase(0.0f, 0.0f, -0.05f);
+                pipeline.MoveCameraBase(0.0f, 0.0f, -0.05f);
             }
             if (IsKeyDown(KEY_LEFT))
             { /* Rotate Left */
@@ -133,15 +145,15 @@ int main(int argc, char *argv[])
 
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
             {
-                // pipeline.OnMouseDown(GetMouseX(), GetMouseY());
+                pipeline.OnMouseDown(GetMouseX(), GetMouseY());
             }
             if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
             {
-                // pipeline.OnMouseUp();
+                pipeline.OnMouseUp();
             }
             if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
             {
-                // pipeline.OnMouseMove(GetMouseX(), GetMouseY());
+                pipeline.OnMouseMove(GetMouseX(), GetMouseY());
             }
 
             pipeline.Begin();

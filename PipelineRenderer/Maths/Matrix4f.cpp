@@ -252,6 +252,7 @@ void Matrix4f::transform(const Vector3f &point, Vector3f &pointOut) const
     float z = m20 * point.x + m21 * point.y + m22 * point.z + m23;
     float w = m30 * point.x + m31 * point.y + m32 * point.z + m33;
 
+    // 2. Perspective Divide (Convert to Normalized Device Coordinates -1 to 1)
     if (w != 1.0f && w != 0.0f)
     {
         pointOut.x = x / w;

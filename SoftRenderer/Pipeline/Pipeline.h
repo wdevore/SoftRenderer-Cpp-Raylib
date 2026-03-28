@@ -51,7 +51,7 @@ private:
     // camera.GetTransformMatrix();
     //
     // Note: we are talking about camera or view-space NOT view-volume-space.
-    Matrix4f worldToView;
+    Matrix4f modelMatrix;
 
     Matrix4f modelViewInv{};
     Point3f cameraModel{};

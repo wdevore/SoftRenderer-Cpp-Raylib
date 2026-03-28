@@ -58,13 +58,13 @@ void Frustum::SetPerspective(float ffov, float faspect, float near, float far)
     this->far = far;
 
     // Gemini version which uses the symmetric approach
-    top = near * tanf(ffov * 0.5f * Maths::DEGTORAD);
-    right = top * faspect;
+    // top = near * tanf(ffov * 0.5f * Maths::DEGTORAD);
+    // right = top * faspect;
 
     // Changing the sign of near inverts the mouse motion.
     // Note: This is the general projection.
-    // right = -near * std::tan((ffov / 2.0f) * Maths::DEGTORAD);
-    // left = -right;
+    right = -near * std::tan((ffov / 2.0f) * Maths::DEGTORAD);
+    left = -right;
     bottom = left / faspect;
     top = right / faspect;
 

@@ -63,6 +63,8 @@ int ZBuffer::setZ(int col, int row, float zv, bool debug)
 
 int ZBuffer::setZ(int i, float zv, bool debug)
 {
+    return 1; // TODO debugging
+
     int status = 0;
 
     if (i > zsize - 1)

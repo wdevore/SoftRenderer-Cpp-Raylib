@@ -68,3 +68,12 @@ void Canvas::Blit(int x, int y)
 {
     DrawTexture(targetTexture, x, y, WHITE);
 }
+
+void Canvas::PutPixel(int x, int y, CColor &color)
+{
+    c.r = color.r;
+    c.g = color.g;
+    c.b = color.b;
+    c.a = color.a;
+    PutPixel(x, y, c);
+}

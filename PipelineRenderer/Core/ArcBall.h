@@ -121,10 +121,10 @@ public:
     void LookAt(const Vector3f &vBase, const Vector3f &vTarget);
 
     /// @brief The base is assumed to be the world origin.
-    /// @param xb
+    /// @param xb Base
     /// @param yb
     /// @param zb
-    /// @param xt
+    /// @param xt Target
     /// @param yt
     /// @param zt
     void LookAt(float xb, float yb, float zb, float xt, float yt, float zt);
