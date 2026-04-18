@@ -20,3 +20,7 @@ endif()
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/PipelineRenderer/CMakeLists.txt")
     add_subdirectory(PipelineRenderer) 
 endif()
+
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/PikumaSoftwareRenderer/CMakeLists.txt")
+    add_subdirectory(PikumaSoftwareRenderer) 
+endif()

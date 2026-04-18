@@ -22,3 +22,10 @@ This repository uses a root `CMakeLists.txt` to manage sub-projects. You do not 
 3.  **Build and Run:**
     *   Click "Build" or press `F7`.
     *   Click "Play" (Run) or press `Shift+F5`.
+
+# Notes:
+
+- https://github.com/Larry57/WinForms3D/tree/master
+- https://github.com/ssloy/tinyrenderer
+- https://github.com/AgentD/swrast
+- https://github.com/karltechno/SoftRast
