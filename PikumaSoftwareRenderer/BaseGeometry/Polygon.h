@@ -38,7 +38,18 @@ namespace Geometry
 
         friend std::ostream &operator<<(std::ostream &os, const Polygon &v)
         {
-            return os << "vertices: " << v.vertices.size() << ", texcoords: " << v.texcoords.size() << ", numVertices: " << v.numVertices << std::endl;
+            for (auto &&v : v.vertices)
+            {
+                os << v << std::endl;
+            }
+            for (auto &&t : v.texcoords)
+            {
+                os << t << std::endl;
+            }
+
+            os << "numVertices: " << v.numVertices << std::endl;
+
+            return os;
         }
     };
 

@@ -1,3 +1,5 @@
+#include <cmath>
+
 #include "Painter.h"
 
 Painter::~Painter()
@@ -6,10 +8,8 @@ Painter::~Painter()
 
 void Painter::DrawBresenhamLine(Canvas &canvas, int xP, int yP, int xQ, int yQ, CColor &color)
 {
-    if (xP < 0 || xP > width - 1 || xQ < 0 || xQ > width - 1)
-        return;
-    if (yP < 0 || yP > height - 1 || yQ < 0 || yQ > height - 1)
-        return;
+    xP = std::max(0, std::min(xP, width - 1));
+    yP = std::max(0, std::min(yP, height - 1));
 
     ca.r = color.r;
     ca.g = color.g;
@@ -71,6 +71,37 @@ void Painter::DrawBresenhamLine(Canvas &canvas, int xP, int yP, int xQ, int yQ, 
                 D -= C;
             }
         }
+    }
+}
+
+void Painter::DrawDDALine(Canvas &canvas, float x0, float y0, float x1, float y1, CColor &color)
+{
+    x0 = std::fmax(0, std::fmin(x0, width - 1));
+    y0 = std::fmax(0, std::fmin(y0, height - 1));
+    x1 = std::fmax(0, std::fmin(x1, width - 1));
+    y1 = std::fmax(0, std::fmin(y1, height - 1));
+
+    float delta_x = (x1 - x0);
+    float delta_y = (y1 - y0);
+
+    float longest_side_length = (std::fabs(delta_x) >= std::fabs(delta_y)) ? std::fabs(delta_x) : std::fabs(delta_y);
+
+    float x_inc = delta_x / longest_side_length;
+    float y_inc = delta_y / longest_side_length;
+
+    float current_x = x0;
+    float current_y = y0;
+
+    ca.r = color.r;
+    ca.g = color.g;
+    ca.b = color.b;
+    ca.a = color.a;
+
+    for (int i = 0; i <= longest_side_length; i++)
+    {
+        canvas.PutPixel(round(current_x), round(current_y), ca);
+        current_x += x_inc;
+        current_y += y_inc;
     }
 }
 
@@ -216,7 +247,7 @@ void Painter::DrawRectangle(Canvas &canvas, int x, int y, int width, int height,
 
 void Painter::DrawTriangleWire(Canvas &canvas, int v0x, int v0y, int v1x, int v1y, int v2x, int v2y, CColor &color)
 {
-    DrawBresenhamLine(canvas, v0x, v0y, v1x, v1y, color);
-    DrawBresenhamLine(canvas, v1x, v1y, v2x, v2y, color);
-    DrawBresenhamLine(canvas, v2x, v2y, v0x, v0y, color);
+    DrawDDALine(canvas, v0x, v0y, v1x, v1y, color);
+    DrawDDALine(canvas, v1x, v1y, v2x, v2y, color);
+    DrawDDALine(canvas, v2x, v2y, v0x, v0y, color);
 }

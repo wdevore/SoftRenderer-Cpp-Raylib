@@ -196,7 +196,6 @@ int main(int argc, char *argv[])
             float wheel = GetMouseWheelMove();
             if (wheel != 0)
             {
-                std::cout << "Mouse wheel moved: " << wheel << std::endl;
                 pipeline.OnMouseWheel(wheel);
             }
 

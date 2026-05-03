@@ -50,6 +50,9 @@ public:
     void DrawBresenhamLine(Canvas &canvas,
                            int xP, int yP, int xQ, int yQ,
                            CColor &color);
+    void DrawDDALine(Canvas &canvas,
+                     float x0, float y0, float x1, float y1,
+                     CColor &color);
 
     void DrawZLine(Canvas &canvas, ZBuffer &zb, Vectorf &v0, Vectorf &v1, CColor color);
 

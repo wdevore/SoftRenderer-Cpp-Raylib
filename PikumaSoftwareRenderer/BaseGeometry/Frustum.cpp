@@ -89,8 +89,11 @@ namespace Geometry
 
         float previousDot = ray.dot(*planeNormal);
 
+        auto lastVertex = &polygon.vertices[polygon.numVertices];
+        // std::cout << "lastVertex: " << lastVertex << std::endl;
+
         // Loop all the polygon vertices while the current is different than the last one
-        while (currentVertex != &polygon.vertices[polygon.numVertices])
+        while (currentVertex != lastVertex)
         {
             ray.sub(*currentVertex, *planePoint);
             currentDot = ray.dot(*planeNormal);
@@ -108,9 +111,11 @@ namespace Geometry
                     Utilities::floatLerp(previousVertex->z, currentVertex->z, t)};
 
                 // Use the lerp formula to get the interpolated U and V texture coordinates
+                // std::cout << *previousVertex << ", " << *currentVertex << ", " << t << std::endl;
                 Maths::Texture2f interpolatedTexcoord{
-                    Utilities::floatLerp(previousVertex->u, currentVertex->u, t),
-                    Utilities::floatLerp(previousVertex->v, currentVertex->v, t)};
+                    Utilities::floatLerp(previousTexcoord->u, currentTexcoord->u, t),
+                    Utilities::floatLerp(previousTexcoord->v, currentTexcoord->v, t)};
+                // std::cout << "it: " << interpolatedTexcoord << std::endl;
 
                 // Insert the intersection point to the list of "inside vertices"
                 insideVertices[numInsideVertices] = intersectionPoint;
@@ -127,12 +132,14 @@ namespace Geometry
                 numInsideVertices++;
             }
 
+            // std::cout << "A curr, prev, end: " << currentVertex << ", " << previousVertex << ", " << lastVertex << std::endl;
             // Move to the next vertex
             previousDot = currentDot;
             previousVertex = currentVertex;
             previousTexcoord = currentTexcoord;
             currentVertex++;
             currentTexcoord++;
+            // std::cout << "B curr, prev, end: " << currentVertex << ", " << previousVertex << ", " << lastVertex << std::endl;
         }
 
         // At the end, copy the list of inside vertices into the destination polygon (out parameter)
@@ -142,6 +149,8 @@ namespace Geometry
             polygon.texcoords[i] = Maths::Texture2f{insideTexcoords[i]};
         }
         polygon.numVertices = numInsideVertices;
+
+        // std::cout << polygon << std::endl;
     }
 
 } // namespace Geometry

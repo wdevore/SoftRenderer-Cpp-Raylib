@@ -83,6 +83,8 @@ void Pipeline::Render()
         ProcessPipeline(meshes[i]);
     }
 
+    // std::cout << "Tris to render: " << trianglesToRenderCount << std::endl;
+
     // Loop all triangles from the triangles_to_render array
     for (int i = 0; i < trianglesToRenderCount; i++)
     {
@@ -93,9 +95,9 @@ void Pipeline::Render()
         //     // painter.DrawFilledTriangle(canvas, triangle);
         // }
 
+        renderMethod = WIRE;
         if (shouldRenderWire())
         {
-            renderMethod = WIRE;
             painter.DrawTriangleWire(canvas, triangle.points[0].x, triangle.points[0].y,
                                      triangle.points[1].x, triangle.points[1].y,
                                      triangle.points[2].x, triangle.points[2].y, CColor::White);
@@ -139,15 +141,21 @@ void Pipeline::ProcessPipeline(Geometry::Mesh &mesh)
 
     // Update camera look at target to create view matrix
     Maths::Vector3f target = camera.getLookAtTarget();
-    std::cout << "Camera target: " << target << std::endl;
-    std::cout << "Camera position: " << camera.position << std::endl;
+    // target.set(-0.598064, 0.006900, 0.801418);
+    // std::cout << "Camera target: " << target << std::endl;
+    // std::cout << "Camera position: " << camera.position << std::endl;
+    //     Target: -0.598064, 0.006900, 0.801418
+    // Position: 0.000000, 0.000000, 0.000000
 
     Maths::Vector3f up_direction{0, 1, 0};
     camera.makeLookAt(camera.position, target, up_direction);
+    int culledFaces = 0;
 
     // Loop all triangle faces of our mesh
     for (auto &face : mesh.faces)
     {
+        // std::cout << "------- Processing face -------" << std::endl;
+
         Maths::Vector3f *face_vertices[3];
         face_vertices[0] = &mesh.vertices[face.a - 1];
         face_vertices[1] = &mesh.vertices[face.b - 1];
@@ -203,6 +211,8 @@ void Pipeline::ProcessPipeline(Geometry::Mesh &mesh)
             // Backface culling, bypassing triangles that are looking away from the camera
             if (dotNormalCamera < 0)
             {
+                // std::cout << "****** Culled face ****** " << std::endl;
+                culledFaces++;
                 continue;
             }
         }
@@ -212,10 +222,13 @@ void Pipeline::ProcessPipeline(Geometry::Mesh &mesh)
         polygon.setFromTriangle(
             transformed_vertices[0], transformed_vertices[1], transformed_vertices[2],
             face.a_uv, face.b_uv, face.c_uv);
-        // std::cout << polygon << std::endl;
+        // std::cout << "original: \n"
+        //           << polygon << std::endl;
 
         // Clip the polygon modify with potential new vertices
         frustum.clip(polygon);
+        // std::cout << "clipped: \n"
+        //           << polygon << std::endl;
 
         // Break the clipped polygon apart back into a list of triangles
         int numTrianglesAfterClipping = 0;
@@ -284,7 +297,10 @@ void Pipeline::ProcessPipeline(Geometry::Mesh &mesh)
             }
         }
         // std::cout << "Triangles to render: " << trianglesToRenderCount << std::endl;
+        // std::cout << "------- End Processing face ------- " << std::endl;
     }
+
+    // std::cout << "==== Finished processing pipeline for mesh ===== " << culledFaces << std::endl;
 }
 
 // =========== Object manipulation =================
