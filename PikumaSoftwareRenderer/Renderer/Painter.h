@@ -3,7 +3,7 @@
 #include "Canvas.h" // Includes Raylib
 #include "CColor.h"
 #include "ZBuffer.h"
-#include "Vector3f.h"
+#include "Vectorf.h"
 
 class Painter
 {
@@ -47,12 +47,18 @@ public:
         this->height = height;
     }
 
-    void DrawZLine(Canvas &canvas, ZBuffer &zb, Vector3f &v0, Vector3f &v1, CColor color);
+    void DrawBresenhamLine(Canvas &canvas,
+                           int xP, int yP, int xQ, int yQ,
+                           CColor &color);
+
+    void DrawZLine(Canvas &canvas, ZBuffer &zb, Vectorf &v0, Vectorf &v1, CColor color);
 
     void DrawZBresenhamLine(Canvas &canvas, ZBuffer &zb,
                             int xP, int yP, int xQ, int yQ, float zP, float zQ,
                             CColor &color);
 
     void DrawGrid(Canvas &canvas, CColor &color);
+    void DrawDottedGrid(Canvas &canvas, CColor &color);
     void DrawRectangle(Canvas &canvas, int x, int y, int width, int height, CColor &color);
+    void DrawTriangleWire(Canvas &canvas, int v0x, int v0y, int v1x, int v1y, int v2x, int v2y, CColor &color);
 };

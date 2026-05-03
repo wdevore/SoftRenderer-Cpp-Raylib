@@ -4,8 +4,78 @@ Painter::~Painter()
 {
 }
 
+void Painter::DrawBresenhamLine(Canvas &canvas, int xP, int yP, int xQ, int yQ, CColor &color)
+{
+    if (xP < 0 || xP > width - 1 || xQ < 0 || xQ > width - 1)
+        return;
+    if (yP < 0 || yP > height - 1 || yQ < 0 || yQ > height - 1)
+        return;
+
+    ca.r = color.r;
+    ca.g = color.g;
+    ca.b = color.b;
+    ca.a = color.a;
+
+    x = xP;
+    y = yP;
+    D = 0;
+    HX = xQ - xP;
+    HY = yQ - yP;
+    xInc = 1;
+    yInc = 1;
+    if (HX < 0)
+    {
+        xInc = -1;
+        dzdx = -dzdx;
+        HX = -HX;
+    }
+    if (HY < 0)
+    {
+        yInc = -1;
+        dzdy = -dzdy;
+        HY = -HY;
+    }
+    if (HY <= HX)
+    {
+        C = 2 * HX;
+        M = 2 * HY;
+        for (;;)
+        {
+            canvas.PutPixel(x, y, ca);
+            if (x == xQ)
+                break;
+            x += xInc;
+            D += M;
+            if (D > HX)
+            {
+                y += yInc;
+                D -= C;
+            }
+        }
+    }
+    else
+    {
+        C = 2 * HY;
+        M = 2 * HX;
+        for (;;)
+        {
+            canvas.PutPixel(x, y, ca);
+            if (y == yQ)
+                break;
+            y += yInc;
+            z += dzdy;
+            D += M;
+            if (D > HY)
+            {
+                x += xInc;
+                D -= C;
+            }
+        }
+    }
+}
+
 void Painter::DrawZLine(Canvas &canvas, ZBuffer &zb,
-                        Vector3f &v0, Vector3f &v1,
+                        Vectorf &v0, Vectorf &v1,
                         CColor color)
 {
     DrawZBresenhamLine(canvas, zb, v0.x, v0.y, v1.x, v1.y, v0.z, v1.z, color);
@@ -122,6 +192,17 @@ void Painter::DrawGrid(Canvas &canvas, CColor &color)
     }
 }
 
+void Painter::DrawDottedGrid(Canvas &canvas, CColor &color)
+{
+    for (int y = 0; y < height; y += 10)
+    {
+        for (int x = 0; x < width; x += 10)
+        {
+            canvas.PutPixel(x, y, color);
+        }
+    }
+}
+
 void Painter::DrawRectangle(Canvas &canvas, int x, int y, int width, int height, CColor &color)
 {
     for (int i = 0; i < width; i++)
@@ -131,4 +212,11 @@ void Painter::DrawRectangle(Canvas &canvas, int x, int y, int width, int height,
             canvas.PutPixel(x + i, y + j, color);
         }
     }
+}
+
+void Painter::DrawTriangleWire(Canvas &canvas, int v0x, int v0y, int v1x, int v1y, int v2x, int v2y, CColor &color)
+{
+    DrawBresenhamLine(canvas, v0x, v0y, v1x, v1y, color);
+    DrawBresenhamLine(canvas, v1x, v1y, v2x, v2y, color);
+    DrawBresenhamLine(canvas, v2x, v2y, v0x, v0y, color);
 }

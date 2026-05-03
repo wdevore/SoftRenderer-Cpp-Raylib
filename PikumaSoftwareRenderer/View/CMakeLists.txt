@@ -2,14 +2,14 @@ cmake_minimum_required(VERSION 3.31.0)
 
 file(GLOB DIR_SOURCES CONFIGURE_DEPENDS *.cpp)
 
-add_library(BaseMathsLib STATIC
+add_library(BaseViewLib STATIC
     ${DIR_SOURCES}
 )
 
-target_include_directories(BaseMathsLib
+target_include_directories(BaseViewLib
     PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-target_link_libraries(BaseMathsLib
-  PUBLIC BaseImagesLib
+target_link_libraries(BaseViewLib
+  PUBLIC BaseMathsLib
 )

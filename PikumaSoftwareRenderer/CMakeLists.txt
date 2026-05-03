@@ -28,6 +28,10 @@ if(NOT TARGET raylib)
 endif()
 
 add_subdirectory(BaseMaths)
+add_subdirectory(BaseGeometry)
+add_subdirectory(Image)
+add_subdirectory(View)
+add_subdirectory(Lights)
 add_subdirectory(Renderer)
 add_subdirectory(Base)
 

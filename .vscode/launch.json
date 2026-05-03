@@ -44,16 +44,24 @@
             "MIMode": "gdb"
         },
         {
-            "name": "SoftRenderer",
+            "name": "PikumaSoftwareRenderer",
             "type": "cppdbg",
             "request": "launch",
             "program": "${command:cmake.launchTargetPath}",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${workspaceFolder}/SoftRenderer",
+            "cwd": "${workspaceFolder}/PikumaSoftwareRenderer",
             "environment": [],
             "externalConsole": false,
-            "MIMode": "gdb"
+            "MIMode": "gdb",
+            "miDebuggerArgs": "-x ${workspaceFolder}/PikumaSoftwareRenderer/.gdbinit",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
         }
     ]
 }

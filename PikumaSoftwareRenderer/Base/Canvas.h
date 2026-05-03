@@ -23,6 +23,8 @@ public:
     void Blit(int x, int y);
 
 private:
+    bool initialized{false};
+
     int width;
     int height;
 

@@ -1,0 +1,122 @@
+#include <cmath>
+
+#include "Camera.h"
+
+namespace View
+{
+    Camera::Camera(/* args */)
+    {
+    }
+
+    Camera::~Camera()
+    {
+    }
+
+    void Camera::initialize(Maths::Vector3f position, Maths::Vector3f direction)
+    {
+        this->position.set(position);
+        this->direction.set(direction);
+        forwardVelocity.zero();
+        yaw = 0.0;
+        pitch = 0.0;
+    }
+
+    void Camera::rotateYaw(float angle)
+    {
+        yaw += angle;
+    }
+
+    void Camera::rotatePitch(float angle)
+    {
+        pitch += angle;
+    }
+
+    void Camera::updateVelocity(float speed)
+    {
+        direction.multiply(speed);
+        forwardVelocity.set(direction);
+    }
+
+    void Camera::updatePosition()
+    {
+        position.add(forwardVelocity);
+    }
+
+    Maths::Vector3f Camera::getLookAtTarget()
+    {
+        // TODO: optimize away local objects
+
+        // Initialize the target looking at the positive z-axis
+        Maths::Vector3f target = {0, 0, 1};
+
+        Matrix4 camera_yaw_rotation{};
+        camera_yaw_rotation.setRotationY(yaw);
+
+        Matrix4 camera_pitch_rotation{};
+        camera_pitch_rotation.setRotationX(pitch);
+
+        // Create camera rotation matrix based on yaw and pitch
+        // camera_rotation = camera_yaw_rotation x camera_pitch_rotation x Identity
+        Matrix4 camera_rotation{}; // Identity
+        camera_rotation.multiply(camera_yaw_rotation, camera_pitch_rotation);
+
+        // Update camera direction based on the rotation
+        Maths::Vector3f camera_direction{};
+        camera_rotation.multiply(target, direction);
+
+        // Offset the camera position in the direction where the camera is pointing at
+        target.add(position, direction);
+
+        return target;
+    }
+
+    void Camera::makeLookAt(const Maths::Vector3f &eye, const Maths::Vector3f &target, const Maths::Vector3f &up)
+    {
+        // TODO: replace locals
+        // Compute the forward (z), right (x), and up (y) vectors
+        Maths::Vector3f x{}, y{}, z{};
+        z.sub(target, eye);
+        z.normalize();
+
+        x.cross(up, z);
+        x.normalize();
+
+        y.cross(z, x);
+
+        // | x.x   x.y   x.z  -dot(x,eye) |
+        // | y.x   y.y   y.z  -dot(y,eye) |
+        // | z.x   z.y   z.z  -dot(z,eye) |
+        // |   0     0     0            1 |
+        lm.m[0][0] = x.x;
+        lm.m[0][1] = x.y;
+        lm.m[0][2] = x.z;
+        lm.m[0][3] = -x.dot(eye);
+        lm.m[1][0] = y.x;
+        lm.m[1][1] = y.y;
+        lm.m[1][2] = y.z;
+        lm.m[1][3] = -y.dot(eye);
+        lm.m[2][0] = z.x;
+        lm.m[2][1] = z.y;
+        lm.m[2][2] = z.z;
+        lm.m[2][3] = -z.dot(eye);
+        lm.m[3][0] = 0.0;
+        lm.m[3][1] = 0.0;
+        lm.m[3][2] = 0.0;
+        lm.m[3][3] = 1.0;
+    }
+
+    void Camera::makePerspective(float fov, float aspect, float znear, float zfar)
+    {
+        // | (h/w)*1/tan(fov/2)             0              0                 0 |
+        // |                  0  1/tan(fov/2)              0                 0 |
+        // |                  0             0     zf/(zf-zn)  (-zf*zn)/(zf-zn) |
+        // |                  0             0              1                 0 |
+        pm.setZero();
+        pm.m[0][0] = aspect * (1 / tan(fov / 2));
+        pm.m[1][1] = 1 / tan(fov / 2);
+        pm.m[2][2] = zfar / (zfar - znear);
+        pm.m[2][3] = (-zfar * znear) / (zfar - znear);
+        pm.m[3][2] = 1.0;
+    }
+
+}

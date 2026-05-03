@@ -11,6 +11,12 @@ Canvas::Canvas()
 Canvas::~Canvas()
 {
     std::cout << "Destroying Canvas" << std::endl;
+    if (!initialized)
+    {
+        std::cout << "###### Canvas was NOT initialized ######" << std::endl;
+        return;
+    }
+
     UnloadTexture(targetTexture);
     UnloadImage(canvas);
 }
@@ -25,6 +31,8 @@ void Canvas::initialize(int width, int height)
 
     // 2. Load an empty texture to the GPU that we will update every frame
     targetTexture = LoadTextureFromImage(canvas);
+
+    initialized = true;
 }
 
 void Canvas::Clear()

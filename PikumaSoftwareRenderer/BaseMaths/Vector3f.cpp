@@ -1,122 +1,144 @@
 #include <cmath>
 #include <sstream>
 
+#include "VectorBase.h"
 #include "Vector3f.h"
-// #include "Point3f.h"
 
-Vector3f::Vector3f() : x(0.0f), y(0.0f), z(0.0f) {}
-
-Vector3f::Vector3f(float x, float y, float z) : x(x), y(y), z(z) {}
-
-Vector3f::Vector3f(const Vector3f &v1) : x(v1.x), y(v1.y), z(v1.z) {}
-
-void Vector3f::set(float x, float y, float z)
+namespace Maths
 {
-    this->x = x;
-    this->y = y;
-    this->z = z;
-}
-
-void Vector3f::set(const Vector3f &v)
-{
-    this->x = v.x;
-    this->y = v.y;
-    this->z = v.z;
-}
-
-float Vector3f::length() const
-{
-    return std::sqrt(x * x + y * y + z * z);
-}
-
-float Vector3f::lengthSquared() const
-{
-    return x * x + y * y + z * z;
-}
-
-void Vector3f::normalize()
-{
-    float l = length();
-    if (l != 0.0f)
+    Vector3f::~Vector3f()
     {
-        x /= l;
-        y /= l;
-        z /= l;
     }
-}
 
-float Vector3f::dot(const Vector3f &v1) const
-{
-    return x * v1.x + y * v1.y + z * v1.z;
-}
+    void Vector3f::set(const VectorBase &c)
+    {
+        x = c.x;
+        y = c.y;
+        z = c.z;
+        w = 1.0f;
+    }
 
-void Vector3f::cross(const Vector3f &v1, const Vector3f &v2)
-{
-    float cx = v1.y * v2.z - v1.z * v2.y;
-    float cy = v1.z * v2.x - v1.x * v2.z;
-    float cz = v1.x * v2.y - v1.y * v2.x;
-    this->x = cx;
-    this->y = cy;
-    this->z = cz;
-}
+    void Vector3f::set(float x, float y, float z)
+    {
+        this->x = x;
+        this->y = y;
+        this->z = z;
+        w = 1.0f;
+    }
 
-void Vector3f::add(const Vector3f &v1)
-{
-    x += v1.x;
-    y += v1.y;
-    z += v1.z;
-}
+    void Vector3f::zero()
+    {
+        x = 0.0f;
+        y = 0.0f;
+        z = 0.0f;
+        w = 1.0f;
+    }
 
-void Vector3f::add(const Vector3f &v1, const Vector3f &v2)
-{
-    x = v1.x + v2.x;
-    y = v1.y + v2.y;
-    z = v1.z + v2.z;
-}
+    void Vector3f::add(const VectorBase &c)
+    {
+        x += c.x;
+        y += c.y;
+        z += c.z;
+    }
 
-void Vector3f::sub(const Vector3f &v1)
-{
-    x -= v1.x;
-    y -= v1.y;
-    z -= v1.z;
-}
+    void Vector3f::add(const VectorBase &a, const VectorBase &b)
+    {
+        x = a.x + b.x;
+        y = a.y + b.y;
+        z = a.z + b.z;
+    }
 
-void Vector3f::sub(const Vector3f &v1, const Vector3f &v2)
-{
-    x = v1.x - v2.x;
-    y = v1.y - v2.y;
-    z = v1.z - v2.z;
-}
+    void Vector3f::sub(const VectorBase &c)
+    {
+        x -= c.x;
+        y -= c.y;
+        z -= c.z;
+    }
 
-void Vector3f::scale(float s)
-{
-    x *= s;
-    y *= s;
-    z *= s;
-}
+    void Vector3f::sub(const VectorBase &a, const VectorBase &b)
+    {
+        x = a.x - b.x;
+        y = a.y - b.y;
+        z = a.z - b.z;
+    }
 
-void Vector3f::scaleAdd(float s, const Vector3f &v1, const Vector3f &v2)
-{
-    x = s * v1.x + v2.x;
-    y = s * v1.y + v2.y;
-    z = s * v1.z + v2.z;
-}
+    void Vector3f::multiply(float s)
+    {
+        x *= s;
+        y *= s;
+        z *= s;
+    }
 
-void Vector3f::negate()
-{
-    x = -x;
-    y = -y;
-    z = -z;
-}
+    void Vector3f::divide(float s)
+    {
+        if (s == 0.0f)
+            return;
 
-bool Vector3f::equals(const Vector3f &v1) const
-{
-    return x == v1.x && y == v1.y && z == v1.z;
-}
+        x /= s;
+        y /= s;
+        z /= s;
+    }
 
-bool Vector3f::epsilonEquals(const Vector3f &v1, float epsilon) const
-{
-    return std::abs(v1.x - x) < epsilon &&
-           std::abs(v1.y - y) < epsilon &&
-           std::abs(v1.z - z) < epsilon;
+    void Vector3f::normalize()
+    {
+        float length = std::sqrt(x * x + y * y + z * z);
+        if (length != 0.0f)
+        {
+            x /= length;
+            y /= length;
+            z /= length;
+        }
+    }
+
+    void Vector3f::rotateOn(float angle, RotateAxis axis)
+    {
+        float s = std::sin(angle);
+        float c = std::cos(angle);
+        float x = x;
+        float y = y;
+        float z = z;
+
+        switch (axis)
+        {
+        case X:
+            y = y * c - z * s;
+            z = y * s + z * c;
+            break;
+        case Y:
+            x = x * c + z * s;
+            z = x * s + z * c;
+            break;
+        case Z:
+            x = x * c - y * s;
+            y = x * s + y * c;
+            break;
+        }
+    }
+
+    void Vector3f::cross(const VectorBase &a, const VectorBase &b)
+    {
+        x = a.y * b.z - a.z * b.y;
+        y = a.z * b.x - a.x * b.z;
+        z = a.x * b.y - a.y * b.x;
+    }
+
+    float Vector3f::dot(const VectorBase &c)
+    {
+        return x * c.x +
+               y * c.y +
+               z * c.z;
+    }
+
+    void Vector3f::print() const
+    {
+        std::cout << *this << std::endl;
+    }
+
+    std::string Vector3f::toString() const
+    {
+        std::ostringstream oss;
+        oss << *this;
+
+        return oss.str();
+    }
 }

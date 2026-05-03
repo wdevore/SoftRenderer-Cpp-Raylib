@@ -13,5 +13,8 @@ target_include_directories(RendererLib
 target_link_libraries(RendererLib
   PUBLIC BaseLib
   PUBLIC BaseMathsLib
+  PUBLIC BaseViewLib
+  PUBLIC BaseLightsLib
+  PUBLIC BaseGeometryLib
   PUBLIC raylib
 )

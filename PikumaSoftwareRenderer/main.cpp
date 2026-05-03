@@ -22,31 +22,43 @@ void CustomDrawFPS(int posX, int posY)
     DrawText(TextFormat("%2i FPS", fps), posX, posY, 20, color);
 }
 
+std::string GetAssetPath(const std::string &localPath)
+{
+    if (FileExists(localPath.c_str()))
+        return localPath;
+    if (FileExists(("../" + localPath).c_str()))
+        return "../" + localPath;
+    if (FileExists(("../PikumaSoftwareRenderer/" + localPath).c_str()))
+        return "../PikumaSoftwareRenderer/" + localPath;
+
+    return localPath; // Fallback to the original path
+}
+
 int main(int argc, char *argv[])
 {
-    int screenWidth = 800;
-    int screenHeight = 450;
+    int screenWidth = 320;  // 800
+    int screenHeight = 240; // 450
     int savedX = -1;
     int savedY = -1;
 
-    std::string configPath = "window.state";
-    if (FileExists(configPath.c_str()))
+    std::string configFile = "window.state";
+    std::string directory = "./PikumaSoftwareRenderer/";
+    // std::string fullPath = directory + configFile;
+    std::string fullPath = "/home/iposthuman/Development/cpp/SoftRenderer-Cpp-Raylib/PikumaSoftwareRenderer/" + configFile;
+
+    bool fileExists = FileExists((fullPath).c_str());
+
+    if (fileExists)
     {
-        std::cout << "State file found in current directory." << std::endl;
-    }
-    else if (FileExists("../PikumaSoftwareRenderer/window.state"))
-    {
-        std::cout << "State file found in PikumaSoftwareRenderer folder." << std::endl;
-        configPath = "../PikumaSoftwareRenderer/window.state";
+        std::cout << "State file '" << fullPath << "' found in PikumaSoftwareRenderer folder." << std::endl;
     }
     else
     {
-        std::cout << "State file not found. Using defaults." << std::endl;
+        std::cout << "State file found in current directory." << std::endl;
+        return -1;
     }
 
-    std::cout << "Config path: " << configPath << std::endl;
-
-    std::ifstream loadFile(configPath);
+    std::ifstream loadFile(fullPath);
     if (loadFile.is_open())
     {
         std::cout << "Loading window state..." << std::endl;
@@ -93,11 +105,30 @@ int main(int argc, char *argv[])
     {
         Pipeline pipeline{screenWidth, screenHeight};
 
-        // Initialize Canvas
-        pipeline.Setup();
+        std::unique_ptr<Geometry::Mesh> mesh = std::make_unique<Geometry::Mesh>();
+        int status = mesh->loadMesh(GetAssetPath("Assets/cube.obj"),
+                                    GetAssetPath("Assets/cube.png"),
+                                    Maths::Vector3f{1, 1, 1}, Maths::Vector3f{0, -1.5, +23}, Maths::Vector3f{0, 0, 0});
+        if (status != 0)
+        {
+            std::cout << "Error loading mesh: " << status << std::endl;
+        }
+
+        if (status == 0)
+        {
+            int index = pipeline.addMesh(std::move(mesh));
+
+            // Initialize Canvas
+            pipeline.Setup();
+        }
+        bool mouseDown = false;
 
         while (!WindowShouldClose())
         {
+            float deltaTime = GetFrameTime();
+
+            pipeline.Begin(deltaTime);
+
             // ===============================================================
             // --- Input Handling ---
             // ===============================================================
@@ -139,15 +170,35 @@ int main(int argc, char *argv[])
 
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
             {
+                mouseDown = true;
+
+                pipeline.OnMouseDown(GetMouseX(), GetMouseY());
             }
             if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
             {
-            }
-            if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
-            {
+                mouseDown = false;
+
+                pipeline.OnMouseUp();
             }
 
-            pipeline.Begin();
+            // Check if the mouse moved this frame
+            Vector2 mouseDelta = GetMouseDelta();
+            if (mouseDelta.x != 0.0f || mouseDelta.y != 0.0f)
+            {
+                if (mouseDown)
+                {
+                    //     std::cout << "Mouse moved: " << mouseDelta.x << ", " << mouseDelta.y << std::endl;
+                    //     std::cout << "Mouse position: " << GetMouseX() << ", " << GetMouseY() << std::endl;
+                    pipeline.OnMouseMove(GetMouseX(), GetMouseY(), (int)mouseDelta.x, (int)mouseDelta.y);
+                }
+            }
+
+            float wheel = GetMouseWheelMove();
+            if (wheel != 0)
+            {
+                std::cout << "Mouse wheel moved: " << wheel << std::endl;
+                pipeline.OnMouseWheel(wheel);
+            }
 
             // ===============================================================
             // Rasterize your sceen
@@ -185,7 +236,9 @@ int main(int argc, char *argv[])
         std::cerr << "Unknown exception occurred" << std::endl;
     }
 
-    std::ofstream saveFile(configPath);
+    std::cout << "========== Exiting program ==========" << std::endl;
+
+    std::ofstream saveFile(configFile);
     if (saveFile.is_open())
     {
         std::cout << "Saving window state..." << std::endl;

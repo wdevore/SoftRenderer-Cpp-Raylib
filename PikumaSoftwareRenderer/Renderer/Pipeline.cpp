@@ -2,6 +2,10 @@
 #include <cmath>
 
 #include "Pipeline.h"
+#include "Matrix4.h"
+#include "Triangle.h"
+#include "Polygon.h"
+#include "Vector3f.h"
 
 Pipeline::~Pipeline()
 {
@@ -14,22 +18,41 @@ void Pipeline::Setup()
 
     canvas.SetClearColor(DARKGRAY);
 
+    // Initialize the scene light direction
+    light.direction.set(0, 0, 1);
+
+    // Initialize the perspective projection matrix
+    float aspect_y = (float)height / (float)width;
+    float aspect_x = (float)width / (float)height;
+    float fov_y = 3.141592 / 3.0; // the same as 180/3, or 60deg
+    float fov_x = std::atan(std::tan(fov_y / 2) * aspect_x) * 2;
+    float znear = 1.0;
+    float zfar = 50.0;
+
+    camera.initialize(Maths::Vector3f{0, 0, 0}, Maths::Vector3f{0, 0, 1});
+    camera.makePerspective(fov_y, aspect_y, znear, zfar);
+    projMatrix.set(camera.pm);
+
+    // Initialize frustum planes with a point and a normal
+    frustum.initialize(fov_x, fov_y, znear, zfar);
+
     std::cout << "Pipeline setup complete." << std::endl;
 }
 
-void Pipeline::Begin()
+void Pipeline::Begin(float deltaTime)
 {
+    this->deltaTime = deltaTime;
+
+    // Initialize the counter of triangles to render for the current frame
+    trianglesToRenderCount = 0;
+
     canvas.Clear();
 }
 
 void Pipeline::Update()
 {
-    // camera.Update();
-    // Because the camera is dynamic retrieve the latest Projection matrix.
-    // viewMatrix.set(camera.GetTransformMatrix4f());
-    canvas.Update(); // Updates color buffer
 
-    // zb.reset();
+    canvas.Update(); // Updates color buffer
 }
 
 void Pipeline::End()
@@ -44,13 +67,263 @@ void Pipeline::End()
     canvas.Blit(0, 0); // Copies color buffer to screen
 }
 
-void Pipeline::Render()
+int Pipeline::addMesh(std::unique_ptr<Geometry::Mesh> mesh)
 {
-    painter.DrawGrid(canvas, CColor::Black);
-    painter.DrawRectangle(canvas, 50, 50, 200, 200, CColor::Magenta);
+    meshes.push_back(std::move(*mesh));
+    return meshes.size() - 1;
 }
 
-// ======================== Camera ========================================
+void Pipeline::Render()
+{
+    painter.DrawDottedGrid(canvas, CColor::Orange);
+    // painter.DrawRectangle(canvas, 50, 50, 100, 100, CColor::Magenta);
+
+    for (int i = 0; i < meshes.size(); i++)
+    {
+        ProcessPipeline(meshes[i]);
+    }
+
+    // Loop all triangles from the triangles_to_render array
+    for (int i = 0; i < trianglesToRenderCount; i++)
+    {
+        Geometry::Triangle triangle = trianglesToRender[i];
+
+        // if (shouldRenderFilledTriangle())
+        // {
+        //     // painter.DrawFilledTriangle(canvas, triangle);
+        // }
+
+        if (shouldRenderWire())
+        {
+            renderMethod = WIRE;
+            painter.DrawTriangleWire(canvas, triangle.points[0].x, triangle.points[0].y,
+                                     triangle.points[1].x, triangle.points[1].y,
+                                     triangle.points[2].x, triangle.points[2].y, CColor::White);
+        }
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Process the graphics pipeline stages for all the mesh triangles
+///////////////////////////////////////////////////////////////////////////////
+// +-------------+
+// | Model space |  <-- original mesh vertices
+// +-------------+
+// |   +-------------+
+// `-> | World space |  <-- multiply by world matrix
+//     +-------------+
+//     |   +--------------+
+//     `-> | Camera space |  <-- multiply by view matrix
+//         +--------------+
+//         |    +------------+
+//         `--> |  Clipping  |  <-- clip against the six frustum planes
+//              +------------+
+//              |    +------------+
+//              `--> | Projection |  <-- multiply by projection matrix
+//                   +------------+
+//                   |    +-------------+
+//                   `--> | Image space |  <-- apply perspective divide
+//                        +-------------+
+//                        |    +--------------+
+//                        `--> | Screen space |  <-- ready to render
+//                             +--------------+
+///////////////////////////////////////////////////////////////////////////////
+void Pipeline::ProcessPipeline(Geometry::Mesh &mesh)
+{
+    // Create scale, rotation, and translation matrices that will be used to multiply the mesh vertices
+    scaleMatrix.setScale(mesh.scale.x, mesh.scale.y, mesh.scale.z);
+    rotationMatrixX.setRotationX(mesh.rotation.x);
+    rotationMatrixY.setRotationY(mesh.rotation.y);
+    rotationMatrixZ.setRotationZ(mesh.rotation.z);
+    translationMatrix.setTranslation(mesh.translation.x, mesh.translation.y, mesh.translation.z);
+
+    // Update camera look at target to create view matrix
+    Maths::Vector3f target = camera.getLookAtTarget();
+    std::cout << "Camera target: " << target << std::endl;
+    std::cout << "Camera position: " << camera.position << std::endl;
+
+    Maths::Vector3f up_direction{0, 1, 0};
+    camera.makeLookAt(camera.position, target, up_direction);
+
+    // Loop all triangle faces of our mesh
+    for (auto &face : mesh.faces)
+    {
+        Maths::Vector3f *face_vertices[3];
+        face_vertices[0] = &mesh.vertices[face.a - 1];
+        face_vertices[1] = &mesh.vertices[face.b - 1];
+        face_vertices[2] = &mesh.vertices[face.c - 1];
+
+        Maths::Vector4f transformed_vertices[3];
+
+        // Loop all three vertices of this current face and apply transformations
+        for (int v = 0; v < 3; v++)
+        {
+            Maths::Vector4f transformedVertex;
+            transformedVertex.setFrom3(*face_vertices[v]);
+
+            // Create a World Matrix combining scale, rotation, and translation matrices
+            Matrix4 worldMatrix{};
+
+            // Order matters: First scale, then rotate, then translate. [T]*[R]*[S]*v
+            worldMatrix.multiply(scaleMatrix, worldMatrix);
+            worldMatrix.multiply(rotationMatrixZ, worldMatrix);
+            worldMatrix.multiply(rotationMatrixY, worldMatrix);
+            worldMatrix.multiply(rotationMatrixX, worldMatrix);
+            worldMatrix.multiply(translationMatrix, worldMatrix);
+
+            // Multiply the world matrix by the original vector
+            worldMatrix.multiply(transformedVertex);
+
+            // Multiply the view matrix by the vector to transform the scene to camera space
+            camera.lm.multiply(transformedVertex);
+
+            // Save transformed vertex in the array of transformed vertices
+            transformed_vertices[v].set(transformedVertex);
+        }
+
+        // Calculate the triangle face normal
+        Maths::Vector3f faceNormal{};
+        Geometry::getNormal(transformed_vertices, faceNormal);
+        // std::cout << faceNormal << std::endl;
+
+        // Backface culling test to see if the current face should be projected
+        if (shouldCullBackfaces)
+        {
+            // Find the vector between vertex A in the triangle and the camera origin
+            Maths::Vector3f camera_ray;
+            Maths::Vector3f origin{0.0f, 0.0f, 0.0f};
+            camera_ray.sub(origin, transformed_vertices[0]);
+            // std::cout << camera_ray << std::endl;
+
+            // Calculate how aligned the camera ray is with the face normal (using dot product)
+            Maths::Vector3f ray;
+            float dotNormalCamera = faceNormal.dot(camera_ray);
+            // std::cout << dotNormalCamera << std::endl;
+
+            // Backface culling, bypassing triangles that are looking away from the camera
+            if (dotNormalCamera < 0)
+            {
+                continue;
+            }
+        }
+
+        // Create a polygon from the original transformed triangle to be clipped
+        Geometry::Polygon polygon{};
+        polygon.setFromTriangle(
+            transformed_vertices[0], transformed_vertices[1], transformed_vertices[2],
+            face.a_uv, face.b_uv, face.c_uv);
+        // std::cout << polygon << std::endl;
+
+        // Clip the polygon modify with potential new vertices
+        frustum.clip(polygon);
+
+        // Break the clipped polygon apart back into a list of triangles
+        int numTrianglesAfterClipping = 0;
+
+        Geometry::trianglesFromPolygon(polygon, trianglesAfterClipping, numTrianglesAfterClipping);
+
+        // Loops all the assembled triangles after clipping
+        for (int triangle_index = 0; triangle_index < numTrianglesAfterClipping; triangle_index++)
+        {
+            Geometry::Triangle *triangleAfterClipping = &trianglesAfterClipping[triangle_index];
+
+            // TODO: make a std::vector in class
+            Maths::Vector4f projectedPoints[3];
+
+            float hw = (float)width / 2.0;
+            float hh = (float)height / 2.0;
+
+            // Loop all three vertices to perform projection and conversion to screen space
+            for (int v = 0; v < 3; v++)
+            {
+                // Project the current vertex using a perspective projection matrix
+                projMatrix.multiply(triangleAfterClipping->points[v], projectedPoints[v]);
+
+                // Perform perspective divide
+                if (projectedPoints[v].w != 0)
+                {
+                    projectedPoints[v].x /= projectedPoints[v].w;
+                    projectedPoints[v].y /= projectedPoints[v].w;
+                    projectedPoints[v].z /= projectedPoints[v].w;
+                }
+
+                // Flip vertically since the y values of the 3D mesh grow bottom->up and in screen space y values grow top->down
+                projectedPoints[v].y *= -1;
+
+                // Scale into the view
+                projectedPoints[v].x *= hw;
+                projectedPoints[v].y *= hh;
+
+                // Translate the projected points to the middle of the screen
+                projectedPoints[v].x += hw;
+                projectedPoints[v].y += hh;
+            }
+
+            // Calculate the shade intensity based on how aliged is the normal with the flipped light direction ray
+            float lightIntensityFactor = -faceNormal.dot(light.direction);
+
+            // Calculate the triangle color based on the light angle
+            uint32_t triangleColor = light.applyLightIntensity(face.color, lightIntensityFactor);
+
+            // Create the final projected triangle that will be rendered in screen space
+            // Geometry::Triangle triangleToRender;
+            // triangleToRender.set(
+            //     projectedPoints,
+            //     triangleAfterClipping->texcoords,
+            //     triangleColor,
+            //     mesh.texture.image);
+
+            // Save the projected triangle in the array of triangles to render
+            if (trianglesToRenderCount < Geometry::Triangle::MAX_TRIANGLES)
+            {
+                trianglesToRender[trianglesToRenderCount].set(projectedPoints,
+                                                              triangleAfterClipping->texcoords,
+                                                              triangleColor,
+                                                              mesh.texture.image);
+                trianglesToRenderCount++;
+            }
+        }
+        // std::cout << "Triangles to render: " << trianglesToRenderCount << std::endl;
+    }
+}
+
+// =========== Object manipulation =================
+void Pipeline::rotateOnX(int index, float angle)
+{
+    meshes[index].rotation.x += angle;
+}
+
+void Pipeline::rotateOnY(int index, float angle)
+{
+    meshes[index].rotation.y += angle;
+}
+
+void Pipeline::rotateOnZ(int index, float angle)
+{
+    meshes[index].rotation.z += angle;
+}
+
+void Pipeline::setScale(int index, Maths::Vector3f scale)
+{
+    meshes[index].scale = scale;
+}
+
+void Pipeline::setRotation(int index, Maths::Vector3f rotation)
+{
+    meshes[index].rotation = rotation;
+}
+
+void Pipeline::setTranslation(int index, Maths::Vector3f translation)
+{
+    meshes[index].translation = translation;
+}
+
+// =========== Clipping =================
+void Pipeline::clipPolygonAgainstPlane(Geometry::Polygon &polygon, int plane)
+{
+}
+
+// =========== Camera manipulation =================
 void Pipeline::MoveCameraBase(float dx, float dy, float dz)
 {
     // camera.MoveCameraBase(dx, dy, dz);
@@ -66,7 +339,30 @@ void Pipeline::OnMouseUp()
     // camera.OnMouseUp();
 }
 
-void Pipeline::OnMouseMove(int x, int y)
+void Pipeline::OnMouseMove(int x, int y, int dx, int dy)
 {
-    // camera.OnMouseMove(x, y);
+    // std::cout << "Mouse moved: " << dx << ", " << dy << std::endl;
+
+    float sensitivity = 0.5f;
+    float yaw = dx * sensitivity;
+    float pitch = dy * sensitivity;
+
+    camera.rotateYaw(yaw * deltaTime);
+    camera.rotatePitch(pitch * deltaTime);
+}
+
+void Pipeline::OnMouseWheel(float delta)
+{
+    float speed = 20.0f;
+
+    if (delta > 0)
+    {
+        camera.updateVelocity(speed * deltaTime);
+        camera.updatePosition();
+    }
+    else
+    {
+        camera.updateVelocity(-speed * deltaTime);
+        camera.updatePosition();
+    }
 }

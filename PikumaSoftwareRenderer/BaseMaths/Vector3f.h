@@ -1,44 +1,44 @@
 #pragma once
-#include <string>
-#include <ostream>
 
-class Vector3f
+#include <iostream>
+
+#include "VectorBase.h"
+
+namespace Maths
 {
-public:
-    float x;
-    float y;
-    float z;
-
-    Vector3f();
-    Vector3f(float x, float y, float z);
-    Vector3f(const Vector3f &v1);
-    ~Vector3f() = default;
-
-    void set(float x, float y, float z);
-    void set(const Vector3f &v);
-
-    float length() const;
-    float lengthSquared() const;
-    void normalize();
-    float dot(const Vector3f &v1) const;
-    void cross(const Vector3f &v1, const Vector3f &v2);
-
-    void add(const Vector3f &v1);
-    void add(const Vector3f &v1, const Vector3f &v2);
-
-    void sub(const Vector3f &v1);
-    void sub(const Vector3f &v1, const Vector3f &v2);
-
-    void scale(float s);
-    void scaleAdd(float s, const Vector3f &v1, const Vector3f &v2);
-
-    void negate();
-
-    bool equals(const Vector3f &v1) const;
-    bool epsilonEquals(const Vector3f &v1, float epsilon) const;
-
-    friend std::ostream &operator<<(std::ostream &os, const Vector3f &o)
+    class Vector3f : public VectorBase
     {
-        return os << "(" << o.x << " : " << o.y << " : " << o.z << ")";
-    }
-};
+    private:
+        /* data */
+    public:
+        Vector3f(/* args */) : VectorBase() {};
+        Vector3f(float _x, float _y, float _z) : VectorBase(_x, _y, _z) {};
+        Vector3f(const Vector3f &c) : VectorBase(c) {};
+        ~Vector3f();
+
+        void set(const VectorBase &c) override;
+        void set(float x, float y, float z);
+
+        void zero() override;
+        void add(const VectorBase &c) override;
+        void add(const VectorBase &a, const VectorBase &b) override;
+        void sub(const VectorBase &c) override;
+        void sub(const VectorBase &a, const VectorBase &b) override;
+        void multiply(float s) override;
+        void divide(float s) override;
+        void normalize() override;
+
+        void rotateOn(float angle, RotateAxis axis) override;
+
+        void cross(const VectorBase &a, const VectorBase &b) override;
+        float dot(const VectorBase &c) override;
+
+        void print() const;
+        std::string toString() const;
+
+        friend std::ostream &operator<<(std::ostream &os, const Vector3f &v)
+        {
+            return os << "<" << v.x << ", " << v.y << ", " << v.z << ">";
+        }
+    };
+} // namespace Maths
