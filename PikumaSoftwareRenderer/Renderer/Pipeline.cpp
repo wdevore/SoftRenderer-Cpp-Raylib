@@ -77,6 +77,9 @@ int Pipeline::addMesh(std::unique_ptr<Geometry::Mesh> mesh)
 
 void Pipeline::Render()
 {
+    // std::cout << "Cam position: " << camera.position << std::endl;
+    // std::cout << "Cam target: " << camera.direction << std::endl;
+
     painter.DrawDottedGrid(canvas, CColor::Orange);
     // painter.DrawRectangle(canvas, 50, 50, 100, 100, CColor::Magenta);
 

@@ -108,7 +108,9 @@ int main(int argc, char *argv[])
         std::unique_ptr<Geometry::Mesh> mesh = std::make_unique<Geometry::Mesh>();
         int status = mesh->loadMesh(GetAssetPath("Assets/cube.obj"),
                                     GetAssetPath("Assets/cube.png"),
-                                    Maths::Vector3f{1, 1, 1}, Maths::Vector3f{0, -1.5, +23}, Maths::Vector3f{0, 0, 0});
+                                    Maths::Vector3f{1, 1, 1},
+                                    Maths::Vector3f{0, 0.0, 15},
+                                    Maths::Vector3f{0, 0, 0});
         if (status != 0)
         {
             std::cout << "Error loading mesh: " << status << std::endl;
