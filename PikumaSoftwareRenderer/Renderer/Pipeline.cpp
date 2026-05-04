@@ -119,13 +119,13 @@ void Pipeline::Render()
             int rectangleSize = 4;
             int x = triangle.points[0].x - rectangleSize / 2;
             int y = triangle.points[0].y - rectangleSize / 2;
-            painter.DrawRectangle(canvas, x, y, rectangleSize, rectangleSize, CColor::Red);
+            painter.DrawRectangle(canvas, x, y, rectangleSize, rectangleSize, CColor::Orange);
             x = triangle.points[1].x - rectangleSize / 2;
             y = triangle.points[1].y - rectangleSize / 2;
-            painter.DrawRectangle(canvas, x, y, rectangleSize, rectangleSize, CColor::Red);
+            painter.DrawRectangle(canvas, x, y, rectangleSize, rectangleSize, CColor::Orange);
             x = triangle.points[2].x - rectangleSize / 2;
             y = triangle.points[2].y - rectangleSize / 2;
-            painter.DrawRectangle(canvas, x, y, rectangleSize, rectangleSize, CColor::Red);
+            painter.DrawRectangle(canvas, x, y, rectangleSize, rectangleSize, CColor::Orange);
         }
     }
 }
