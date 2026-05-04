@@ -12,6 +12,7 @@
 
 class Pipeline
 {
+public:
     enum RenderMethod
     {
         WIRE,
@@ -71,6 +72,11 @@ public:
     int addMesh(std::unique_ptr<Geometry::Mesh> mesh);
 
     void Render();
+    void setRenderMethod(RenderMethod method)
+    {
+        renderMethod = method;
+    }
+
     void ProcessPipeline(Geometry::Mesh &mesh);
 
     void SimpleBresenhamLine(int x0, int y0, int x1, int y1, Color color);

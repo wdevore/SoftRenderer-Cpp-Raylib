@@ -123,6 +123,8 @@ int main(int argc, char *argv[])
         }
         bool mouseDown = false;
 
+        pipeline.setRenderMethod(Pipeline::RenderMethod::FILL_TRIANGLE);
+
         while (!WindowShouldClose())
         {
             float deltaTime = GetFrameTime();
@@ -132,7 +134,7 @@ int main(int argc, char *argv[])
             // ===============================================================
             // --- Input Handling ---
             // ===============================================================
-            if (IsKeyDown(KEY_W)) // Move Camera Forward
+            if (IsKeyDown(KEY_W))
             {
                 // Moves the camera up in the camera's plane
             }
@@ -166,6 +168,42 @@ int main(int argc, char *argv[])
 
             if (IsKeyPressed(KEY_SPACE))
             { /* Toggle Animation/Action */
+            }
+
+            if (IsKeyPressed(KEY_ONE))
+            {
+                pipeline.setRenderMethod(Pipeline::RenderMethod::WIRE_VERTEX);
+                std::cout << "Wire vertex mode" << std::endl;
+            }
+
+            if (IsKeyPressed(KEY_TWO))
+            {
+                pipeline.setRenderMethod(Pipeline::RenderMethod::WIRE);
+                std::cout << "Wire mode" << std::endl;
+            }
+
+            if (IsKeyPressed(KEY_THREE))
+            {
+                pipeline.setRenderMethod(Pipeline::RenderMethod::FILL_TRIANGLE);
+                std::cout << "Fill triangle mode" << std::endl;
+            }
+
+            if (IsKeyPressed(KEY_FOUR))
+            {
+                pipeline.setRenderMethod(Pipeline::RenderMethod::FILL_TRIANGLE_WIRE);
+                std::cout << "Fill triangle wire mode" << std::endl;
+            }
+
+            if (IsKeyPressed(KEY_FIVE))
+            {
+                pipeline.setRenderMethod(Pipeline::RenderMethod::TEXTURED);
+                std::cout << "Textured mode" << std::endl;
+            }
+
+            if (IsKeyPressed(KEY_SIX))
+            {
+                pipeline.setRenderMethod(Pipeline::RenderMethod::TEXTURED_WIRE);
+                std::cout << "Textured wire mode" << std::endl;
             }
 
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))

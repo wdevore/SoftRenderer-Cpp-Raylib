@@ -15,3 +15,16 @@ void CColor::Set(int r, int g, int b, int a)
     this->b = b;
     this->a = a;
 }
+
+CColor::CColor(uint color)
+{
+    Set(color);
+}
+
+void CColor::Set(uint color)
+{
+    a = (color >> 24) & 0xFF;
+    r = (color >> 16) & 0xFF;
+    g = (color >> 8) & 0xFF;
+    b = color & 0xFF;
+}

@@ -1,5 +1,5 @@
-#include "VectorBase.h"
 #include "Vector2f.h"
+#include <sstream>
 
 namespace Maths
 {
@@ -44,5 +44,28 @@ namespace Maths
 
         x /= s;
         y /= s;
+    }
+
+    void Vector2f::print() const
+    {
+        std::cout << *this << std::endl;
+    }
+
+    std::string Vector2f::toString() const
+    {
+        std::ostringstream oss;
+        oss << *this;
+
+        return oss.str();
+    }
+
+    /// @brief 2D edge cross product
+    /// @param a
+    /// @param b
+    /// @param p
+    /// @return
+    float area(const Vector2f &a, const Vector2f &b, const Vector2f &p)
+    {
+        return (b.x - a.x) * (p.y - a.y) - (b.y - a.y) * (p.x - a.x);
     }
 }

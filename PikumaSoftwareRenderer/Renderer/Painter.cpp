@@ -1,9 +1,16 @@
 #include <cmath>
 
 #include "Painter.h"
+#include "Vector4f.h"
+#include "Vector2f.h"
 
 Painter::~Painter()
 {
+}
+
+void Painter::reset()
+{
+    zb.reset();
 }
 
 void Painter::DrawBresenhamLine(Canvas &canvas, int xP, int yP, int xQ, int yQ, CColor &color)
@@ -106,10 +113,10 @@ void Painter::DrawDDALine(Canvas &canvas, float x0, float y0, float x1, float y1
 }
 
 void Painter::DrawZLine(Canvas &canvas, ZBuffer &zb,
-                        Vectorf &v0, Vectorf &v1,
+                        int v0x, int v0y, int v1x, int v1y, int v0z, int v1z,
                         CColor color)
 {
-    DrawZBresenhamLine(canvas, zb, v0.x, v0.y, v1.x, v1.y, v0.z, v1.z, color);
+    DrawZBresenhamLine(canvas, zb, v0x, v0y, v1x, v1y, v0z, v1z, color);
 }
 
 void Painter::DrawZBresenhamLine(Canvas &canvas, ZBuffer &zb,
@@ -250,4 +257,91 @@ void Painter::DrawTriangleWire(Canvas &canvas, int v0x, int v0y, int v1x, int v1
     DrawDDALine(canvas, v0x, v0y, v1x, v1y, color);
     DrawDDALine(canvas, v1x, v1y, v2x, v2y, color);
     DrawDDALine(canvas, v2x, v2y, v0x, v0y, color);
+}
+
+void Painter::DrawFilledTriangle(Canvas &canvas, const Geometry::Triangle &triangle, CColor &color)
+{
+    const Maths::Vector4f *a = &triangle.points[0];
+    const Maths::Vector4f *b = &triangle.points[1];
+    const Maths::Vector4f *c = &triangle.points[2];
+
+    // Finds the bounding box with all candidate pixels
+    int x_min = std::floor(std::fmin(std::fmin(a->x, b->x), c->x));
+    int y_min = std::floor(std::fmin(std::fmin(a->y, b->y), c->y));
+    int x_max = ceil(std::fmax(std::fmax(a->x, b->x), c->x));
+    int y_max = ceil(std::fmax(std::fmax(a->y, b->y), c->y));
+
+    // Screen 2D points from vertices v0, v1, and v2
+    Maths::Vector2f sv0{a->x, a->y};
+    Maths::Vector2f sv1{b->x, b->y};
+    Maths::Vector2f sv2{c->x, c->y};
+
+    // Compute the area of the entire triangle/parallelogram
+    float area = Maths::area(sv0, sv1, sv2);
+
+    // TODO: remove the backface culling in the pipeline.
+    // Back-face culling using the signed-area
+    if (area <= 0)
+    {
+        return;
+    }
+
+    // Compute the constant deltas that will be used for the horizontal and vertical steps
+    float delta_w0_col = (b->y - c->y);
+    float delta_w1_col = (c->y - a->y);
+    float delta_w2_col = (a->y - b->y);
+    float delta_w0_row = (c->x - b->x);
+    float delta_w1_row = (a->x - c->x);
+    float delta_w2_row = (b->x - a->x);
+
+    // Compute the edge functions for the fist (top-left) point
+    Maths::Vector2f p0{x_min + 0.5f, y_min + 0.5f};
+    float w0_row = Maths::area(sv1, sv2, p0);
+    float w1_row = Maths::area(sv2, sv0, p0);
+    float w2_row = Maths::area(sv0, sv1, p0);
+
+    // Loop all candidate pixels inside the bounding box
+    for (int y = y_min; y <= y_max; y++)
+    {
+        float w0 = w0_row;
+        float w1 = w1_row;
+        float w2 = w2_row;
+        for (int x = x_min; x <= x_max; x++)
+        {
+            bool is_inside = w0 >= 0 && w1 >= 0 && w2 >= 0;
+            if (is_inside)
+            {
+                float alpha = w0 / area;
+                float beta = w1 / area;
+                float gamma = w2 / area;
+
+                // Interpolate the value of 1/w for the current pixel
+                float interpolated_reciprocal_w = (1 / a->w) * alpha + (1 / b->w) * beta + (1 / c->w) * gamma;
+
+                // Adjust 1/w so the pixels that are closer to the camera have smaller values
+                interpolated_reciprocal_w = 1.0 - interpolated_reciprocal_w;
+
+                // Only draw the pixel if the depth value is less than the one previously stored in the z-buffer
+                if (interpolated_reciprocal_w < zb.getZ(x, y))
+                {
+                    // Draw a pixel at position (x,y) with a solid color
+                    ca.r = color.r;
+                    ca.g = color.g;
+                    ca.b = color.b;
+                    ca.a = color.a;
+
+                    canvas.PutPixel(x, y, ca);
+
+                    // Update the z-buffer value with the 1/w of this current pixel
+                    zb.setZ(x, y, interpolated_reciprocal_w, false);
+                }
+            }
+            w0 += delta_w0_col;
+            w1 += delta_w1_col;
+            w2 += delta_w2_col;
+        }
+        w0_row += delta_w0_row;
+        w1_row += delta_w1_row;
+        w2_row += delta_w2_row;
+    }
 }

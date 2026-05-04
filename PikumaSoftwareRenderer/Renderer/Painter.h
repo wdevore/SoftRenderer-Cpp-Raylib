@@ -3,7 +3,7 @@
 #include "Canvas.h" // Includes Raylib
 #include "CColor.h"
 #include "ZBuffer.h"
-#include "Vectorf.h"
+#include "Triangle.h"
 
 class Painter
 {
@@ -37,6 +37,8 @@ private:
     int yInc{};
     float I{};
 
+    ZBuffer zb{};
+
 public:
     Painter() {};
     ~Painter();
@@ -45,7 +47,10 @@ public:
     {
         this->width = width;
         this->height = height;
+
+        zb.Initialize(width, height);
     }
+    void reset();
 
     void DrawBresenhamLine(Canvas &canvas,
                            int xP, int yP, int xQ, int yQ,
@@ -54,7 +59,7 @@ public:
                      float x0, float y0, float x1, float y1,
                      CColor &color);
 
-    void DrawZLine(Canvas &canvas, ZBuffer &zb, Vectorf &v0, Vectorf &v1, CColor color);
+    void DrawZLine(Canvas &canvas, ZBuffer &zb, int v0x, int v0y, int v1x, int v1y, int v0z, int v1z, CColor color);
 
     void DrawZBresenhamLine(Canvas &canvas, ZBuffer &zb,
                             int xP, int yP, int xQ, int yQ, float zP, float zQ,
@@ -64,4 +69,6 @@ public:
     void DrawDottedGrid(Canvas &canvas, CColor &color);
     void DrawRectangle(Canvas &canvas, int x, int y, int width, int height, CColor &color);
     void DrawTriangleWire(Canvas &canvas, int v0x, int v0y, int v1x, int v1y, int v2x, int v2y, CColor &color);
+
+    void DrawFilledTriangle(Canvas &canvas, const Geometry::Triangle &triangle, CColor &color);
 };

@@ -28,7 +28,7 @@ void ZBuffer::reset()
     // We initialize it to "-infinity" (or a very small number) so that any
     // incoming geometry is closer than the background.
     for (int i = 0; i < zsize; i++)
-        z[i] = std::numeric_limits<float>::min();
+        z[i] = 1.0f; // std::numeric_limits<float>::min();
 }
 
 int ZBuffer::getIndex(int col, int row)
@@ -96,4 +96,14 @@ int ZBuffer::setZ(int i, float zv, bool debug)
         status = 2;
     }
     return status;
+}
+
+float ZBuffer::getZ(int col, int row)
+{
+    if (col < 0 || col >= width || row < 0 || row >= height)
+    {
+        return 1.0;
+    }
+    int index = (row - 1) * width + col;
+    return z[index];
 }

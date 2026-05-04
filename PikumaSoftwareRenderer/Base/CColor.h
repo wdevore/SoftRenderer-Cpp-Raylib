@@ -25,10 +25,12 @@ struct CColor
     static CColor Orange;
 
     CColor() : r(128), g(128), b(128), a(255) {}
+    CColor(uint color);
     CColor(int r, int g, int b, int a = 255) : r(r), g(g), b(b), a(a) {}
 
     void Set(CColor color);
     void Set(int r, int g, int b, int a = 255);
+    void Set(uint color);
 
     friend std::ostream &operator<<(std::ostream &os, const CColor &c)
     {

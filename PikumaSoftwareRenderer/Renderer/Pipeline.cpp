@@ -47,6 +47,8 @@ void Pipeline::Begin(float deltaTime)
     trianglesToRenderCount = 0;
 
     canvas.Clear();
+
+    painter.reset();
 }
 
 void Pipeline::Update()
@@ -78,10 +80,18 @@ void Pipeline::Render()
     painter.DrawDottedGrid(canvas, CColor::Orange);
     // painter.DrawRectangle(canvas, 50, 50, 100, 100, CColor::Magenta);
 
-    for (int i = 0; i < meshes.size(); i++)
+    for (auto &&mesh : meshes)
     {
-        ProcessPipeline(meshes[i]);
+        ProcessPipeline(mesh);
     }
+
+    // for (int i = 0; i < meshes.size(); i++)
+    // {
+    //     // Matrix4 rotationX{};
+    //     // rotationX.setRotationX();
+
+    //     ProcessPipeline(meshes[i]);
+    // }
 
     // std::cout << "Tris to render: " << trianglesToRenderCount << std::endl;
 
@@ -90,17 +100,25 @@ void Pipeline::Render()
     {
         Geometry::Triangle triangle = trianglesToRender[i];
 
-        // if (shouldRenderFilledTriangle())
-        // {
-        //     // painter.DrawFilledTriangle(canvas, triangle);
-        // }
+        if (shouldRenderFilledTriangle())
+        {
+            CColor faceColor{triangle.color};
 
-        renderMethod = WIRE;
+            painter.DrawFilledTriangle(canvas, triangle, faceColor);
+        }
+
         if (shouldRenderWire())
         {
             painter.DrawTriangleWire(canvas, triangle.points[0].x, triangle.points[0].y,
                                      triangle.points[1].x, triangle.points[1].y,
                                      triangle.points[2].x, triangle.points[2].y, CColor::White);
+        }
+
+        if (shouldRenderWireVertex())
+        {
+            painter.DrawRectangle(canvas, triangle.points[0].x, triangle.points[0].y, 2, 2, CColor::Red);
+            painter.DrawRectangle(canvas, triangle.points[1].x, triangle.points[1].y, 2, 2, CColor::Red);
+            painter.DrawRectangle(canvas, triangle.points[2].x, triangle.points[2].y, 2, 2, CColor::Red);
         }
     }
 }
@@ -132,6 +150,10 @@ void Pipeline::Render()
 ///////////////////////////////////////////////////////////////////////////////
 void Pipeline::ProcessPipeline(Geometry::Mesh &mesh)
 {
+    mesh.rotation.x += 0.005f;
+    mesh.rotation.y += 0.005f;
+    mesh.rotation.z += 0.005f;
+
     // Create scale, rotation, and translation matrices that will be used to multiply the mesh vertices
     scaleMatrix.setScale(mesh.scale.x, mesh.scale.y, mesh.scale.z);
     rotationMatrixX.setRotationX(mesh.rotation.x);
