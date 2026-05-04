@@ -36,8 +36,8 @@ std::string GetAssetPath(const std::string &localPath)
 
 int main(int argc, char *argv[])
 {
-    int screenWidth = 320;  // 800
-    int screenHeight = 240; // 450
+    int screenWidth = 800;  //  320
+    int screenHeight = 450; //   240
     int savedX = -1;
     int savedY = -1;
 

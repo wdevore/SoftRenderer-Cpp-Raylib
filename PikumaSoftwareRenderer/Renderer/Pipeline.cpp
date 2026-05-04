@@ -116,9 +116,16 @@ void Pipeline::Render()
 
         if (shouldRenderWireVertex())
         {
-            painter.DrawRectangle(canvas, triangle.points[0].x, triangle.points[0].y, 2, 2, CColor::Red);
-            painter.DrawRectangle(canvas, triangle.points[1].x, triangle.points[1].y, 2, 2, CColor::Red);
-            painter.DrawRectangle(canvas, triangle.points[2].x, triangle.points[2].y, 2, 2, CColor::Red);
+            int rectangleSize = 4;
+            int x = triangle.points[0].x - rectangleSize / 2;
+            int y = triangle.points[0].y - rectangleSize / 2;
+            painter.DrawRectangle(canvas, x, y, rectangleSize, rectangleSize, CColor::Red);
+            x = triangle.points[1].x - rectangleSize / 2;
+            y = triangle.points[1].y - rectangleSize / 2;
+            painter.DrawRectangle(canvas, x, y, rectangleSize, rectangleSize, CColor::Red);
+            x = triangle.points[2].x - rectangleSize / 2;
+            y = triangle.points[2].y - rectangleSize / 2;
+            painter.DrawRectangle(canvas, x, y, rectangleSize, rectangleSize, CColor::Red);
         }
     }
 }
