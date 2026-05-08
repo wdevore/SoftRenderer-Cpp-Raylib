@@ -4,6 +4,7 @@
 
 #include "Plane.h"
 #include "Polygon.h"
+#include "Line.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Frustum planes are defined by a point and a normal vector
@@ -40,6 +41,13 @@ namespace Geometry
         FAR
     };
 
+    enum ClippedInfo
+    {
+        CLIPPED,
+        OUTSIDE,
+        INSIDE
+    };
+
     class Frustum
     {
     private:
@@ -57,6 +65,13 @@ namespace Geometry
 
         void clip(Polygon &polygon);
         void clipAgainstPlane(Polygon &polygon, FrustumPlane plane);
+
+        ClippedInfo clip(Geometry::Line &line);
+        /// @brief
+        /// @param line
+        /// @param plane
+        /// @return 0 = completely outside
+        ClippedInfo clipAgainstLine(Geometry::Line &line, FrustumPlane plane);
     };
 
 } // namespace Geometry

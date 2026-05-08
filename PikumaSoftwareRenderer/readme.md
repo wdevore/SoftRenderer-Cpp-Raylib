@@ -9,6 +9,7 @@ In order to see a variable in the *Debug Console* we need to explicitly call
 - Add WASD to lookAt camera
 - Make further optimizations
 - Add more objects, for example Tetrahedra
+- Add Line collection (**working**)
 - Add 3D grid
 - Add 3D axis marker
 - Add Sphere

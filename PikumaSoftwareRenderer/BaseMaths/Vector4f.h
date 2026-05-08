@@ -11,6 +11,7 @@ namespace Maths
         /* data */
     public:
         Vector4f(/* args */);
+        Vector4f(float _x, float _y, float _z) : VectorBase(_x, _y, _z) {};
         ~Vector4f();
 
         void set(const VectorBase &c) override;

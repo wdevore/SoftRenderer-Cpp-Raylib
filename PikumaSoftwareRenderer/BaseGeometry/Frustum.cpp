@@ -153,4 +153,115 @@ namespace Geometry
         // std::cout << polygon << std::endl;
     }
 
+    /// @brief We should always generate with either a clipped line or original.
+    /// @param p1
+    /// @param p2
+    /// @return true if clipped or completely inside, false if all outside
+    ClippedInfo Frustum::clip(Geometry::Line &line)
+    {
+        // If any line is marked as "outside" then the line should be ignored.
+        // So marked it as "outside"
+
+        ClippedInfo ciL = clipAgainstLine(line, LEFT);
+        if (ciL == ClippedInfo::OUTSIDE)
+            return ClippedInfo::OUTSIDE;
+
+        ClippedInfo ciR = clipAgainstLine(line, RIGHT);
+        if (ciR == ClippedInfo::OUTSIDE)
+            return ClippedInfo::OUTSIDE;
+
+        ClippedInfo ciT = clipAgainstLine(line, TOP);
+        if (ciT == ClippedInfo::OUTSIDE)
+            return ClippedInfo::OUTSIDE;
+
+        ClippedInfo ciB = clipAgainstLine(line, BOTTOM);
+        if (ciB == ClippedInfo::OUTSIDE)
+            return ClippedInfo::OUTSIDE;
+
+        ClippedInfo ciN = clipAgainstLine(line, NEAR);
+        if (ciN == ClippedInfo::OUTSIDE)
+            return ClippedInfo::OUTSIDE;
+
+        ClippedInfo ciF = clipAgainstLine(line, FAR);
+        if (ciF == ClippedInfo::OUTSIDE)
+            return ClippedInfo::OUTSIDE;
+
+        return ClippedInfo::CLIPPED; // Line was clipped or completely inside
+    }
+
+    ClippedInfo Frustum::clipAgainstLine(Geometry::Line &line, FrustumPlane plane)
+    {
+        Maths::Vector3f *planePoint = &planes[plane].point;
+        Maths::Vector3f *planeNormal = &planes[plane].normal;
+
+        // Declare a static array of inside vertices
+        int numInsideVertices = 0;
+
+        // Calculate the dot product of the p0 and p1
+        float p0Dot = 0; // curr
+        float p1Dot = 0; // prev
+        Maths::Vector3f ray{};
+
+        Maths::Vector3f p0;
+        p0.set(line.points[0]);
+        Maths::Vector3f p1;
+        p1.set(line.points[1]);
+
+        // If the dot product > 0 then point is on "inside" side of the plane.
+        ray.sub(p0, *planePoint);
+        ray.normalize();
+        p0Dot = ray.dot(*planeNormal);
+
+        ray.sub(p1, *planePoint);
+        ray.normalize();
+        p1Dot = ray.dot(*planeNormal);
+
+        if (p0Dot < 0 && p1Dot < 0)
+        {
+            return ClippedInfo::OUTSIDE;
+        }
+
+        // If product < 0 then one is inside and the other outside, then find intersection.
+        if (p0Dot * p1Dot < 0)
+        {
+            // Calculate the intersection point I = Q1 + t(Q2-Q1)
+            if (p0Dot < 0)
+            {
+                // Find the interpolation factor t
+                float t = p0Dot / (p0Dot - p1Dot);
+                // p0 was on the outside so we interpolate from p0 to p1
+                Maths::Vector3f intersectionPoint{
+                    Utilities::floatLerp(p0.x, p1.x, t),
+                    Utilities::floatLerp(p0.y, p1.y, t),
+                    Utilities::floatLerp(p0.z, p1.z, t)};
+
+                // Re-define p0 as the intersection
+                line.points[0].set(intersectionPoint);
+                line.points[1].set(p1);
+            }
+            else
+            {
+                // Find the interpolation factor t
+                float t = p0Dot / (p1Dot - p0Dot);
+                // p1 was on the outside so we interpolate from p1 to p0
+                Maths::Vector3f intersectionPoint{
+                    Utilities::floatLerp(p1.x, p0.x, t),
+                    Utilities::floatLerp(p1.y, p0.y, t),
+                    Utilities::floatLerp(p1.z, p0.z, t)};
+
+                // Re-define p0 as the intersection
+                line.points[0].set(p0);
+                line.points[1].set(intersectionPoint);
+            }
+
+            return ClippedInfo::CLIPPED;
+        }
+        else
+        {
+            // They are both inside. Just leave the line alone.
+        }
+
+        return ClippedInfo::INSIDE;
+    }
+
 } // namespace Geometry

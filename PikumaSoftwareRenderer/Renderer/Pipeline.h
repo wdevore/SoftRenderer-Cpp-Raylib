@@ -9,6 +9,7 @@
 #include "Polygon.h"
 #include "Frustum.h"
 #include "DirectionalLight.h"
+#include "LineCollection.h"
 
 class Pipeline
 {
@@ -35,6 +36,9 @@ private:
     std::vector<Geometry::Triangle> trianglesToRender;
     std::vector<Geometry::Triangle> trianglesAfterClipping;
 
+    int linesToRenderCount{};
+    std::vector<Geometry::Line> linesToRender;
+
     Matrix4 scaleMatrix{};
     Matrix4 rotationMatrixX{};
     Matrix4 rotationMatrixY{};
@@ -54,14 +58,11 @@ private:
 
 public:
     std::vector<Geometry::Mesh> meshes{};
+    std::vector<Geometry::LineCollection> lineCollections{};
+
     bool shouldCullBackfaces{true};
 
-    Pipeline(int width, int height) : width(width), height(height)
-    {
-        painter.Initialize(width, height);
-        trianglesAfterClipping.resize(Geometry::Polygon::MAX_NUM_POLY_TRIANGLES);
-        trianglesToRender.resize(Geometry::Triangle::MAX_TRIANGLES);
-    };
+    Pipeline(int width, int height);
     ~Pipeline();
 
     void Setup();
@@ -70,6 +71,7 @@ public:
     void End();
 
     int addMesh(std::unique_ptr<Geometry::Mesh> mesh);
+    int addLineCollection(std::unique_ptr<Geometry::LineCollection> collection);
 
     void Render();
     void setRenderMethod(RenderMethod method)
@@ -77,7 +79,8 @@ public:
         renderMethod = method;
     }
 
-    void ProcessPipeline(Geometry::Mesh &mesh);
+    void ProcessPipelineMesh(Geometry::Mesh &mesh);
+    void ProcessPipelineLines(Geometry::LineCollection &lines);
 
     void SimpleBresenhamLine(int x0, int y0, int x1, int y1, Color color);
 

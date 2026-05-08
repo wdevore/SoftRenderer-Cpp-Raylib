@@ -105,12 +105,21 @@ int main(int argc, char *argv[])
     {
         Pipeline pipeline{screenWidth, screenHeight};
 
+        std::unique_ptr<Geometry::LineCollection> lineCollection = std::make_unique<Geometry::LineCollection>();
+        Geometry::Line line{Maths::Vector4f{-1.0f, 0.0f, 0.0f}, Maths::Vector4f{1.0f, 0.0f, 0.0f}, CColor::Green};
+        line.translation.set(0, 0.0, 15);
+        line.scale.set(1, 1, 1);
+
+        lineCollection->addLine(line);
+        pipeline.addLineCollection(std::move(lineCollection));
+
         std::unique_ptr<Geometry::Mesh> mesh = std::make_unique<Geometry::Mesh>();
-        int status = mesh->loadMesh(GetAssetPath("Assets/cube.obj"),
-                                    GetAssetPath("Assets/cube.png"),
-                                    Maths::Vector3f{1, 1, 1},
-                                    Maths::Vector3f{0, 0.0, 15},
-                                    Maths::Vector3f{0, 0, 0});
+        int status = 0;
+        mesh->loadMesh(GetAssetPath("Assets/cube.obj"),
+                       GetAssetPath("Assets/cube.png"),
+                       Maths::Vector3f{1, 1, 1},
+                       Maths::Vector3f{0, 0.0, 15},
+                       Maths::Vector3f{0, 0, 0});
         if (status != 0)
         {
             std::cout << "Error loading mesh: " << status << std::endl;
@@ -118,7 +127,7 @@ int main(int argc, char *argv[])
 
         if (status == 0)
         {
-            int index = pipeline.addMesh(std::move(mesh));
+            // int index = pipeline.addMesh(std::move(mesh));
 
             // Initialize Canvas
             pipeline.Setup();

@@ -13,4 +13,5 @@ target_include_directories(BaseGeometryLib
 target_link_libraries(BaseGeometryLib
   PUBLIC BaseMathsLib
   PUBLIC BaseImagesLib
+  PUBLIC BaseLib
 )
