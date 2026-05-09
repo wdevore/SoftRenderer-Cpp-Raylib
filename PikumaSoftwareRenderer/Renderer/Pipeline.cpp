@@ -29,7 +29,7 @@ void Pipeline::Setup()
     float znear = 1.0;
     float zfar = 50.0;
 
-    camera.initialize(Maths::Vector3f{0, 0, 0}, Maths::Vector3f{0, 0, 1});
+    camera.initialize(Maths::Vector3f{5, 5, 0}, Maths::Vector3f{0, 0, 1});
     camera.makePerspective(fov_y, aspect_y, znear, zfar);
     projMatrix.set(camera.pm);
 
@@ -344,7 +344,7 @@ void Pipeline::ProcessPipelineLines(Geometry::LineCollection &lines)
     // Update camera look at target to create view matrix
     Maths::Vector3f target = camera.getLookAtTarget();
     // std::cout << "target: " << target << std::endl;
-    // target.set(-0.793337, -0.024998, 0.60827);
+    // target.set(-0.687633, -0.0166665, 0.725868);
 
     Maths::Vector3f up_direction{0, 1, 0};
     camera.makeLookAt(camera.position, target, up_direction);
@@ -353,8 +353,8 @@ void Pipeline::ProcessPipelineLines(Geometry::LineCollection &lines)
     {
         // Create scale, rotation, and translation matrices that will be used to multiply the mesh vertices
         scaleMatrix.setScale(line.scale.x, line.scale.y, line.scale.z);
-        rotationMatrixX.setRotationX(line.rotation.x);
-        rotationMatrixY.setRotationY(line.rotation.y);
+        // rotationMatrixX.setRotationX(line.rotation.x);
+        // rotationMatrixY.setRotationY(line.rotation.y);
         rotationMatrixZ.setRotationZ(line.rotation.z);
         translationMatrix.setTranslation(line.translation.x, line.translation.y, line.translation.z);
 

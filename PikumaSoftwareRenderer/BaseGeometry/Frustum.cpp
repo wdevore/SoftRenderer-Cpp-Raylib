@@ -242,7 +242,7 @@ namespace Geometry
             else
             {
                 // Find the interpolation factor t
-                float t = p0Dot / (p1Dot - p0Dot);
+                float t = p1Dot / (p1Dot - p0Dot);
                 // p1 was on the outside so we interpolate from p1 to p0
                 Maths::Vector3f intersectionPoint{
                     Utilities::floatLerp(p1.x, p0.x, t),

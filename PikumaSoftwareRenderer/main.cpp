@@ -8,6 +8,7 @@
 #include <memory>
 
 #include "Pipeline.h"
+#include "Constants.h"
 
 void CustomDrawFPS(int posX, int posY)
 {
@@ -106,11 +107,25 @@ int main(int argc, char *argv[])
         Pipeline pipeline{screenWidth, screenHeight};
 
         std::unique_ptr<Geometry::LineCollection> lineCollection = std::make_unique<Geometry::LineCollection>();
-        Geometry::Line line{Maths::Vector4f{-1.0f, 0.0f, 0.0f}, Maths::Vector4f{1.0f, 0.0f, 0.0f}, CColor::Green};
-        line.translation.set(0, 0.0, 15);
-        line.scale.set(1, 1, 1);
 
-        lineCollection->addLine(line);
+        Geometry::Line lineXAxis{Maths::Vector4f{-1.0f, 0.0f, 0.0f}, Maths::Vector4f{1.0f, 0.0f, 0.0f}, CColor::Red};
+        lineXAxis.translation.set(0, 0.0, 15);
+        lineXAxis.scale.set(1, 1, 1);
+        // +Angle = CCW rotation
+        // lineXAxis.rotation.set(0, 0, 45.0 * Maths::DEGTORAD);
+        lineCollection->addLine(lineXAxis);
+
+        Geometry::Line lineYAxis{Maths::Vector4f{0.0f, -1.0f, 0.0f}, Maths::Vector4f{0.0f, 1.0f, 0.0f}, CColor::Green};
+        lineYAxis.translation.set(0, 0.0, 15);
+        lineYAxis.scale.set(1, 1, 1);
+        lineCollection->addLine(lineYAxis);
+
+        Geometry::Line lineZAxis{Maths::Vector4f{0.0f, 0.0f, -1.0f}, Maths::Vector4f{0.0f, 0.0f, 1.0f}, CColor::Blue};
+        lineZAxis.translation.set(0, 0.0, 15);
+        lineZAxis.scale.set(1, 1, 1);
+        lineCollection->addLine(lineZAxis);
+
+        // Finally pass it to the pipeline.
         pipeline.addLineCollection(std::move(lineCollection));
 
         std::unique_ptr<Geometry::Mesh> mesh = std::make_unique<Geometry::Mesh>();
