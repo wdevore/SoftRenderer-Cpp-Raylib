@@ -109,19 +109,19 @@ int main(int argc, char *argv[])
         std::unique_ptr<Geometry::LineCollection> lineCollection = std::make_unique<Geometry::LineCollection>();
 
         Geometry::Line lineXAxis{Maths::Vector4f{-1.0f, 0.0f, 0.0f}, Maths::Vector4f{1.0f, 0.0f, 0.0f}, CColor::Red};
-        lineXAxis.translation.set(0, 0.0, 15);
+        lineXAxis.translation.set(5, 0.0, 15);
         lineXAxis.scale.set(1, 1, 1);
         // +Angle = CCW rotation
         // lineXAxis.rotation.set(0, 0, 45.0 * Maths::DEGTORAD);
         lineCollection->addLine(lineXAxis);
 
         Geometry::Line lineYAxis{Maths::Vector4f{0.0f, -1.0f, 0.0f}, Maths::Vector4f{0.0f, 1.0f, 0.0f}, CColor::Green};
-        lineYAxis.translation.set(0, 0.0, 15);
+        lineYAxis.translation.set(5, 0.0, 15);
         lineYAxis.scale.set(1, 1, 1);
         lineCollection->addLine(lineYAxis);
 
         Geometry::Line lineZAxis{Maths::Vector4f{0.0f, 0.0f, -1.0f}, Maths::Vector4f{0.0f, 0.0f, 1.0f}, CColor::Orange};
-        lineZAxis.translation.set(0, 0.0, 15);
+        lineZAxis.translation.set(5, 0.0, 15);
         lineZAxis.scale.set(1, 1, 1);
         lineCollection->addLine(lineZAxis);
 
@@ -142,7 +142,7 @@ int main(int argc, char *argv[])
 
         if (status == 0)
         {
-            // int index = pipeline.addMesh(std::move(mesh));
+            int index = pipeline.addMesh(std::move(mesh));
 
             // Initialize Canvas
             pipeline.Setup();

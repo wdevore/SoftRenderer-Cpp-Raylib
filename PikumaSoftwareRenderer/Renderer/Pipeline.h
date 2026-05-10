@@ -58,6 +58,9 @@ private:
 
     float deltaTime{};
 
+    // ========== DEBUG OR TESTNG ==========
+    bool linesSelected{false};
+
 public:
     std::vector<Geometry::Mesh> meshes{};
     std::vector<Geometry::LineCollection> lineCollections{};

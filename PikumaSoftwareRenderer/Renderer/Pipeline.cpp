@@ -53,6 +53,8 @@ void Pipeline::Setup()
     // Initialize frustum planes with a point and a normal
     frustum.initialize(fov_x, fov_y, znear, zfar);
 
+    FocusCamera();
+
     std::cout << "Pipeline setup complete." << std::endl;
 }
 
@@ -194,9 +196,9 @@ void Pipeline::Render()
 ///////////////////////////////////////////////////////////////////////////////
 void Pipeline::ProcessPipelineMesh(Geometry::Mesh &mesh)
 {
-    mesh.rotation.x += 0.005f;
-    mesh.rotation.y += 0.005f;
-    mesh.rotation.z += 0.005f;
+    // mesh.rotation.x += 0.005f;
+    // mesh.rotation.y += 0.005f;
+    // mesh.rotation.z += 0.005f;
 
     // Create scale, rotation, and translation matrices that will be used to multiply the mesh vertices
     scaleMatrix.setScale(mesh.scale.x, mesh.scale.y, mesh.scale.z);
@@ -489,13 +491,16 @@ void Pipeline::clipPolygonAgainstPlane(Geometry::Polygon &polygon, int plane)
 // =========== Camera manipulation =================
 void Pipeline::FocusCamera()
 {
-    if (!lineCollections.empty())
+    if (linesSelected)
     {
         camera.desiredTarget = lineCollections[0].lines[0].translation;
+        linesSelected = false;
     }
     else
     {
-        camera.desiredTarget.set(0, 0, 15);
+        camera.desiredTarget = meshes[0].translation;
+        // camera.desiredTarget.set(0, 0, 15);
+        linesSelected = true;
     }
 }
 

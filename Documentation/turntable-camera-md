@@ -32,3 +32,8 @@ We will explicitly snap the camera to the correct properties during Setup() so i
 
 You now have a highly polished camera! Pan, orbit, and zoom all benefit from this smoothing effect automatically. If you want the camera to feel "heavier" (slowing down more gradually), just lower the lerpSpeed inside your TurntableCamera::update method.
 
+# Reset zoom and rotation
+How can I make the camera also reset its zoom distance and rotation angle when focusing?
+
+# Raycast/click to set new Target
+Can we add functionality to raycast/click on an object to set it as the new target?
