@@ -6,6 +6,7 @@
 #include "Triangle.h"
 #include "Polygon.h"
 #include "Vector3f.h"
+#include "Constants.h"
 
 Pipeline::~Pipeline()
 {
@@ -21,15 +22,31 @@ void Pipeline::Setup()
     // Initialize the scene light direction
     light.direction.set(0, 0, 1);
 
-    // Initialize the perspective projection matrix
+    // ------------ Setup an initial camera target and orbit radius -----------
+    // Look explicitly at the axis's translation coordinates (0, 0, 15) with radius 15
+    camera.initialize(Maths::Vector3f{0, 0, 15}, 15.0f);
+    // Elevate slightly so it's not looking perfectly straight-on initially
+    camera.rotate(0.0f, 25.0f * Maths::DEGTORAD);
+    camera.yaw = camera.desiredYaw;     // Snap to skip intro animation
+    camera.pitch = camera.desiredPitch; // Snap to skip intro animation
+    camera.updatePosition();
+
+    // ------------ Setup initial view matrix
+    Maths::Vector3f up_direction{0, 1, 0};
+    camera.makeLookAt(up_direction);
+    std::cout << camera.vm << std::endl;
+
+    // ------------- Setup initial projection matrix ----------------
     float aspect_y = (float)height / (float)width;
     float aspect_x = (float)width / (float)height;
-    float fov_y = 3.141592 / 3.0; // the same as 180/3, or 60deg
+    // float fov_y = 60.0f * Maths::DEGTORAD; // the same as 180/3, or 60deg = 30deg-up + 30deg-down
+    float fov_y = 45.0f * Maths::DEGTORAD; // = 22.5deg-up + 22.5deg-down
     float fov_x = std::atan(std::tan(fov_y / 2) * aspect_x) * 2;
+    std::cout << "fov_x: " << fov_x * Maths::RADTODEG / 2 << std::endl;
+
     float znear = 1.0;
     float zfar = 50.0;
 
-    camera.initialize(Maths::Vector3f{5, 5, 0}, Maths::Vector3f{0, 0, 1});
     camera.makePerspective(fov_y, aspect_y, znear, zfar);
     projMatrix.set(camera.pm);
 
@@ -92,6 +109,8 @@ int Pipeline::addLineCollection(std::unique_ptr<Geometry::LineCollection> collec
 
 void Pipeline::Render()
 {
+    camera.update(deltaTime); // Process smooth camera inertia
+
     painter.DrawDottedGrid(canvas, CColor::Orange);
     // painter.DrawRectangle(canvas, 50, 50, 100, 100, CColor::Magenta);
 
@@ -186,11 +205,8 @@ void Pipeline::ProcessPipelineMesh(Geometry::Mesh &mesh)
     rotationMatrixZ.setRotationZ(mesh.rotation.z);
     translationMatrix.setTranslation(mesh.translation.x, mesh.translation.y, mesh.translation.z);
 
-    // Update camera look at target to create view matrix
-    Maths::Vector3f target = camera.getLookAtTarget();
-
     Maths::Vector3f up_direction{0, 1, 0};
-    camera.makeLookAt(camera.position, target, up_direction);
+    camera.makeLookAt(up_direction);
     int culledFaces = 0;
 
     // Loop all triangle faces of our mesh
@@ -225,7 +241,7 @@ void Pipeline::ProcessPipelineMesh(Geometry::Mesh &mesh)
             worldMatrix.multiply(transformedVertex);
 
             // Multiply the view matrix by the vector to transform the scene to camera space
-            camera.lm.multiply(transformedVertex);
+            camera.vm.multiply(transformedVertex);
 
             // Save transformed vertex in the array of transformed vertices
             transformed_vertices[v].set(transformedVertex);
@@ -341,13 +357,7 @@ void Pipeline::ProcessPipelineLines(Geometry::LineCollection &lines)
 {
     // TODO: add animation of properties
 
-    // Update camera look at target to create view matrix
-    Maths::Vector3f target = camera.getLookAtTarget();
-    // std::cout << "target: " << target << std::endl;
-    // target.set(-0.687633, -0.0166665, 0.725868);
-
-    Maths::Vector3f up_direction{0, 1, 0};
-    camera.makeLookAt(camera.position, target, up_direction);
+    camera.makeLookAt(upDirection);
 
     for (auto &line : lines.lines)
     {
@@ -386,7 +396,7 @@ void Pipeline::ProcessPipelineLines(Geometry::LineCollection &lines)
             worldMatrix.multiply(transformedVertex);
 
             // Multiply the view matrix by the vector to transform the scene to camera space
-            camera.lm.multiply(transformedVertex);
+            camera.vm.multiply(transformedVertex);
 
             // Save transformed vertex in the array of transformed vertices
             transformed_vertices[v].set(transformedVertex);
@@ -500,8 +510,13 @@ void Pipeline::OnMouseMove(int x, int y, int dx, int dy)
     float yaw = dx * sensitivity;
     float pitch = dy * sensitivity;
 
-    camera.rotateYaw(yaw * deltaTime);
-    camera.rotatePitch(pitch * deltaTime);
+    camera.rotate(yaw * deltaTime, pitch * deltaTime);
+}
+
+void Pipeline::OnMousePan(int x, int y, int dx, int dy)
+{
+    float sensitivity = 0.05f;
+    camera.pan(dx * sensitivity, dy * sensitivity, upDirection);
 }
 
 void Pipeline::OnMouseWheel(float delta)
@@ -510,12 +525,10 @@ void Pipeline::OnMouseWheel(float delta)
 
     if (delta > 0)
     {
-        camera.updateVelocity(speed * deltaTime);
-        camera.updatePosition();
+        camera.zoom(speed * deltaTime);
     }
     else
     {
-        camera.updateVelocity(-speed * deltaTime);
-        camera.updatePosition();
+        camera.zoom(-speed * deltaTime);
     }
 }

@@ -120,7 +120,7 @@ int main(int argc, char *argv[])
         lineYAxis.scale.set(1, 1, 1);
         lineCollection->addLine(lineYAxis);
 
-        Geometry::Line lineZAxis{Maths::Vector4f{0.0f, 0.0f, -1.0f}, Maths::Vector4f{0.0f, 0.0f, 1.0f}, CColor::Blue};
+        Geometry::Line lineZAxis{Maths::Vector4f{0.0f, 0.0f, -1.0f}, Maths::Vector4f{0.0f, 0.0f, 1.0f}, CColor::Orange};
         lineZAxis.translation.set(0, 0.0, 15);
         lineZAxis.scale.set(1, 1, 1);
         lineCollection->addLine(lineZAxis);
@@ -254,6 +254,10 @@ int main(int argc, char *argv[])
                     //     std::cout << "Mouse moved: " << mouseDelta.x << ", " << mouseDelta.y << std::endl;
                     //     std::cout << "Mouse position: " << GetMouseX() << ", " << GetMouseY() << std::endl;
                     pipeline.OnMouseMove(GetMouseX(), GetMouseY(), (int)mouseDelta.x, (int)mouseDelta.y);
+                }
+                else if (IsMouseButtonDown(MOUSE_BUTTON_MIDDLE))
+                {
+                    pipeline.OnMousePan(GetMouseX(), GetMouseY(), (int)mouseDelta.x, (int)mouseDelta.y);
                 }
             }
 

@@ -5,7 +5,7 @@
 #include "Painter.h"
 #include "Mesh.h"
 #include "Matrix4.h"
-#include "Camera.h"
+#include "TurntableCamera.h"
 #include "Polygon.h"
 #include "Frustum.h"
 #include "DirectionalLight.h"
@@ -45,7 +45,9 @@ private:
     Matrix4 rotationMatrixZ{};
     Matrix4 translationMatrix{};
 
-    View::Camera camera{};
+    View::TurntableCamera camera{};
+    Maths::Vector3f upDirection{0, 1, 0};
+
     Geometry::Frustum frustum{};
 
     Matrix4 projMatrix{};
@@ -128,5 +130,6 @@ public:
     void OnMouseDown(int x, int y);
     void OnMouseUp();
     void OnMouseMove(int x, int y, int dx, int dy);
+    void OnMousePan(int x, int y, int dx, int dy);
     void OnMouseWheel(float delta);
 };

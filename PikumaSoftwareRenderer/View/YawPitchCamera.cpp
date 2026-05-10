@@ -1,6 +1,7 @@
 #include <cmath>
 
-#include "Camera.h"
+#include "YawPitchCamera.h"
+#include "Constants.h"
 
 namespace View
 {
@@ -12,20 +13,23 @@ namespace View
     {
     }
 
-    void Camera::initialize(Maths::Vector3f position, Maths::Vector3f direction)
+    void Camera::initialize(Maths::Vector3f position)
     {
         this->position.set(position);
-        this->direction.set(direction);
         forwardVelocity.zero();
         yaw = 0.0;
         pitch = 0.0;
     }
 
+    /// @brief +Angle = CCW rotation, -Angle = CW rotation
+    /// @param angle in Radians
     void Camera::rotateYaw(float angle)
     {
         yaw += angle;
     }
 
+    /// @brief +Angle = CCW rotation, -Angle = CW rotation
+    /// @param angle in Radians
     void Camera::rotatePitch(float angle)
     {
         pitch += angle;
@@ -45,24 +49,25 @@ namespace View
     Maths::Vector3f Camera::getLookAtTarget()
     {
         // TODO: optimize away local objects
-
         // Initialize the target looking at the positive z-axis
-        Maths::Vector3f target = {0, 0, 1};
+        // Maths::Vector3f target = {0, 0, 1};
+        target.set(0, 0, 1);
 
-        Matrix4 camera_yaw_rotation{};
-        camera_yaw_rotation.setRotationY(yaw);
+        Matrix4 yawRotation{};
+        yawRotation.setRotationY(yaw);
 
-        Matrix4 camera_pitch_rotation{};
-        camera_pitch_rotation.setRotationX(pitch);
+        Matrix4 pitchRotation{};
+        pitchRotation.setRotationX(pitch);
 
         // Create camera rotation matrix based on yaw and pitch
         // camera_rotation = camera_yaw_rotation x camera_pitch_rotation x Identity
-        Matrix4 camera_rotation{}; // Identity
-        camera_rotation.multiply(camera_yaw_rotation, camera_pitch_rotation);
+        Matrix4 rotation{}; // Identity
+        rotation.multiply(yawRotation, pitchRotation);
 
         // Update camera direction based on the rotation
         Maths::Vector3f camera_direction{};
-        camera_rotation.multiply(target, direction);
+        rotation.multiply(target, direction);
+        std::cout << "direction: " << direction << ",yaw: " << yaw * Maths::RADTODEG << ",pitch: " << pitch * Maths::RADTODEG << std::endl;
 
         // Offset the camera position in the direction where the camera is pointing at
         target.add(position, direction);
@@ -87,22 +92,22 @@ namespace View
         // | y.x   y.y   y.z  -dot(y,eye) |
         // | z.x   z.y   z.z  -dot(z,eye) |
         // |   0     0     0            1 |
-        lm.m[0][0] = x.x;
-        lm.m[0][1] = x.y;
-        lm.m[0][2] = x.z;
-        lm.m[0][3] = -x.dot(eye);
-        lm.m[1][0] = y.x;
-        lm.m[1][1] = y.y;
-        lm.m[1][2] = y.z;
-        lm.m[1][3] = -y.dot(eye);
-        lm.m[2][0] = z.x;
-        lm.m[2][1] = z.y;
-        lm.m[2][2] = z.z;
-        lm.m[2][3] = -z.dot(eye);
-        lm.m[3][0] = 0.0;
-        lm.m[3][1] = 0.0;
-        lm.m[3][2] = 0.0;
-        lm.m[3][3] = 1.0;
+        vm.m[0][0] = x.x;
+        vm.m[0][1] = x.y;
+        vm.m[0][2] = x.z;
+        vm.m[0][3] = -x.dot(eye);
+        vm.m[1][0] = y.x;
+        vm.m[1][1] = y.y;
+        vm.m[1][2] = y.z;
+        vm.m[1][3] = -y.dot(eye);
+        vm.m[2][0] = z.x;
+        vm.m[2][1] = z.y;
+        vm.m[2][2] = z.z;
+        vm.m[2][3] = -z.dot(eye);
+        vm.m[3][0] = 0.0;
+        vm.m[3][1] = 0.0;
+        vm.m[3][2] = 0.0;
+        vm.m[3][3] = 1.0;
     }
 
     void Camera::makePerspective(float fov, float aspect, float znear, float zfar)

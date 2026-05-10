@@ -5,7 +5,7 @@ In order to see a variable in the *Debug Console* we need to explicitly call
 
 # Tasks
 - Add Arcball camera
-- Add turntable camera
+- **done** Add turntable camera
 - Add WASD to lookAt camera
 - Make further optimizations
 - Add more objects, for example Tetrahedra

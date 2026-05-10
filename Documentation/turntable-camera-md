@@ -1,0 +1,34 @@
+To create a "Turn-table" (or Orbit) camera that orbits around a target instead of turning its head like a first-person camera, we can implement a new TurntableCamera class using spherical coordinates. The left-mouse drag will modify the yaw and pitch properties, which will dictate the camera's rotation relative to the target.
+
+Create the header for the new camera class. It calculates its position on the surface of a sphere defined by the radius, yaw, and pitch around the target.
+
+This encapsulates the spherical coordinate math and enforces limits to prevent the camera from flipping over (gimbal lock).
+
+Let's pass the mouse movements to the new camera's rotate() and zoom() methods. We also need to update how it calls makeLookAt() since our Turn-table handles grabbing the origin and target intrinsically.
+
+Now, dragging the left mouse button sideways will smoothly rotate the camera around your 3D cube, and dragging it up or down will orbit over/under the object. Furthermore, scrolling your mouse wheel will smoothly zoom in and out!
+
+# Panning
+To implement camera panning, we need to calculate the camera's local "Right" and "Up" vectors based on where it is currently looking. Once we have those vectors, we can move the target point along them whenever the middle mouse button is dragged.
+
+Because the camera orbits its target, moving the target will effectively drag the entire camera along with it, creating a natural panning motion.
+
+First, we'll declare and implement a new pan() method that calculates the local vectors and updates the target's coordinate.
+
+Now, clicking and dragging with the middle mouse button will seamlessly pan your Turn-table camera! Because it adjusts your target coordinates, any subsequent orbital rotation (left click drag) will correctly pivot around your newly panned center point.
+
+# Smooth movement via interpolation
+To make your camera movements feel polished and cinematic, we can introduce a damping (or interpolation) system.
+
+Instead of directly changing the camera's position the moment you move the mouse, we will store the mouse inputs as desired targets (e.g., desiredTarget, desiredYaw). Then, during the render loop, we will smoothly animate the camera's current values toward those desired values using frame-rate independent exponential smoothing.
+
+This will automatically add a beautiful sense of weight, momentum, and inertia to your panning, rotating, and zooming!
+
+We'll modify your input functions to adjust the desired values instead of the immediate values. Then we implement update() to smoothly interpolate towards those targets.
+
+Now we just need to call camera.update(deltaTime) every frame right before we start drawing. We can also clean up the manual updatePosition() calls we had sprinkled in our mouse event handlers, as the update loop will handle all position generation now.
+
+We will explicitly snap the camera to the correct properties during Setup() so it doesn't animate from {0,0,0} during the very first frame of the app.
+
+You now have a highly polished camera! Pan, orbit, and zoom all benefit from this smoothing effect automatically. If you want the camera to feel "heavier" (slowing down more gradually), just lower the lerpSpeed inside your TurntableCamera::update method.
+
