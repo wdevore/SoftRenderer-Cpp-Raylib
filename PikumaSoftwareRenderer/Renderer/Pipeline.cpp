@@ -487,6 +487,18 @@ void Pipeline::clipPolygonAgainstPlane(Geometry::Polygon &polygon, int plane)
 }
 
 // =========== Camera manipulation =================
+void Pipeline::FocusCamera()
+{
+    if (!lineCollections.empty())
+    {
+        camera.desiredTarget = lineCollections[0].lines[0].translation;
+    }
+    else
+    {
+        camera.desiredTarget.set(0, 0, 15);
+    }
+}
+
 void Pipeline::MoveCameraBase(float dx, float dy, float dz)
 {
     // camera.MoveCameraBase(dx, dy, dz);

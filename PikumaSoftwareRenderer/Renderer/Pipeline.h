@@ -125,6 +125,7 @@ public:
     void clipPolygonAgainstPlane(Geometry::Polygon &polygon, int plane);
 
     // =========== Camera manipulation =================
+    void FocusCamera();
     void MoveCameraBase(float dx, float dy, float dz);
 
     void OnMouseDown(int x, int y);

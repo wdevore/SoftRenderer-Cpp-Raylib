@@ -196,6 +196,12 @@ int main(int argc, char *argv[])
             { /* Toggle Animation/Action */
             }
 
+            if (IsKeyPressed(KEY_F))
+            {
+                pipeline.FocusCamera();
+                std::cout << "Camera focused on object" << std::endl;
+            }
+
             if (IsKeyPressed(KEY_ONE))
             {
                 pipeline.setRenderMethod(Pipeline::RenderMethod::WIRE_VERTEX);
