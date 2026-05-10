@@ -64,18 +64,27 @@ namespace View
 
     void TurntableCamera::update(float deltaTime)
     {
-        // Frame-rate independent exponential smoothing
-        float lerpSpeed = 15.0f; // Lower is looser/heavier, Higher is snappier
-        float t = 1.0f - std::exp(-lerpSpeed * deltaTime);
+        if (smoothControl)
+        {
+            // Frame - rate independent exponential smoothing
+            float lerpSpeed = 15.0f; // Lower is looser/heavier, Higher is snappier
+            float t = 1.0f - std::exp(-lerpSpeed * deltaTime);
 
-        yaw += (desiredYaw - yaw) * t;
-        pitch += (desiredPitch - pitch) * t;
-        radius += (desiredRadius - radius) * t;
+            yaw += (desiredYaw - yaw) * t;
+            pitch += (desiredPitch - pitch) * t;
+            radius += (desiredRadius - radius) * t;
 
-        Maths::Vector3f targetDiff;
-        targetDiff.sub(desiredTarget, target);
-        targetDiff.multiply(t);
-        target.add(targetDiff);
+            Maths::Vector3f targetDiff;
+            targetDiff.sub(desiredTarget, target);
+            targetDiff.multiply(t);
+            target.add(targetDiff);
+        }
+        else
+        {
+            yaw = desiredYaw;
+            pitch = desiredPitch;
+            // target.add(desiredTarget);
+        }
 
         updatePosition();
     }

@@ -493,13 +493,18 @@ void Pipeline::FocusCamera()
 {
     if (linesSelected)
     {
-        camera.desiredTarget = lineCollections[0].lines[0].translation;
+        if (smoothControl)
+            camera.desiredTarget = lineCollections[0].lines[0].translation;
+        else
+            camera.target = lineCollections[0].lines[0].translation;
         linesSelected = false;
     }
     else
     {
-        camera.desiredTarget = meshes[0].translation;
-        // camera.desiredTarget.set(0, 0, 15);
+        if (smoothControl)
+            camera.desiredTarget = meshes[0].translation;
+        else
+            camera.target = meshes[0].translation;
         linesSelected = true;
     }
 }
@@ -548,4 +553,15 @@ void Pipeline::OnMouseWheel(float delta)
     {
         camera.zoom(-speed * deltaTime);
     }
+}
+
+void Pipeline::setSmoothControl(bool smooth)
+{
+    this->smoothControl = smooth;
+    camera.smoothControl = this->smoothControl;
+}
+
+void Pipeline::toggleSmoothControl()
+{
+    setSmoothControl(!smoothControl);
 }

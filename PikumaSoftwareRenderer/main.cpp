@@ -9,6 +9,7 @@
 
 #include "Pipeline.h"
 #include "Constants.h"
+#include "KeyControl.h"
 
 void CustomDrawFPS(int posX, int posY)
 {
@@ -151,6 +152,16 @@ int main(int argc, char *argv[])
 
         pipeline.setRenderMethod(Pipeline::RenderMethod::FILL_TRIANGLE);
 
+        IOControl::KeyControl keyS{KEY_S};
+        IOControl::KeyControl keyF{KEY_F};
+        IOControl::KeyControl keyW{KEY_W};
+        IOControl::KeyControl key1{KEY_ONE};
+        IOControl::KeyControl key2{KEY_TWO};
+        IOControl::KeyControl key3{KEY_THREE};
+        IOControl::KeyControl key4{KEY_FOUR};
+        IOControl::KeyControl key5{KEY_FIVE};
+        IOControl::KeyControl key6{KEY_SIX};
+
         while (!WindowShouldClose())
         {
             float deltaTime = GetFrameTime();
@@ -160,30 +171,38 @@ int main(int argc, char *argv[])
             // ===============================================================
             // --- Input Handling ---
             // ===============================================================
-            if (IsKeyDown(KEY_W))
+            keyS.update();
+            keyF.update();
+            keyW.update();
+            key1.update();
+            key2.update();
+            key3.update();
+            key4.update();
+            key5.update();
+            key6.update();
+
+            if (keyW.isActive())
             {
-                // Moves the camera up in the camera's plane
+                std::cout << "W pressed" << std::endl;
             }
-            if (IsKeyDown(KEY_S))
+            // We only want to detect the first event and reset on keyup.
+            if (keyS.isTapped())
             {
-                // Moves the camera down in the camera's plane
+                pipeline.toggleSmoothControl();
+                std::cout << "Smooth control Enabled: " << (pipeline.smoothControlEnabled() ? "Yes" : "No") << std::endl;
             }
             if (IsKeyDown(KEY_A))
             {
-                // Moves the camera left in the camera's plane
             }
             if (IsKeyDown(KEY_D))
             {
-                // Moves the camera right in the camera's plane
             }
 
             if (IsKeyDown(KEY_UP))
             {
-                // Moves the camera forward in the camera's plane
             }
             if (IsKeyDown(KEY_DOWN))
             {
-                // Moves the camera backward in the camera's plane
             }
             if (IsKeyDown(KEY_LEFT))
             { /* Rotate Left */
@@ -196,43 +215,43 @@ int main(int argc, char *argv[])
             { /* Toggle Animation/Action */
             }
 
-            if (IsKeyPressed(KEY_F))
+            if (keyF.isTapped())
             {
                 pipeline.FocusCamera();
                 std::cout << "Camera focused on object" << std::endl;
             }
 
-            if (IsKeyPressed(KEY_ONE))
+            if (key1.isTapped())
             {
                 pipeline.setRenderMethod(Pipeline::RenderMethod::WIRE_VERTEX);
                 std::cout << "Wire vertex mode" << std::endl;
             }
 
-            if (IsKeyPressed(KEY_TWO))
+            if (key2.isTapped())
             {
                 pipeline.setRenderMethod(Pipeline::RenderMethod::WIRE);
                 std::cout << "Wire mode" << std::endl;
             }
 
-            if (IsKeyPressed(KEY_THREE))
+            if (key3.isTapped())
             {
                 pipeline.setRenderMethod(Pipeline::RenderMethod::FILL_TRIANGLE);
                 std::cout << "Fill triangle mode" << std::endl;
             }
 
-            if (IsKeyPressed(KEY_FOUR))
+            if (key4.isTapped())
             {
                 pipeline.setRenderMethod(Pipeline::RenderMethod::FILL_TRIANGLE_WIRE);
                 std::cout << "Fill triangle wire mode" << std::endl;
             }
 
-            if (IsKeyPressed(KEY_FIVE))
+            if (key5.isTapped())
             {
                 pipeline.setRenderMethod(Pipeline::RenderMethod::TEXTURED);
                 std::cout << "Textured mode" << std::endl;
             }
 
-            if (IsKeyPressed(KEY_SIX))
+            if (key6.isTapped())
             {
                 pipeline.setRenderMethod(Pipeline::RenderMethod::TEXTURED_WIRE);
                 std::cout << "Textured wire mode" << std::endl;

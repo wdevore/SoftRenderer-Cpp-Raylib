@@ -32,6 +32,8 @@ namespace View
         void pan(float deltaX, float deltaY, const Maths::Vector3f &up);
         void update(float deltaTime);
 
+        bool smoothControl{false};
+
         void updatePosition();
 
         void makeLookAt(const Maths::Vector3f &up);

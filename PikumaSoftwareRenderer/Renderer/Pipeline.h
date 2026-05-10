@@ -58,6 +58,9 @@ private:
 
     float deltaTime{};
 
+    // ============ Animation control ===========
+    bool smoothControl{false};
+
     // ========== DEBUG OR TESTNG ==========
     bool linesSelected{false};
 
@@ -136,4 +139,12 @@ public:
     void OnMouseMove(int x, int y, int dx, int dy);
     void OnMousePan(int x, int y, int dx, int dy);
     void OnMouseWheel(float delta);
+
+    // ============ Animation control ===========
+    void setSmoothControl(bool smooth);
+    bool smoothControlEnabled()
+    {
+        return smoothControl;
+    }
+    void toggleSmoothControl();
 };
