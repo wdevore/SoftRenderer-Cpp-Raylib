@@ -24,23 +24,27 @@ void Pipeline::Setup()
 
     // ------------ Setup an initial camera target and orbit radius -----------
     // Look explicitly at the axis's translation coordinates (0, 0, 15) with radius 15
-    camera.initialize(Maths::Vector3f{0, 0, 15}, 15.0f);
+    // camera.initialize(Maths::Vector3f{0, 0, 15}, 15.0f);
+    camera.initialize(Maths::Vector3f{0, 0, 5}, 15.0f); // Turntable
+    // camera.initialize(Maths::Vector3f{0, 0, 5}); // YawPitch
+
     // Elevate slightly so it's not looking perfectly straight-on initially
-    camera.rotate(0.0f, 25.0f * Maths::DEGTORAD);
-    camera.yaw = camera.desiredYaw;     // Snap to skip intro animation
-    camera.pitch = camera.desiredPitch; // Snap to skip intro animation
+    // camera.rotate(0.0f, 25.0f * Maths::DEGTORAD);
+    // camera.rotate(-0.991679, 0.102995);
+
+    // camera.yaw = camera.desiredYaw;     // Snap to skip intro animation
+    // camera.pitch = camera.desiredPitch; // Snap to skip intro animation
     camera.updatePosition();
 
     // ------------ Setup initial view matrix
-    Maths::Vector3f up_direction{0, 1, 0};
-    camera.makeLookAt(up_direction);
+    // camera.makeLookAt(upDirection); // turntable
     std::cout << camera.vm << std::endl;
 
     // ------------- Setup initial projection matrix ----------------
     float aspect_y = (float)height / (float)width;
     float aspect_x = (float)width / (float)height;
-    // float fov_y = 60.0f * Maths::DEGTORAD; // the same as 180/3, or 60deg = 30deg-up + 30deg-down
-    float fov_y = 45.0f * Maths::DEGTORAD; // = 22.5deg-up + 22.5deg-down
+    float fov_y = 60.0f * Maths::DEGTORAD; // the same as 180/3, or 60deg = 30deg-up + 30deg-down
+    // float fov_y = 45.0f * Maths::DEGTORAD; // = 22.5deg-up + 22.5deg-down
     float fov_x = std::atan(std::tan(fov_y / 2) * aspect_x) * 2;
     std::cout << "fov_x: " << fov_x * Maths::RADTODEG / 2 << std::endl;
 
@@ -111,7 +115,7 @@ int Pipeline::addLineCollection(std::unique_ptr<Geometry::LineCollection> collec
 
 void Pipeline::Render()
 {
-    camera.update(deltaTime); // Process smooth camera inertia
+    camera.update(deltaTime); // turntable: Process smooth camera inertia
 
     painter.DrawDottedGrid(canvas, CColor::Orange);
     // painter.DrawRectangle(canvas, 50, 50, 100, 100, CColor::Magenta);
@@ -126,6 +130,8 @@ void Pipeline::Render()
         ProcessPipelineMesh(mesh);
     }
 
+    CColor faceColor{};
+
     // Loop all triangles from the triangles_to_render array
     for (int i = 0; i < trianglesToRenderCount; i++)
     {
@@ -133,7 +139,7 @@ void Pipeline::Render()
 
         if (shouldRenderFilledTriangle())
         {
-            CColor faceColor{triangle.color};
+            faceColor.SetFromUint32(triangle.color);
 
             painter.DrawFilledTriangle(canvas, triangle, faceColor);
         }
@@ -164,8 +170,11 @@ void Pipeline::Render()
     {
         Geometry::Line line = linesToRender[i];
 
-        painter.DrawDDALine(canvas, line.points[0].x, line.points[0].y,
-                            line.points[1].x, line.points[1].y, line.color);
+        painter.DrawZLine(canvas,
+                          line.points[0].x, line.points[0].y,
+                          line.points[1].x, line.points[1].y,
+                          line.points[0].z, line.points[1].z,
+                          line.color);
     }
 }
 
@@ -207,8 +216,12 @@ void Pipeline::ProcessPipelineMesh(Geometry::Mesh &mesh)
     rotationMatrixZ.setRotationZ(mesh.rotation.z);
     translationMatrix.setTranslation(mesh.translation.x, mesh.translation.y, mesh.translation.z);
 
-    Maths::Vector3f up_direction{0, 1, 0};
-    camera.makeLookAt(up_direction);
+    camera.makeLookAt(); // turntable
+
+    // camera.getLookAtTarget(); // yawpitch
+    // std::cout << "Target: " << camera.target << std::endl;
+    // std::cout << "Position: " << camera.position << std::endl;
+    // camera.makeLookAt(camera.position, camera.target, upDirection); // yawpitch
     int culledFaces = 0;
 
     // Loop all triangle faces of our mesh
@@ -336,7 +349,11 @@ void Pipeline::ProcessPipelineMesh(Geometry::Mesh &mesh)
             float lightIntensityFactor = -faceNormal.dot(light.direction);
 
             // Calculate the triangle color based on the light angle
-            uint32_t triangleColor = light.applyLightIntensity(face.color, lightIntensityFactor);
+            uint32_t triangleColor;
+            if (shouldCalcFlatShading)
+                triangleColor = light.applyLightIntensity(face.color, lightIntensityFactor);
+            else
+                triangleColor = face.color;
 
             // Save the projected triangle in the array of triangles to render
             if (trianglesToRenderCount < Geometry::Triangle::MAX_TRIANGLES)
@@ -358,8 +375,10 @@ void Pipeline::ProcessPipelineMesh(Geometry::Mesh &mesh)
 void Pipeline::ProcessPipelineLines(Geometry::LineCollection &lines)
 {
     // TODO: add animation of properties
+    // camera.makeLookAt(eye, target, upDirection); // yawpitch
 
-    camera.makeLookAt(upDirection);
+    camera.makeLookAt(); // turntable
+    // std::cout << "Yaw,Pitch: " << camera.yaw << ", " << camera.pitch << std::endl;
 
     for (auto &line : lines.lines)
     {
@@ -493,7 +512,7 @@ void Pipeline::FocusCamera()
 {
     if (linesSelected)
     {
-        if (smoothControl)
+        if (smoothControl) // turntable
             camera.desiredTarget = lineCollections[0].lines[0].translation;
         else
             camera.target = lineCollections[0].lines[0].translation;
@@ -501,7 +520,7 @@ void Pipeline::FocusCamera()
     }
     else
     {
-        if (smoothControl)
+        if (smoothControl) // turntable
             camera.desiredTarget = meshes[0].translation;
         else
             camera.target = meshes[0].translation;
@@ -532,13 +551,14 @@ void Pipeline::OnMouseMove(int x, int y, int dx, int dy)
     float yaw = dx * sensitivity;
     float pitch = dy * sensitivity;
 
-    camera.rotate(yaw * deltaTime, pitch * deltaTime);
+    camera.rotate(yaw * deltaTime, pitch * deltaTime); // turntable
 }
 
 void Pipeline::OnMousePan(int x, int y, int dx, int dy)
 {
     float sensitivity = 0.05f;
-    camera.pan(dx * sensitivity, dy * sensitivity, upDirection);
+    // Inverting dx creates an intuitive effect for panning left and right.
+    camera.pan(-dx * sensitivity, dy * sensitivity, upDirection); // turntable
 }
 
 void Pipeline::OnMouseWheel(float delta)

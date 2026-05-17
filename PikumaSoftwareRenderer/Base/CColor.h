@@ -31,6 +31,7 @@ struct CColor
     void Set(CColor color);
     void Set(int r, int g, int b, int a = 255);
     void Set(uint color);
+    void SetFromUint32(uint32_t color);
 
     friend std::ostream &operator<<(std::ostream &os, const CColor &c)
     {

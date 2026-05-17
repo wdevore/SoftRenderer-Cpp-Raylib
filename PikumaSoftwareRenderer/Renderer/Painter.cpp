@@ -112,11 +112,60 @@ void Painter::DrawDDALine(Canvas &canvas, float x0, float y0, float x1, float y1
     }
 }
 
-void Painter::DrawZLine(Canvas &canvas, ZBuffer &zb,
-                        int v0x, int v0y, int v1x, int v1y, int v0z, int v1z,
+void Painter::DrawDDAZLine(Canvas &canvas, float x0, float y0, float x1, float y1, float zP, float zQ, CColor &color)
+{
+    float delta_x = (x1 - x0);
+    float delta_y = (y1 - y0);
+
+    float longest_side_length = (std::fabs(delta_x) >= std::fabs(delta_y)) ? std::fabs(delta_x) : std::fabs(delta_y);
+
+    // Prevent division by zero if both points are exactly the same
+    if (longest_side_length == 0)
+        return;
+
+    float x_inc = delta_x / longest_side_length;
+    float y_inc = delta_y / longest_side_length;
+    float z_inc = (zQ - zP) / longest_side_length;
+
+    float current_x = x0;
+    float current_y = y0;
+    float current_z = zP;
+
+    ca.r = color.r;
+    ca.g = color.g;
+    ca.b = color.b;
+    ca.a = color.a;
+
+    for (int i = 0; i <= longest_side_length; i++)
+    {
+        int cx = std::round(current_x);
+        int cy = std::round(current_y);
+
+        // Scissor out-of-bounds pixels, but perform depth testing and drawing for on-screen pixels
+        if (cx >= 0 && cx < width && cy >= 0 && cy < height)
+        {
+            if (current_z < zb.getZ(cx, cy))
+            {
+                canvas.PutPixel(cx, cy, ca);
+                zb.setZ(cx, cy, current_z);
+            }
+        }
+
+        current_x += x_inc;
+        current_y += y_inc;
+        current_z += z_inc;
+    }
+}
+
+void Painter::DrawZLine(Canvas &canvas,
+                        float v0x, float v0y, float v1x, float v1y, float v0z, float v1z,
                         CColor color)
 {
-    DrawZBresenhamLine(canvas, zb, v0x, v0y, v1x, v1y, v0z, v1z, color);
+    DrawDDAZLine(canvas,
+                 v0x, v0y,
+                 v1x, v1y,
+                 v0z, v1z,
+                 color);
 }
 
 void Painter::DrawZBresenhamLine(Canvas &canvas, ZBuffer &zb,
@@ -261,9 +310,12 @@ void Painter::DrawTriangleWire(Canvas &canvas, int v0x, int v0y, int v1x, int v1
 
 void Painter::DrawFilledTriangle(Canvas &canvas, const Geometry::Triangle &triangle, CColor &color)
 {
-    const Maths::Vector4f *a = &triangle.points[0];
-    const Maths::Vector4f *b = &triangle.points[1];
-    const Maths::Vector4f *c = &triangle.points[2];
+    const Maths::Vector4f *a = &triangle.points[0]; // v0
+    const Maths::Vector4f *b = &triangle.points[1]; // v1
+    const Maths::Vector4f *c = &triangle.points[2]; // v2
+    // const Maths::Vector4f *a = new Maths::Vector4f{163.347809, 126.778587, 0.0f};
+    // const Maths::Vector4f *b = new Maths::Vector4f{179.263596, 128.011566, 0.0f};
+    // const Maths::Vector4f *c = new Maths::Vector4f{163.41626, 111.056435, 0.0f};
 
     // Finds the bounding box with all candidate pixels
     int x_min = std::floor(std::fmin(std::fmin(a->x, b->x), c->x));
@@ -281,10 +333,14 @@ void Painter::DrawFilledTriangle(Canvas &canvas, const Geometry::Triangle &trian
 
     // TODO: remove the backface culling in the pipeline.
     // Back-face culling using the signed-area
-    if (area <= 0)
-    {
-        return;
-    }
+    // if (area <= 0)
+    // {
+    //     return;
+    // }
+    // if (area == 0)
+    // {
+    //     return;
+    // }
 
     // Compute the constant deltas that will be used for the horizontal and vertical steps
     float delta_w0_col = (b->y - c->y);
@@ -308,7 +364,7 @@ void Painter::DrawFilledTriangle(Canvas &canvas, const Geometry::Triangle &trian
         float w2 = w2_row;
         for (int x = x_min; x <= x_max; x++)
         {
-            bool is_inside = w0 >= 0 && w1 >= 0 && w2 >= 0;
+            bool is_inside = area > 0 ? (w0 >= 0 && w1 >= 0 && w2 >= 0) : (w0 <= 0 && w1 <= 0 && w2 <= 0);
             if (is_inside)
             {
                 float alpha = w0 / area;
@@ -322,6 +378,7 @@ void Painter::DrawFilledTriangle(Canvas &canvas, const Geometry::Triangle &trian
                 interpolated_reciprocal_w = 1.0 - interpolated_reciprocal_w;
 
                 // Only draw the pixel if the depth value is less than the one previously stored in the z-buffer
+                // std::cout << interpolated_reciprocal_w << ", " << zb.getZ(x, y) << std::endl;
                 if (interpolated_reciprocal_w < zb.getZ(x, y))
                 {
                     // Draw a pixel at position (x,y) with a solid color
@@ -333,7 +390,11 @@ void Painter::DrawFilledTriangle(Canvas &canvas, const Geometry::Triangle &trian
                     canvas.PutPixel(x, y, ca);
 
                     // Update the z-buffer value with the 1/w of this current pixel
-                    zb.setZ(x, y, interpolated_reciprocal_w, false);
+                    zb.setZ(x, y, interpolated_reciprocal_w);
+                }
+                else
+                {
+                    // std::cout << "pixel overlap" << std::endl;
                 }
             }
             w0 += delta_w0_col;

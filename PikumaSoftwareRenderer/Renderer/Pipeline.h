@@ -6,6 +6,7 @@
 #include "Mesh.h"
 #include "Matrix4.h"
 #include "TurntableCamera.h"
+// #include "YawPitchCamera.h"
 #include "Polygon.h"
 #include "Frustum.h"
 #include "DirectionalLight.h"
@@ -46,7 +47,10 @@ private:
     Matrix4 translationMatrix{};
 
     View::TurntableCamera camera{};
+    // View::YawPitchCamera camera{};
     Maths::Vector3f upDirection{0, 1, 0};
+    Maths::Vector3f target{0, 0, 1};
+    Maths::Vector3f eye{0, 0, 0};
 
     Geometry::Frustum frustum{};
 
@@ -69,6 +73,7 @@ public:
     std::vector<Geometry::LineCollection> lineCollections{};
 
     bool shouldCullBackfaces{true};
+    bool shouldCalcFlatShading{true};
 
     Pipeline(int width, int height);
     ~Pipeline();

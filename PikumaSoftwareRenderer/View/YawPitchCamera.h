@@ -5,7 +5,7 @@
 
 namespace View
 {
-    class Camera
+    class YawPitchCamera
     {
     private:
         /* data */
@@ -20,8 +20,8 @@ namespace View
         Matrix4 vm{}; // view matrix
         Matrix4 pm{}; // projection matrix
 
-        Camera(/* args */);
-        ~Camera();
+        YawPitchCamera(/* args */);
+        ~YawPitchCamera();
 
         void initialize(Maths::Vector3f position);
 

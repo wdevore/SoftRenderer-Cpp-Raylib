@@ -5,17 +5,18 @@
 
 namespace View
 {
-    Camera::Camera(/* args */)
+    YawPitchCamera::YawPitchCamera(/* args */)
     {
     }
 
-    Camera::~Camera()
+    YawPitchCamera::~YawPitchCamera()
     {
     }
 
-    void Camera::initialize(Maths::Vector3f position)
+    void YawPitchCamera::initialize(Maths::Vector3f position)
     {
         this->position.set(position);
+        direction.set(0, 0, 1);
         forwardVelocity.zero();
         yaw = 0.0;
         pitch = 0.0;
@@ -23,30 +24,30 @@ namespace View
 
     /// @brief +Angle = CCW rotation, -Angle = CW rotation
     /// @param angle in Radians
-    void Camera::rotateYaw(float angle)
+    void YawPitchCamera::rotateYaw(float angle)
     {
         yaw += angle;
     }
 
     /// @brief +Angle = CCW rotation, -Angle = CW rotation
     /// @param angle in Radians
-    void Camera::rotatePitch(float angle)
+    void YawPitchCamera::rotatePitch(float angle)
     {
         pitch += angle;
     }
 
-    void Camera::updateVelocity(float speed)
+    void YawPitchCamera::updateVelocity(float speed)
     {
         direction.multiply(speed);
         forwardVelocity.set(direction);
     }
 
-    void Camera::updatePosition()
+    void YawPitchCamera::updatePosition()
     {
         position.add(forwardVelocity);
     }
 
-    Maths::Vector3f Camera::getLookAtTarget()
+    Maths::Vector3f YawPitchCamera::getLookAtTarget()
     {
         // TODO: optimize away local objects
         // Initialize the target looking at the positive z-axis
@@ -67,7 +68,7 @@ namespace View
         // Update camera direction based on the rotation
         Maths::Vector3f camera_direction{};
         rotation.multiply(target, direction);
-        std::cout << "direction: " << direction << ",yaw: " << yaw * Maths::RADTODEG << ",pitch: " << pitch * Maths::RADTODEG << std::endl;
+        // std::cout << "direction: " << direction << ",yaw: " << yaw * Maths::RADTODEG << ",pitch: " << pitch * Maths::RADTODEG << std::endl;
 
         // Offset the camera position in the direction where the camera is pointing at
         target.add(position, direction);
@@ -75,7 +76,7 @@ namespace View
         return target;
     }
 
-    void Camera::makeLookAt(const Maths::Vector3f &eye, const Maths::Vector3f &target, const Maths::Vector3f &up)
+    void YawPitchCamera::makeLookAt(const Maths::Vector3f &eye, const Maths::Vector3f &target, const Maths::Vector3f &up)
     {
         // TODO: replace locals
         // Compute the forward (z), right (x), and up (y) vectors
@@ -110,7 +111,7 @@ namespace View
         vm.m[3][3] = 1.0;
     }
 
-    void Camera::makePerspective(float fov, float aspect, float znear, float zfar)
+    void YawPitchCamera::makePerspective(float fov, float aspect, float znear, float zfar)
     {
         // | (h/w)*1/tan(fov/2)             0              0                 0 |
         // |                  0  1/tan(fov/2)              0                 0 |

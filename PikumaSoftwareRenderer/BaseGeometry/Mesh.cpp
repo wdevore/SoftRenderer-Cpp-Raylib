@@ -42,6 +42,8 @@ namespace Geometry
         char line[1024];
         std::vector<Maths::Texture2f> texcoords{};
 
+        int colorIndex = 0; // ======== color Debug  ============
+
         while (fgets(line, 1024, file))
         {
             // Vertex information
@@ -71,6 +73,32 @@ namespace Geometry
                     &vertex_indices[0], &texture_indices[0], &normal_indices[0],
                     &vertex_indices[1], &texture_indices[1], &normal_indices[1],
                     &vertex_indices[2], &texture_indices[2], &normal_indices[2]);
+
+                // uint32_t color;
+                // switch (colorIndex)
+                // {
+                // case 0:
+                //     color = 0xFF0000FF;
+                //     break;
+                // case 1:
+                //     color = 0xFF00FF00;
+                //     break;
+                // case 2:
+                //     color = 0xFFFF0000;
+                //     break;
+                // case 3:
+                //     color = 0xFF00FFFF;
+                //     break;
+                // case 4:
+                //     color = 0xFFFFFF00;
+                //     break;
+                // case 5:
+                //     color = 0xFF000000;
+                //     break;
+                // default:
+                //     color = 0xFFFFFFFF;
+                //     break;
+                // }
                 Face face = {
                     vertex_indices[0],
                     vertex_indices[1],
@@ -79,6 +107,10 @@ namespace Geometry
                     texcoords[texture_indices[1] - 1],
                     texcoords[texture_indices[2] - 1],
                     0xFFFFFFFF};
+                if (colorIndex > 5)
+                    colorIndex = 0;
+                else
+                    colorIndex++;
 
                 faces.push_back(face);
             }

@@ -58,8 +58,15 @@ public:
     void DrawDDALine(Canvas &canvas,
                      float x0, float y0, float x1, float y1,
                      CColor &color);
+    void DrawDDAZLine(Canvas &canvas,
+                      float x0, float y0, float x1, float y1, float zP, float zQ,
+                      CColor &color);
 
-    void DrawZLine(Canvas &canvas, ZBuffer &zb, int v0x, int v0y, int v1x, int v1y, int v0z, int v1z, CColor color);
+    void DrawZLine(Canvas &canvas,
+                   float v0x, float v0y,
+                   float v1x, float v1y,
+                   float v0z, float v1z,
+                   CColor color);
 
     void DrawZBresenhamLine(Canvas &canvas, ZBuffer &zb,
                             int xP, int yP, int xQ, int yQ, float zP, float zQ,

@@ -25,8 +25,9 @@ void ZBuffer::Initialize(int width, int height)
 
 void ZBuffer::reset()
 {
-    // We initialize it to "-infinity" (or a very small number) so that any
-    // incoming geometry is closer than the background.
+    // We initialize it to "1.0". The frustum near and far planes after mapping
+    // near = 0.0 and far = 1.0
+    // Pixels that are closer have a smaller value.
     for (int i = 0; i < zsize; i++)
         z[i] = 1.0f; // std::numeric_limits<float>::min();
 }
@@ -36,7 +37,7 @@ int ZBuffer::getIndex(int col, int row)
     if (row > height)
         return -1;
 
-    int index = (row - 1) * width + col;
+    int index = (row)*width + col;
 
     return index;
 }
@@ -98,12 +99,19 @@ int ZBuffer::setZ(int i, float zv, bool debug)
     return status;
 }
 
+int ZBuffer::setZ(int col, int row, float zv)
+{
+    int i = getIndex(col, row);
+
+    z[i] = zv;
+}
+
 float ZBuffer::getZ(int col, int row)
 {
     if (col < 0 || col >= width || row < 0 || row >= height)
     {
         return 1.0;
     }
-    int index = (row - 1) * width + col;
+    int index = (row)*width + col;
     return z[index];
 }

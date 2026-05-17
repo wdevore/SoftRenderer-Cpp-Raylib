@@ -10,6 +10,8 @@ namespace View
     public:
         Maths::Vector3f position{};
         Maths::Vector3f target{};
+        Maths::Vector3f upDirection{0, 1, 0};
+
         float radius{10.0f};
         float yaw{0.0f};
         float pitch{0.0f};
@@ -36,7 +38,7 @@ namespace View
 
         void updatePosition();
 
-        void makeLookAt(const Maths::Vector3f &up);
+        void makeLookAt();
         void makePerspective(float fov, float aspect, float znear, float zfar);
     };
 } // namespace View

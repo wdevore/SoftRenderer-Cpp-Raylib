@@ -109,24 +109,24 @@ int main(int argc, char *argv[])
 
         std::unique_ptr<Geometry::LineCollection> lineCollection = std::make_unique<Geometry::LineCollection>();
 
-        Geometry::Line lineXAxis{Maths::Vector4f{-1.0f, 0.0f, 0.0f}, Maths::Vector4f{1.0f, 0.0f, 0.0f}, CColor::Red};
+        Geometry::Line lineXAxis{Maths::Vector4f{-2.0f, 0.0f, 0.0f}, Maths::Vector4f{2.0f, 0.0f, 0.0f}, CColor::Red};
         lineXAxis.translation.set(5, 0.0, 15);
         lineXAxis.scale.set(1, 1, 1);
         // +Angle = CCW rotation
         // lineXAxis.rotation.set(0, 0, 45.0 * Maths::DEGTORAD);
         lineCollection->addLine(lineXAxis);
 
-        Geometry::Line lineYAxis{Maths::Vector4f{0.0f, -1.0f, 0.0f}, Maths::Vector4f{0.0f, 1.0f, 0.0f}, CColor::Green};
+        Geometry::Line lineYAxis{Maths::Vector4f{0.0f, -2.0f, 0.0f}, Maths::Vector4f{0.0f, 2.0f, 0.0f}, CColor::Green};
         lineYAxis.translation.set(5, 0.0, 15);
         lineYAxis.scale.set(1, 1, 1);
         lineCollection->addLine(lineYAxis);
 
-        Geometry::Line lineZAxis{Maths::Vector4f{0.0f, 0.0f, -1.0f}, Maths::Vector4f{0.0f, 0.0f, 1.0f}, CColor::Orange};
+        Geometry::Line lineZAxis{Maths::Vector4f{0.0f, 0.0f, -2.0f}, Maths::Vector4f{0.0f, 0.0f, 2.0f}, CColor::Orange};
         lineZAxis.translation.set(5, 0.0, 15);
         lineZAxis.scale.set(1, 1, 1);
         lineCollection->addLine(lineZAxis);
 
-        // Finally pass it to the pipeline.
+        // // Finally pass it to the pipeline.
         pipeline.addLineCollection(std::move(lineCollection));
 
         std::unique_ptr<Geometry::Mesh> mesh = std::make_unique<Geometry::Mesh>();
@@ -134,7 +134,7 @@ int main(int argc, char *argv[])
         mesh->loadMesh(GetAssetPath("Assets/cube.obj"),
                        GetAssetPath("Assets/cube.png"),
                        Maths::Vector3f{1, 1, 1},
-                       Maths::Vector3f{0, 0.0, 15},
+                       Maths::Vector3f{0, 0, 0},
                        Maths::Vector3f{0, 0, 0});
         if (status != 0)
         {
@@ -155,6 +155,9 @@ int main(int argc, char *argv[])
         IOControl::KeyControl keyS{KEY_S};
         IOControl::KeyControl keyF{KEY_F};
         IOControl::KeyControl keyW{KEY_W};
+        IOControl::KeyControl keyX{KEY_X};
+        IOControl::KeyControl keyL{KEY_L};
+
         IOControl::KeyControl key1{KEY_ONE};
         IOControl::KeyControl key2{KEY_TWO};
         IOControl::KeyControl key3{KEY_THREE};
@@ -174,6 +177,9 @@ int main(int argc, char *argv[])
             keyS.update();
             keyF.update();
             keyW.update();
+            keyX.update();
+            keyL.update();
+
             key1.update();
             key2.update();
             key3.update();
@@ -213,6 +219,17 @@ int main(int argc, char *argv[])
 
             if (IsKeyPressed(KEY_SPACE))
             { /* Toggle Animation/Action */
+            }
+
+            if (keyX.isTapped())
+            {
+                pipeline.shouldCullBackfaces = !pipeline.shouldCullBackfaces;
+                std::cout << "Backface culling Enabled: " << (pipeline.shouldCullBackfaces ? "Yes" : "No") << std::endl;
+            }
+            if (keyL.isTapped())
+            {
+                pipeline.shouldCalcFlatShading = !pipeline.shouldCalcFlatShading;
+                std::cout << "Flat shading Enabled: " << (pipeline.shouldCalcFlatShading ? "Yes" : "No") << std::endl;
             }
 
             if (keyF.isTapped())

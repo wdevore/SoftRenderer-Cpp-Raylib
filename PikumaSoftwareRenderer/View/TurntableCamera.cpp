@@ -83,7 +83,10 @@ namespace View
         {
             yaw = desiredYaw;
             pitch = desiredPitch;
-            // target.add(desiredTarget);
+
+            Maths::Vector3f targetDiff;
+            targetDiff.sub(desiredTarget, target);
+            target.add(targetDiff);
         }
 
         updatePosition();
@@ -96,7 +99,7 @@ namespace View
         position.z = target.z + radius * std::cos(pitch) * std::cos(yaw);
     }
 
-    void TurntableCamera::makeLookAt(const Maths::Vector3f &up)
+    void TurntableCamera::makeLookAt()
     {
         Maths::Vector3f x{}, y{}, z{};
 
@@ -105,7 +108,7 @@ namespace View
         z.normalize();
 
         // Right vector
-        x.cross(up, z);
+        x.cross(upDirection, z);
         x.normalize();
 
         // Recalculate up vector

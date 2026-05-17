@@ -28,3 +28,8 @@ void CColor::Set(uint color)
     g = (color >> 8) & 0xFF;
     b = color & 0xFF;
 }
+
+void CColor::SetFromUint32(uint32_t color)
+{
+    Set((uint)color);
+}

@@ -66,6 +66,10 @@ namespace Maths
     /// @return
     float area(const Vector2f &a, const Vector2f &b, const Vector2f &p)
     {
-        return (b.x - a.x) * (p.y - a.y) - (b.y - a.y) * (p.x - a.x);
+        Vector2f ab = {b.x - a.x, b.y - a.y};
+        Vector2f ap = {p.x - a.x, p.y - a.y};
+        return ab.x * ap.y - ab.y * ap.x;
+
+        // return (b.x - a.x) * (p.y - a.y) - (b.y - a.y) * (p.x - a.x);
     }
 }
