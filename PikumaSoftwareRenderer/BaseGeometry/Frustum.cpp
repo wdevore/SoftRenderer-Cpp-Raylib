@@ -208,12 +208,17 @@ namespace Geometry
         p1.set(line.points[1]);
 
         // If the dot product > 0 then point is on "inside" side of the plane.
+        // The clipping formula t = p0Dot / (p0Dot - p1Dot) relies on p0Dot
+        // and p1Dot being the true perpendicular distances from
+        // the points to the plane. When you normalize the ray vector, you destroy
+        // the distance information and instead calculate the cosine of the angle
+        // between the vectors. Because the true distances are lost,
+        // the interpolation factor t becomes completely non-linear, which
+        // causes your line intersections to calculate at the wrong positions.
         ray.sub(p0, *planePoint);
-        ray.normalize();
         p0Dot = ray.dot(*planeNormal);
 
         ray.sub(p1, *planePoint);
-        ray.normalize();
         p1Dot = ray.dot(*planeNormal);
 
         if (p0Dot < 0 && p1Dot < 0)
@@ -249,7 +254,7 @@ namespace Geometry
                     Utilities::floatLerp(p1.y, p0.y, t),
                     Utilities::floatLerp(p1.z, p0.z, t)};
 
-                // Re-define p0 as the intersection
+                // Re-define p1 as the intersection
                 line.points[0].set(p0);
                 line.points[1].set(intersectionPoint);
             }
