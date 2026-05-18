@@ -70,7 +70,7 @@ private:
 
 public:
     std::vector<Geometry::Mesh> meshes{};
-    std::vector<Geometry::LineCollection> lineCollections{};
+    std::vector<std::unique_ptr<Geometry::LineCollection>> lineCollections{};
 
     bool shouldCullBackfaces{true};
     bool shouldCalcFlatShading{true};

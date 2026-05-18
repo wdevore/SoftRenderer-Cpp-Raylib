@@ -10,6 +10,8 @@
 #include "Pipeline.h"
 #include "Constants.h"
 #include "KeyControl.h"
+#include "TriAxisLines.h"
+#include "GridLines.h"
 
 void CustomDrawFPS(int posX, int posY)
 {
@@ -107,27 +109,15 @@ int main(int argc, char *argv[])
     {
         Pipeline pipeline{screenWidth, screenHeight};
 
-        std::unique_ptr<Geometry::LineCollection> lineCollection = std::make_unique<Geometry::LineCollection>();
+        std::unique_ptr<Geometry::LineCollection> triAxisLines = std::make_unique<Geometry::TriAxisLines>();
+        triAxisLines->build();
+        // Pass it to the pipeline.
+        pipeline.addLineCollection(std::move(triAxisLines));
 
-        Geometry::Line lineXAxis{Maths::Vector4f{-2.0f, 0.0f, 0.0f}, Maths::Vector4f{2.0f, 0.0f, 0.0f}, CColor::Red};
-        lineXAxis.translation.set(5, 0.0, 15);
-        lineXAxis.scale.set(1, 1, 1);
-        // +Angle = CCW rotation
-        // lineXAxis.rotation.set(0, 0, 45.0 * Maths::DEGTORAD);
-        lineCollection->addLine(lineXAxis);
-
-        Geometry::Line lineYAxis{Maths::Vector4f{0.0f, -2.0f, 0.0f}, Maths::Vector4f{0.0f, 2.0f, 0.0f}, CColor::Green};
-        lineYAxis.translation.set(5, 0.0, 15);
-        lineYAxis.scale.set(1, 1, 1);
-        lineCollection->addLine(lineYAxis);
-
-        Geometry::Line lineZAxis{Maths::Vector4f{0.0f, 0.0f, -2.0f}, Maths::Vector4f{0.0f, 0.0f, 2.0f}, CColor::Orange};
-        lineZAxis.translation.set(5, 0.0, 15);
-        lineZAxis.scale.set(1, 1, 1);
-        lineCollection->addLine(lineZAxis);
-
-        // // Finally pass it to the pipeline.
-        pipeline.addLineCollection(std::move(lineCollection));
+        std::unique_ptr<Geometry::LineCollection> gridLines = std::make_unique<Geometry::GridLines>();
+        gridLines->build();
+        // Pass it to the pipeline.
+        pipeline.addLineCollection(std::move(gridLines));
 
         std::unique_ptr<Geometry::Mesh> mesh = std::make_unique<Geometry::Mesh>();
         int status = 0;

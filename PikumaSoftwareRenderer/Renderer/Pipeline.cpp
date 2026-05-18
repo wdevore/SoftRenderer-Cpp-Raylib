@@ -24,20 +24,17 @@ void Pipeline::Setup()
 
     // ------------ Setup an initial camera target and orbit radius -----------
     // Look explicitly at the axis's translation coordinates (0, 0, 15) with radius 15
-    // camera.initialize(Maths::Vector3f{0, 0, 15}, 15.0f);
-    camera.initialize(Maths::Vector3f{0, 0, 5}, 15.0f); // Turntable
-    // camera.initialize(Maths::Vector3f{0, 0, 5}); // YawPitch
-
-    // Elevate slightly so it's not looking perfectly straight-on initially
-    // camera.rotate(0.0f, 25.0f * Maths::DEGTORAD);
-    // camera.rotate(-0.991679, 0.102995);
+    // Setting Z = 0 defaults to center of the turntable's Y axis at the center.
+    // Any other number causes the turntable's center to "push" objects away
+    // and they "orbit" the turntable.
+    // Of course if you use the "F" the center is adjust to whatever object instead.
+    camera.initialize(Maths::Vector3f{0, 0, 0}, 15.0f); // Turntable
 
     // camera.yaw = camera.desiredYaw;     // Snap to skip intro animation
     // camera.pitch = camera.desiredPitch; // Snap to skip intro animation
     camera.updatePosition();
 
     // ------------ Setup initial view matrix
-    // camera.makeLookAt(upDirection); // turntable
     std::cout << camera.vm << std::endl;
 
     // ------------- Setup initial projection matrix ----------------
@@ -109,7 +106,7 @@ int Pipeline::addMesh(std::unique_ptr<Geometry::Mesh> mesh)
 
 int Pipeline::addLineCollection(std::unique_ptr<Geometry::LineCollection> collection)
 {
-    lineCollections.push_back(std::move(*collection));
+    lineCollections.push_back(std::move(collection));
     return lineCollections.size() - 1;
 }
 
@@ -122,7 +119,7 @@ void Pipeline::Render()
 
     for (auto &&lineCollection : lineCollections)
     {
-        ProcessPipelineLines(lineCollection);
+        ProcessPipelineLines(*lineCollection);
     }
 
     for (auto &&mesh : meshes)
@@ -217,11 +214,8 @@ void Pipeline::ProcessPipelineMesh(Geometry::Mesh &mesh)
     translationMatrix.setTranslation(mesh.translation.x, mesh.translation.y, mesh.translation.z);
 
     camera.makeLookAt(); // turntable
-
-    // camera.getLookAtTarget(); // yawpitch
     // std::cout << "Target: " << camera.target << std::endl;
     // std::cout << "Position: " << camera.position << std::endl;
-    // camera.makeLookAt(camera.position, camera.target, upDirection); // yawpitch
     int culledFaces = 0;
 
     // Loop all triangle faces of our mesh
@@ -295,13 +289,9 @@ void Pipeline::ProcessPipelineMesh(Geometry::Mesh &mesh)
         polygon.setFromTriangle(
             transformed_vertices[0], transformed_vertices[1], transformed_vertices[2],
             face.a_uv, face.b_uv, face.c_uv);
-        // std::cout << "original: \n"
-        //           << polygon << std::endl;
 
         // Clip the polygon modify with potential new vertices
         frustum.clip(polygon);
-        // std::cout << "clipped: \n"
-        //           << polygon << std::endl;
 
         // Break the clipped polygon apart back into a list of triangles
         int numTrianglesAfterClipping = 0;
@@ -365,27 +355,21 @@ void Pipeline::ProcessPipelineMesh(Geometry::Mesh &mesh)
                 trianglesToRenderCount++;
             }
         }
-        // std::cout << "Triangles to render: " << trianglesToRenderCount << std::endl;
-        // std::cout << "------- End Processing face ------- " << std::endl;
     }
-
-    // std::cout << "==== Finished processing pipeline for mesh ===== " << culledFaces << std::endl;
 }
 
 void Pipeline::ProcessPipelineLines(Geometry::LineCollection &lines)
 {
     // TODO: add animation of properties
-    // camera.makeLookAt(eye, target, upDirection); // yawpitch
 
     camera.makeLookAt(); // turntable
-    // std::cout << "Yaw,Pitch: " << camera.yaw << ", " << camera.pitch << std::endl;
 
     for (auto &line : lines.lines)
     {
         // Create scale, rotation, and translation matrices that will be used to multiply the mesh vertices
         scaleMatrix.setScale(line.scale.x, line.scale.y, line.scale.z);
-        // rotationMatrixX.setRotationX(line.rotation.x);
-        // rotationMatrixY.setRotationY(line.rotation.y);
+        rotationMatrixX.setRotationX(line.rotation.x);
+        rotationMatrixY.setRotationY(line.rotation.y);
         rotationMatrixZ.setRotationZ(line.rotation.z);
         translationMatrix.setTranslation(line.translation.x, line.translation.y, line.translation.z);
 
@@ -430,9 +414,6 @@ void Pipeline::ProcessPipelineLines(Geometry::LineCollection &lines)
         Geometry::ClippedInfo clipped = frustum.clip(lineClipped);
         if (clipped == Geometry::ClippedInfo::OUTSIDE)
             continue;
-
-        // Loops all the assembled lines after clipping
-        // Geometry::Line *lineAfterClipping = &linesToRender[line_index++];
 
         // TODO: make a std::vector in class
         Maths::Vector4f projectedPoints[2];
@@ -513,9 +494,9 @@ void Pipeline::FocusCamera()
     if (linesSelected)
     {
         if (smoothControl) // turntable
-            camera.desiredTarget = lineCollections[0].lines[0].translation;
+            camera.desiredTarget = lineCollections[0]->lines[0].translation;
         else
-            camera.target = lineCollections[0].lines[0].translation;
+            camera.target = lineCollections[0]->lines[0].translation;
         linesSelected = false;
     }
     else

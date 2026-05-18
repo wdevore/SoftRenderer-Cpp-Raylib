@@ -23,7 +23,7 @@ namespace Geometry
             lines.push_back(line);
         }
 
-        void buildLineGrid();
+        virtual void build() = 0;
     };
 
 } // namespace Geometry

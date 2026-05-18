@@ -331,13 +331,9 @@ void Painter::DrawFilledTriangle(Canvas &canvas, const Geometry::Triangle &trian
     // Compute the area of the entire triangle/parallelogram
     float area = Maths::area(sv0, sv1, sv2);
 
-    // TODO: remove the backface culling in the pipeline.
+    // Optional cull:
     // Back-face culling using the signed-area
     // if (area <= 0)
-    // {
-    //     return;
-    // }
-    // if (area == 0)
     // {
     //     return;
     // }
@@ -378,7 +374,6 @@ void Painter::DrawFilledTriangle(Canvas &canvas, const Geometry::Triangle &trian
                 interpolated_reciprocal_w = 1.0 - interpolated_reciprocal_w;
 
                 // Only draw the pixel if the depth value is less than the one previously stored in the z-buffer
-                // std::cout << interpolated_reciprocal_w << ", " << zb.getZ(x, y) << std::endl;
                 if (interpolated_reciprocal_w < zb.getZ(x, y))
                 {
                     // Draw a pixel at position (x,y) with a solid color
@@ -391,10 +386,6 @@ void Painter::DrawFilledTriangle(Canvas &canvas, const Geometry::Triangle &trian
 
                     // Update the z-buffer value with the 1/w of this current pixel
                     zb.setZ(x, y, interpolated_reciprocal_w);
-                }
-                else
-                {
-                    // std::cout << "pixel overlap" << std::endl;
                 }
             }
             w0 += delta_w0_col;

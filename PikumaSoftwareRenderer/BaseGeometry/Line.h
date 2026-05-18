@@ -17,9 +17,9 @@ namespace Geometry
         Maths::Vector4f points[2];
         CColor color;
 
-        Maths::Vector3f scale{};       // scale in x, y, and z
-        Maths::Vector3f rotation{};    // rotation in x, y, and z
-        Maths::Vector3f translation{}; // translation in x, y, and z
+        Maths::Vector3f scale{1, 1, 1}; // scale in x, y, and z
+        Maths::Vector3f rotation{};     // rotation in x, y, and z
+        Maths::Vector3f translation{};  // translation in x, y, and z
 
         Line(/* args */);
         Line(const Maths::Vector4f &p1, const Maths::Vector4f &p2, CColor color);

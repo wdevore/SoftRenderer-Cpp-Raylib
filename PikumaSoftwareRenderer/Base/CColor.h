@@ -12,6 +12,8 @@ struct CColor
     int a;
 
     static CColor BgDarkGray;
+    static CColor LightGray;
+    static CColor LighterGray;
     static CColor Red;
     static CColor White;
     static CColor Black;
@@ -40,6 +42,8 @@ struct CColor
 };
 
 inline CColor CColor::BgDarkGray{80, 80, 80, 255};
+inline CColor CColor::LightGray{128, 128, 128, 255};
+inline CColor CColor::LighterGray{200, 200, 200, 255};
 inline CColor CColor::Red{255, 0, 0, 255};
 inline CColor CColor::White{255, 255, 255, 255};
 inline CColor CColor::Black{0, 0, 0, 255};

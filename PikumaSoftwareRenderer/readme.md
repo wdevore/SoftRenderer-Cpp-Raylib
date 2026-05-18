@@ -4,7 +4,7 @@ In order to see a variable in the *Debug Console* we need to explicitly call
 ```-exec printf "%s", worldMatrix.toString().c_str()```
 
 # Tasks
-- Add Zbuffered lines
+- Add Zbuffered lines (**done**)
 - Add Arcball camera
 - Add turntable camera (**done**)
 - Add WASD to lookAt camera
