@@ -1,7 +1,9 @@
 # SoftRenderer-Cpp-Raylib
-A port of my Java software renderer to Cpp and Raylib including Pikuma's
+A port of my Java software renderer to Cpp and Raylib including Pikuma's 3D rasterization course.
 
-This also includes a C++ version of Pikuma's software renderer. "3D Programming from scratch". It doesn't not include Textures.
+This also includes a C++ version of Pikuma's software renderer. "3D Programming from scratch". It doesn't not include Textures--Yet.
+
+[SoftRenderer-Cpp-Raylib mp4 video](PikumaSoftwareRenderer/Documentation/Pikuma-simple-phase3.mp4)
 
 # Building and Running
 

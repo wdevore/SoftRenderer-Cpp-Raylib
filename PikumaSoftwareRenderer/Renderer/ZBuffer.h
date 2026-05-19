@@ -13,7 +13,7 @@ public:
     int getIndex(int col, int row);
     int setZ(int col, int row, float zv, bool debug);
     int setZ(int i, float zv, bool debug);
-    int setZ(int col, int row, float zv);
+    void setZ(int col, int row, float zv);
     float getZ(int col, int row);
 
 private:

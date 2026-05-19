@@ -27,13 +27,14 @@ if(NOT TARGET raylib)
   FetchContent_MakeAvailable(raylib)
 endif()
 
+add_subdirectory(Base)
 add_subdirectory(BaseMaths)
 add_subdirectory(BaseGeometry)
 add_subdirectory(Image)
 add_subdirectory(View)
 add_subdirectory(Lights)
 add_subdirectory(Renderer)
-add_subdirectory(Base)
+add_subdirectory(Particles)
 
 target_include_directories(PikumaSoftwareRenderer
     # PRIVATE Maths

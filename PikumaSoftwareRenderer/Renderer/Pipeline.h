@@ -11,6 +11,7 @@
 #include "Frustum.h"
 #include "DirectionalLight.h"
 #include "LineCollection.h"
+#include "Particle.h"
 
 class Pipeline
 {
@@ -67,6 +68,9 @@ private:
 
     // ========== DEBUG OR TESTNG ==========
     bool linesSelected{false};
+
+    // ========= Particles =============
+    ParticleSpace::Particle particle{};
 
 public:
     std::vector<Geometry::Mesh> meshes{};

@@ -99,7 +99,7 @@ int ZBuffer::setZ(int i, float zv, bool debug)
     return status;
 }
 
-int ZBuffer::setZ(int col, int row, float zv)
+void ZBuffer::setZ(int col, int row, float zv)
 {
     int i = getIndex(col, row);
 

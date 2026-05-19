@@ -16,5 +16,6 @@ target_link_libraries(RendererLib
   PUBLIC BaseViewLib
   PUBLIC BaseLightsLib
   PUBLIC BaseGeometryLib
+  PUBLIC ParticlesLib
   PUBLIC raylib
 )

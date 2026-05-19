@@ -1,7 +1,5 @@
 #pragma once
 
-#include <cstdint>
-
 #include "Vector3f.h"
 
 namespace Lights
